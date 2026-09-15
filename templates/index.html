@@ -1,0 +1,293 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gobierno Autónomo Municipal de Sacaba | Trámites y Multas</title>
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='img/logo-sacaba.svg') }}">
+    <meta name="description" content="Portal oficial de trámites y multas del Gobierno Autónomo Municipal de Sacaba. Carnet, residencia, licencias, catastro, vehículos, multas y pagos en línea.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=20260904">
+    <link rel="stylesheet" href="{{ url_for('static', filename='chatbot/chatbot-widget.css') }}?v=20260904">
+</head>
+<body>
+
+    <!-- Barra Superior -->
+    <div class="top-bar">
+        <div class="container">
+            <div class="top-bar-left">
+                <span><i class="fas fa-phone"></i> <span data-id="tb-tel" data-qu="4701677">4701677</span></span>
+                <span><i class="fas fa-envelope"></i> info@sacaba.gob.bo</span>
+                <span><i class="fas fa-clock"></i> <span data-id="tb-hor" data-qu="Lun-Vie 8:00-12:00 / 14:00-18:00">Lun-Vie 8:00-12:00 / 14:00-18:00</span></span>
+            </div>
+            <div class="top-bar-right">
+                <a href="#" data-id="tb-fb" data-qu="Facebook" title="Facebook"><i class="fab fa-facebook-f"></i></a>
+                <a href="#" data-id="tb-tw" data-qu="X" title="X"><i class="fab fa-x-twitter"></i></a>
+                <a href="#" data-id="tb-wa" data-qu="WhatsApp" title="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="main-header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo-section">
+                    <div class="logo-emblem"><img src="{{ url_for('static', filename='img/logo-sacaba.svg') }}" alt="Gobierno Autónomo Municipal de Sacaba"></div>
+                    <div class="logo-text">
+                        <span class="logo-subtitle" data-id="logo-sub" data-qu="Munisipyu Gobierno Autónomo">Gobierno Autónomo Municipal</span>
+                        <h1 class="logo-title">SACABA</h1>
+                        <span class="logo-location">Cochabamba - Bolivia</span>
+                    </div>
+                </div>
+                <nav class="main-nav">
+                    <a href="#inicio" class="nav-link active" data-id="nav-inicio" data-qu="Qallariy">Inicio</a>
+                    <a href="#tramites" class="nav-link" data-id="nav-tramites" data-qu="Trámitekuna">Trámites</a>
+                    <a href="#multas" class="nav-link" data-id="nav-multas" data-qu="Multakuna">Multas</a>
+                    <a href="#apis" class="nav-link" data-id="nav-apis" data-qu="APIs">APIs</a>
+                    <a href="#institucion" class="nav-link" data-id="nav-inst" data-qu="Institución">Institución</a>
+                    <a href="#contacto" class="nav-link" data-id="nav-contacto" data-qu="Contacto">Contacto</a>
+                </nav>
+                <div class="header-actions">
+                    <button class="lang-toggle" onclick="togglePageLang()"><i class="fas fa-language"></i> <span id="pageLangLabel">QU</span></button>
+                    <button class="mobile-menu-btn" id="mobileMenuBtn"><i class="fas fa-bars"></i></button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Banner -->
+    <section class="hero-banner" id="inicio">
+        <div class="hero-bg"></div>
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+        <div class="hero-grid-layer"></div>
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-logo-wrap"><img src="{{ url_for('static', filename='img/logo-sacaba.svg') }}" alt="Gobierno Autónomo Municipal de Sacaba"></div>
+                <div class="hero-badge" data-id="hero-badge" data-qu="Oficial Trámitekuna"><i class="fas fa-shield-alt"></i> Portal Oficial de Trámites y Pagos</div>
+                <h1 data-id="hero-h1" data-qu="Runakunapaq Yachay Sistema Digital">Sistema de Orientación<br>Ciudadana Digital</h1>
+                <p data-id="hero-p" data-qu="Trámitekuna, multakuna, munisipyuq serviciosninta utqaylla yachaykunki. P'unchay-tuta 24 horas kachkan.">Consulta trámites, requisitos, costos y formas de pago de multas, con la asistencia gratuita de nuestro chatbot inteligente. Disponible las 24 horas.</p>
+                <div class="hero-buttons">
+                    <a href="#tramites" class="btn btn-primary" data-id="hero-btn1" data-qu="Trámitekuna Qhaway"><i class="fas fa-file-alt"></i> Ver Trámites</a>
+                    <a href="#multas" class="btn btn-outline" data-id="hero-btn2" data-qu="Multakuna"><i class="fas fa-qrcode"></i> Pagos y Multas</a>
+                </div>
+                <div class="hero-meta">
+                    <div><i class="fas fa-clock"></i> <span data-id="hero-meta-1" data-qu="24 horas p'unchay-tuta">Disponible 24/7</span></div>
+                    <div><i class="fas fa-robot"></i> <span data-id="hero-meta-2" data-qu="Inteligencia Artificial">Inteligencia Artificial</span></div>
+                    <div><i class="fas fa-microphone-alt"></i> <span data-id="hero-meta-3" data-qu="Kunka Taqwa">Voz y Audio</span></div>
+                    <div><i class="fas fa-graduation-cap"></i> <span data-id="hero-meta-4" data-qu="Yachay Atiq">Con Aprendizaje</span></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Accesos Rápidos -->
+    <section class="quick-access">
+        <div class="container">
+            <div class="quick-grid">
+                <a href="#carnet" class="quick-item"><div class="quick-icon"><i class="fas fa-id-card"></i></div><span data-id="q-carnet" data-qu="Carnet de Identidad">Carnet de Identidad</span></a>
+                <a href="#tramites" class="quick-item" data-search="residencia"><div class="quick-icon"><i class="fas fa-home"></i></div><span data-id="q-resid" data-qu="Tiyay Constancia">Constancia Residencia</span></a>
+                <a href="#tramites" class="quick-item" data-search="funcionamiento"><div class="quick-icon"><i class="fas fa-store"></i></div><span data-id="q-func" data-qu="Licencia Funcionamiento">Licencia Funcionamiento</span></a>
+                <a href="#tramites" class="quick-item" data-search="catastro"><div class="quick-icon"><i class="fas fa-map-marked-alt"></i></div><span data-id="q-catastro" data-qu="Catastro">Catastro Predial</span></a>
+                <a href="#tramites" class="quick-item" data-search="vehiculo"><div class="quick-icon"><i class="fas fa-car"></i></div><span data-id="q-veh" data-qu="Vehículo">Vehículos</span></a>
+                <a href="#multas" class="quick-item"><div class="quick-icon"><i class="fas fa-qrcode"></i></div><span data-id="q-multas" data-qu="Multas y Pago">Multas y Pago</span></a>
+            </div>
+        </div>
+    </section>
+
+    <!-- TRÁMITES -->
+    <section class="section tramites-section" id="tramites">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag"><i class="fas fa-folder-open"></i> <span data-id="tag-tram" data-qu="Trámitekuna">Trámites</span></span>
+                <h2 data-id="h2-tram" data-qu="Munisipyuq Trámitekuna">Trámites Municipales</h2>
+                <p data-id="p-tram" data-qu="Sapanka trámiteq requisitosninta, qullqininta, ruwayninta yachaykunki.">Busca tu trámite y consulta requisitos, costos, pasos y ubicación.</p>
+            </div>
+
+            <div class="tramite-tools">
+                <div class="tramite-search">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="tramiteSearch" data-id="search-ph" data-qu="Buscar trámite: carnet, catastro, vehículo, licencia..." placeholder="Buscar trámite: carnet, catastro, vehículo, licencia..." autocomplete="off">
+                </div>
+            </div>
+
+            <div class="filter-bar" id="filterBar">
+                <button class="filter-btn active" data-filter="todos" data-id="f-todos" data-qu="Tukuy">Todos</button>
+                <button class="filter-btn" data-filter="identidad" data-id="f-ident" data-qu="Identidad">Identidad</button>
+                <button class="filter-btn" data-filter="vivienda" data-id="f-viv" data-qu="Wasi">Vivienda y Catastro</button>
+                <button class="filter-btn" data-filter="negocio" data-id="f-neg" data-qu="Negocio">Negocio</button>
+                <button class="filter-btn" data-filter="servicios" data-id="f-serv" data-qu="Servicios">Servicios y Vehículos</button>
+            </div>
+
+            <div class="tramites-list" id="tramites-grid">
+                <!-- Las tarjetas se generan desde static/js/tramites-data.js -->
+            </div>
+        </div>
+    </section>
+
+    <!-- MULTAS Y PAGOS -->
+    <section class="section multas-section" id="multas">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag"><i class="fas fa-exclamation-circle"></i> <span data-qu="Multakuna">Multas</span></span>
+                <h2 data-qu="Munisipyuq Multakuna">Multas y Formas de Pago</h2>
+                <p data-qu="Multakuna uywaq pagayninkunaq yachayninta rikuy.">Infórmate sobre el monto de las multas y paga en caja, bancos o con código QR.</p>
+            </div>
+
+            <div class="multas-grid">
+                <div class="multa-card">
+                    <div class="multa-header transito"><i class="fas fa-traffic-light"></i><h3 data-id="multa-trans-title" data-qu="Tránsito Multakuna">Multas de Tránsito</h3></div>
+                    <ul class="multa-list">
+                        <li><span data-id="mt-vel" data-qu="Usqhay velocidad">Exceso de velocidad</span><strong>Bs. 100-300</strong></li>
+                        <li><span data-id="mt-lic" data-qu="Licencia sin mana apay">Conducir sin licencia</span><strong>Bs. 200-500</strong></li>
+                        <li><span data-id="mt-park" data-qu="Aparkuna mana jina">Estacionamiento prohibido</span><strong>Bs. 50-100</strong></li>
+                        <li><span data-id="mt-semaf" data-qu="Semáforota mana kasukuy">No respetar semáforo</span><strong>Bs. 100-200</strong></li>
+                        <li><span data-id="mt-ebri" data-qu="Machasqa apay">Conducir en estado de ebriedad</span><strong>Bs. 500-1.000</strong></li>
+                    </ul>
+                    <button class="multa-btn" onclick="openChatWithQuery('multas transito')"><i class="fas fa-comments"></i> <span data-id="mt-info" data-qu="Astawan Yachay">Más Información</span></button>
+                </div>
+
+                <div class="multa-card">
+                    <div class="multa-header municipal"><i class="fas fa-building"></i><h3 data-id="multa-mun-title" data-qu="Munisipyu Multakuna">Multas Municipales</h3></div>
+                    <ul class="multa-list">
+                        <li><span data-id="mm-basura" data-qu="Callepi basurata wikch'uy">Arrojar basura en la vía pública</span><strong>Bs. 50-100</strong></li>
+                        <li><span data-id="mm-ruido" data-qu="22:00manta aswan sinru ruqyay">Ruido excesivo después de 22:00</span><strong>Bs. 100-200</strong></li>
+                        <li><span data-id="mm-vend" data-qu="Mana autorización jina ventay">Vender sin autorización</span><strong>Bs. 200-500</strong></li>
+                        <li><span data-id="mm-mobi" data-qu="Munisipyu yupaykuna dañay">Dañar mobiliario municipal</span><strong>Bs. 100-300</strong></li>
+                        <li><span data-id="mm-constr" data-qu="Mana permiso jina ruway">Construir sin permiso</span><strong>Bs. 500-2.000</strong></li>
+                    </ul>
+                    <button class="multa-btn" onclick="openChatWithQuery('multas municipales')"><i class="fas fa-comments"></i> <span data-id="mm-info" data-qu="Astawan Yachay">Más Información</span></button>
+                </div>
+
+                <div class="multa-card pagos-card">
+                    <div class="multa-header pago"><i class="fas fa-money-bill-wave"></i><h3 data-id="pago-title" data-qu="Pagaypaq Yachay">Pago de Multas</h3></div>
+                    <ul class="multa-list">
+                        <li><span><i class="fas fa-landmark"></i> <span data-id="pago-caja" data-qu="Caja Municipal">Caja Municipal</span></span><strong data-id="pago-caja-dir" data-qu="Plaza 6 de Agosto">Plaza 6 de Agosto</strong></li>
+                        <li><span><i class="fas fa-university"></i> <span data-id="pago-banco" data-qu="Banco Unión">Banco Unión</span></span><strong data-id="pago-banco-dir" data-qu="Av. Blanco Galindo esq. Eloy Salmón">Av. Blanco Galindo esq. Eloy Salmón</strong></li>
+                        <li><span><i class="fas fa-building-columns"></i> <span data-id="pago-bnb" data-qu="BNB / BISA (agencia central)">BNB / BISA (agencia central)</span></span><strong data-id="pago-bnb-dir" data-qu="Av. principal de Sacaba">Av. principal de Sacaba</strong></li>
+                        <li><span><i class="fas fa-qrcode"></i> <span data-id="pago-qr" data-qu="Código QR">Código QR</span></span><strong data-id="pago-qr-desc" data-qu="Pago móvil 24h">Pago móvil 24h</strong></li>
+                    </ul>
+                    <button class="multa-btn" onclick="openChatWithQuery('pago multa')"><i class="fas fa-comments"></i> <span data-id="pago-ver" data-qu="Procedimientota Qhaway">Ver Procedimiento</span></button>
+                </div>
+            </div>
+
+            <!-- Pago QR + pasos -->
+            <div class="multa-pay-steps">
+                <div class="pay-step-card">
+                    <div class="pay-step-num">1</div>
+                    <div class="pay-step-body">
+                        <h4 data-qu="Deudaykita Qhaway">Consulta tu deuda</h4>
+                        <p data-qu="Multaykita munisipyupi utaq chatbotman tapuspa churapay. Pago codigowan oficial notificacionta chaskiy.">Verifica tu multa en la municipalidad o pregúntale al chatbot. Recibe la notificación oficial con el código de pago.</p>
+                    </div>
+                </div>
+                <div class="pay-step-card">
+                    <div class="pay-step-num">2</div>
+                    <div class="pay-step-body">
+                        <h4 data-qu="Imaynata pagayta akllay">Elige cómo pagar</h4>
+                        <p data-qu="Caja Municipalpi efectivo, ventanilla utaq Banco Union nitaq bancoskunapi transferencia, utaq QRwan pagana.">Efectivo en Caja Municipal, ventanilla o transferencia en el Banco Unión y bancos afiliados, o paga móvil con el QR.</p>
+                    </div>
+                </div>
+                <div class="pay-step-card">
+                    <div class="pay-step-num">3</div>
+                    <div class="pay-step-body">
+                        <h4 data-qu="Comprobanteta waqaychay">Guarda el comprobante</h4>
+                        <p data-qu="Reciboykita waqaychay. Pantasqa kaptinqa, <strong>5 p'unchay llamkaq</strong> apelayta atiyki.">Conserva tu recibo. Si crees que es un error, tienes <strong>5 días hábiles</strong> para presentar tu apelación.</p>
+                    </div>
+                </div>
+                <div class="pay-step-card qr-card">
+                    <div class="qr-box"><img src="{{ url_for('static', filename='img/qr-multas.svg') }}" alt="Código QR para pago de multas"></div>
+                    <div>
+                        <h4 data-qu="QRwan Pagay (Banca Móvil)">Paga con QR (Banca Móvil)</h4>
+                        <ol class="qr-steps">
+                            <li data-qu="<strong>Bankoykip app</strong> (Banca Móvil) kichay.">Abre la <strong>app de tu banco</strong> (Banca Móvil).</li>
+                            <li data-qu="<strong>&quot;Pago QR&quot;</strong> utaq <strong>&quot;Escanear QR&quot;</strong> opcionta maskay.">Busca la opción <strong>"Pago QR"</strong> o <strong>"Escanear QR"</strong>.</li>
+                            <li data-qu="Munisipyuq <strong>código QRta</strong> ventanillapi utaq reciboykipi scanay."><strong>Escanea</strong> el código QR de la municipalidad en la ventanilla o impreso en tu recibo.</li>
+                            <li data-qu="Multaq <strong>monto exactuta</strong> qillqay.">Escribe el <strong>monto exacto</strong> de la multa.</li>
+                            <li data-qu="Pagayta <strong>confirmay</strong> nitaq comprobanteta waqaychay."><strong>Confirma</strong> el pago y guarda el comprobante.</li>
+                        </ol>
+                        <span class="qr-hint" data-qu="<i class=&quot;fas fa-qrcode&quot;></i> Recaudación código: GAMS-2026"><i class="fas fa-qrcode"></i> Código de recaudación: GAMS-2026</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- INSTITUCIÓN -->
+    <section class="section institucion-section" id="institucion">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag"><i class="fas fa-info-circle"></i> <span data-id="tag-inst" data-qu="Institución">Institución</span></span>
+                <h2 data-id="h2-inst" data-qu="Sakaba Munisipyu Autónomo">Gobierno Autónomo Municipal de Sacaba</h2>
+                <p data-id="p-inst" data-qu="Sacaba, munisipyuq llika, qanchisniyuq zona, qasankuna, pachamama, tradiciones.">Sacaba es el municipio puerta de la región andina de Cochabamba: valle, tradición y ciudad que crece junto a su gente.</p>
+            </div>
+            <div class="institucion-grid" id="contacto">
+                <div class="inst-card">
+                    <div class="inst-icon"><i class="fas fa-clock"></i></div>
+                    <h3 data-id="inst-hor-title" data-qu="Horario Atención">Horarios de Atención</h3>
+                    <ul>
+                        <li data-id="inst-hor-1" data-qu="Lun-Vie: 8:00 - 12:00 / 14:00 - 18:00"><strong>Lun-Vie:</strong> 8:00 - 12:00 / 14:00 - 18:00</li>
+                        <li data-id="inst-hor-2" data-qu="Sáb: 8:00 - 12:00"><strong>Sáb:</strong> 8:00 - 12:00</li>
+                        <li data-id="inst-hor-3" data-qu="Dom: Cerrado">Dom: Cerrado</li>
+                    </ul>
+                </div>
+                <div class="inst-card">
+                    <div class="inst-icon"><i class="fas fa-map-marker-alt"></i></div>
+                    <h3 data-id="inst-ub-title" data-qu="Ubicación">Ubicación</h3>
+                    <ul>
+                        <li data-id="inst-ub-dir" data-qu="Consistorial S-002, Sacaba, Cochabamba">Consistorial S-002, Sacaba, Cochabamba</li>
+                    </ul>
+                    <a href="https://maps.app.goo.gl/f27gLh5Accp2UmKW9" target="_blank" class="inst-map-btn" data-id="inst-map-btn" data-qu="Cómo llegar"><i class="fas fa-map"></i> Cómo llegar</a>
+                </div>
+                <div class="inst-card">
+                    <div class="inst-icon"><i class="fas fa-phone-alt"></i></div>
+                    <h3 data-id="inst-con-title" data-qu="Contacto">Contacto</h3>
+                    <ul>
+                        <li><strong data-id="inst-con-tel-lbl" data-qu="Tel:">Tel:</strong> <span data-id="inst-con-tel" data-qu="4701677">4701677</span></li>
+                        <li><strong>Email:</strong> info@sacaba.gob.bo</li>
+                        <li><strong>Web:</strong> sacaba.gob.bo</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="main-footer">
+        <div class="container">
+            <div class="footer-top">
+                <div class="footer-col">
+                    <div class="footer-logo"><img src="{{ url_for('static', filename='img/logo-sacaba.svg') }}" alt="Gobierno Autónomo Municipal de Sacaba" class="footer-logo-img"><div><span data-qu="Munisipyu Gobierno Autónomo">Gobierno Autónomo Municipal</span><strong>SACABA</strong></div></div>
+                    <p class="footer-desc" data-qu="Trámitekuna, servicios nitaq munisipyu multakunaq yachayninta rikuchi, inteligencia asistenciatawan 24 horas p'unchay-tuta.">Orientación ciudadana sobre trámites, servicios y multas municipales, con asistencia inteligente disponible las 24 horas.</p>
+                </div>
+                <div class="footer-col">
+                    <h4 data-qu="Tupachina">Enlaces</h4>
+                    <a href="#inicio" data-qu="Qallariy">Inicio</a>
+                    <a href="#tramites" data-qu="Trámitekuna">Trámites</a>
+                    <a href="#multas" data-qu="Multakuna">Multas y Pagos</a>
+                    <a href="#institucion" data-qu="Institución">Institución</a>
+                </div>
+                <div class="footer-col">
+                    <h4 data-id="ft-contacto" data-qu="Contacto">Contacto</h4>
+                    <p data-id="ft-tel" data-qu="4701677"><i class="fas fa-phone"></i> 4701677</p>
+                    <p><i class="fas fa-envelope"></i> info@sacaba.gob.bo</p>
+                    <p data-id="ft-dir" data-qu="Consistorial S-002, Sacaba"><i class="fas fa-map-marker-alt"></i> Consistorial S-002, Sacaba</p>
+                </div>
+            </div>
+            <div class="footer-bottom"><p>&copy; 2026 <span data-qu="Sakaba Munisipyu">Gobierno Autónomo Municipal de Sacaba</span> · Cochabamba - Bolivia</p></div>
+        </div>
+    </footer>
+
+    <!-- Chatbot Widget -->
+    <div id="chatbot-widget"></div>
+
+    <!-- Scripts -->
+    <script src="{{ url_for('static', filename='js/tramites-data.js') }}?v=20260904"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}?v=20260904"></script>
+    <script src="{{ url_for('static', filename='chatbot/chatbot-widget.js') }}?v=20260904"></script>
+    <script>initChatbotWidget({defaultLanguage:'es'});</script>
+</body>
+</html>

@@ -1,0 +1,20 @@
+[
+  {
+    "q": "qwerty",
+    "qf": "qwerty",
+    "lang": "es",
+    "count": 26
+  },
+  {
+    "q": "xyzabc sin sentido",
+    "qf": "xyzabc sin sentido",
+    "lang": "es",
+    "count": 13
+  },
+  {
+    "q": "abcxyz",
+    "qf": "abcxyz",
+    "lang": "es",
+    "count": 14
+  }
+]

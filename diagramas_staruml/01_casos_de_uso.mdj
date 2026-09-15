@@ -1,0 +1,1097 @@
+{
+ "_type": "Project",
+ "_id": "7f142c3a78634b02876faf=",
+ "_parent": null,
+ "name": "Chatbot Municipal - Casos de Uso",
+ "ownedElements": [
+  {
+   "_type": "UMLModel",
+   "_id": "e8df4e6c765b43f5bd3040=",
+   "_parent": {
+    "$ref": "7f142c3a78634b02876faf="
+   },
+   "name": "Model",
+   "ownedElements": [
+    {
+     "_type": "UMLUseCaseDiagram",
+     "_id": "005f59cb3759407a8ef2b1=",
+     "_parent": {
+      "$ref": "e8df4e6c765b43f5bd3040="
+     },
+     "name": "Diagrama de Casos de Uso",
+     "visible": true,
+     "defaultDiagram": true,
+     "ownedViews": [
+      {
+       "_type": "UMLActorView",
+       "_id": "26a86cf379294ec599b758=",
+       "_parent": {
+        "$ref": "005f59cb3759407a8ef2b1="
+       },
+       "model": {
+        "$ref": "4324b41b7ae047e8b7fa23="
+       },
+       "subViews": [
+        {
+         "_type": "LabelView",
+         "_id": "94b91c8fed15457b844432=",
+         "_parent": null,
+         "visible": true,
+         "enabled": true,
+         "lineColor": "#000000",
+         "fillColor": "#ffffff",
+         "fontColor": "#000000",
+         "font": "Arial;13;0",
+         "parentStyle": true,
+         "left": 65,
+         "top": 150,
+         "width": 72,
+         "height": 16,
+         "text": "Ciudadano",
+         "horizontalAlignment": 2,
+         "verticalAlignment": 5
+        }
+       ],
+       "visible": true,
+       "enabled": true,
+       "lineColor": "#000000",
+       "fillColor": "#ffffff",
+       "fontColor": "#000000",
+       "font": "Arial;13;0",
+       "parentStyle": true,
+       "showShadow": true,
+       "containerChangeable": false,
+       "left": 60,
+       "top": 80,
+       "width": 50,
+       "height": 70
+      },
+      {
+       "_type": "UMLActorView",
+       "_id": "1cde1d5fb17d4d969f9254=",
+       "_parent": {
+        "$ref": "005f59cb3759407a8ef2b1="
+       },
+       "model": {
+        "$ref": "d89f65949ff14ade9a5287="
+       },
+       "subViews": [
+        {
+         "_type": "LabelView",
+         "_id": "7c65f957fc044c85bc8715=",
+         "_parent": null,
+         "visible": true,
+         "enabled": true,
+         "lineColor": "#000000",
+         "fillColor": "#ffffff",
+         "fontColor": "#000000",
+         "font": "Arial;13;0",
+         "parentStyle": true,
+         "left": 65,
+         "top": 590,
+         "width": 104,
+         "height": 16,
+         "text": "Administrador",
+         "horizontalAlignment": 2,
+         "verticalAlignment": 5
+        }
+       ],
+       "visible": true,
+       "enabled": true,
+       "lineColor": "#000000",
+       "fillColor": "#ffffff",
+       "fontColor": "#000000",
+       "font": "Arial;13;0",
+       "parentStyle": true,
+       "showShadow": true,
+       "containerChangeable": false,
+       "left": 60,
+       "top": 520,
+       "width": 50,
+       "height": 70
+      },
+      {
+       "_type": "UMLUseCaseView",
+       "_id": "808ff85fbc534329b79ec2=",
+       "_parent": {
+        "$ref": "005f59cb3759407a8ef2b1="
+       },
+       "model": {
+        "$ref": "d191c748485c45cfa616ff="
+       },
+       "subViews": [
+        {
+         "_type": "LabelView",
+         "_id": "649750cc123947c681d65e=",
+         "_parent": null,
+         "visible": true,
+         "enabled": true,
+         "lineColor": "#000000",
+         "fillColor": "#ffffff",
+         "fontColor": "#000000",
+         "font": "Arial;13;0",
+         "parentStyle": true,
+         "left": 335,
+         "top": 72,
+         "width": 119,
+         "height": 16,
+         "text": "Consultar Trámite",
+         "horizontalAlignment": 2,
+         "verticalAlignment": 5
+        }
+       ],
+       "visible": true,
+       "enabled": true,
+       "lineColor": "#000000",
+       "fillColor": "#ffffff",
+       "fontColor": "#000000",
+       "font": "Arial;13;0",
+       "parentStyle": true,
+       "showShadow": true,
+       "containerChangeable": false,
+       "left": 320,
+       "top": 60,
+       "width": 200,
+       "height": 40
+      },
+      {
+       "_type": "UMLUseCaseView",
+       "_id": "31a6317b030c400881db7b=",
+       "_parent": {
+        "$ref": "005f59cb3759407a8ef2b1="
+       },
+       "model": {
+        "$ref": "06d2dbbf711b47dc865d7b="
+       },
+       "subViews": [
+        {
+         "_type": "LabelView",
+         "_id": "18b97e012c2f45b1b067a7=",
+         "_parent": null,
+         "visible": true,
+         "enabled": true,
+         "lineColor": "#000000",
+         "fillColor": "#ffffff",
+         "fontColor": "#000000",
+         "font": "Arial;13;0",
+         "parentStyle": true,
+         "left": 335,
+         "top": 152,
+         "width": 98,
+         "height": 16,
+         "text": "Buscar Trámite",
+         "horizontalAlignment": 2,
+         "verticalAlignment": 5
+        }
+       ],
+       "visible": true,
+       "enabled": true,
+       "lineColor": "#000000",
+       "fillColor": "#ffffff",
+       "fontColor": "#000000",
+       "font": "Arial;13;0",
+       "parentStyle": true,
+       "showShadow": true,
+       "containerChangeable": false,
+       "left": 320,
+       "top": 140,
+       "width": 200,
+       "height": 40
+      },
+      {
+       "_type": "UMLUseCaseView",
+       "_id": "4e9c4d53e7c74bb8aedf44=",
+       "_parent": {
+        "$ref": "005f59cb3759407a8ef2b1="
+       },
+       "model": {
+        "$ref": "b37c55d70e53465c8727aa="
+       },
+       "subViews": [
+        {
+         "_type": "LabelView",
+         "_id": "437a8339a3fd454baaa955=",
+         "_parent": null,
+         "visible": true,
+         "enabled": true,
+         "lineColor": "#000000",
+         "fillColor": "#ffffff",
+         "fontColor": "#000000",
+         "font": "Arial;13;0",
+         "parentStyle": true,
+         "left": 335,
+         "top": 232,
+         "width": 147,
+         "height": 16,
+         "text": "Filtrar por Categoría",
+         "horizontalAlignment": 2,
+         "verticalAlignment": 5
+        }
+       ],
+       "visible": true,
+       "enabled": true,
+       "lineColor": "#000000",
+       "fillColor": "#ffffff",
+       "fontColor": "#000000",
+       "font": "Arial;13;0",
+       "parentStyle": true,
+       "showShadow": true,
+       "containerChangeable": false,
+       "left": 320,
+       "top": 220,
+       "width": 200,
+       "height": 40
+      },
+      {
+       "_type": "UMLUseCaseView",
+       "_id": "ac002a41de05436eb0a74b=",
+       "_parent": {
+        "$ref": "005f59cb3759407a8ef2b1="
+       },
+       "model": {
+        "$ref": "c432e7e530ba4ccd825951="
+       },
+       "subViews": [
+        {
+         "_type": "LabelView",
+         "_id": "52d859db29384727b50ca3=",
+         "_parent": null,
+         "visible": true,
+         "enabled": true,
+         "lineColor": "#000000",
+         "fillColor": "#ffffff",
+         "fontColor": "#000000",
+         "font": "Arial;13;0",
+         "parentStyle": true,
+         "left": 335,
+         "top": 312,
+         "width": 112,
+         "height": 16,
+         "text": "Consultar Multas",
+         "horizontalAlignment": 2,
+         "verticalAlignment": 5
+        }
+       ],
+       "visible": true,
+       "enabled": true,
+       "lineColor": "#000000",
+       "fillColor": "#ffffff",
+       "fontColor": "#000000",
+       "font": "Arial;13;0",
+       "parentStyle": true,
+       "showShadow": true,
+       "containerChangeable": false,
+       "left": 320,
+       "top": 300,
+       "width": 200,
+       "height": 40
+      },
+      {
+       "_type": "UMLUseCaseView",
+       "_id": "69e92846e0be4ea38b3fef=",
+       "_parent": {
+        "$ref": "005f59cb3759407a8ef2b1="
+       },
+       "model": {
+        "$ref": "5f5fbd70e60f4c67a110d7="
+       },
+       "subViews": [
+        {
+         "_type": "LabelView",
+         "_id": "251872dc3649497080c1be=",
+         "_parent": null,
+         "visible": true,
+         "enabled": true,
+         "lineColor": "#000000",
+         "fillColor": "#ffffff",
+         "fontColor": "#000000",
+         "font": "Arial;13;0",
+         "parentStyle": true,
+         "left": 635,
+         "top": 72,
+         "width": 84,
+         "height": 16,
+         "text": "Usar Chatbot",
+         "horizontalAlignment": 2,
+         "verticalAlignment": 5
+        }
+       ],
+       "visible": true,
+       "enabled": true,
+       "lineColor": "#000000",
+       "fillColor": "#ffffff",
+       "fontColor": "#000000",
+       "font": "Arial;13;0",
+       "parentStyle": true,
+       "showShadow": true,
+       "containerChangeable": false,
+       "left": 620,
+       "top": 60,
+       "width": 200,
+       "height": 40
+      },
+      {
+       "_type": "UMLUseCaseView",
+       "_id": "fa35362fb0d046c0bf3419=",
+       "_parent": {
+        "$ref": "005f59cb3759407a8ef2b1="
+       },
+       "model": {
+        "$ref": "d9616c39e81942439b3d7e="
+       },
+       "subViews": [
+        {
+         "_type": "LabelView",
+         "_id": "bbce7bb6301d4fa5b53e5d=",
+         "_parent": null,
+         "visible": true,
+         "enabled": true,
+         "lineColor": "#000000",
+         "fillColor": "#ffffff",
+         "fontColor": "#000000",
+         "font": "Arial;13;0",
+         "parentStyle": true,
+         "left": 635,
+         "top": 152,
+         "width": 147,
+         "height": 16,
+         "text": "Enviar Mensaje de Voz",
+         "horizontalAlignment": 2,
+         "verticalAlignment": 5
+        }
+       ],
+       "visible": true,
+       "enabled": true,
+       "lineColor": "#000000",
+       "fillColor": "#ffffff",
+       "fontColor": "#000000",
+       "font": "Arial;13;0",
+       "parentStyle": true,
+       "showShadow": true,
+       "containerChangeable": false,
+       "left": 620,
+       "top": 140,
+       "width": 200,
+       "height": 40
+      },
+      {
+       "_type": "UMLUseCaseView",
+       "_id": "d95231dfa2ac44eda7d5a4=",
+       "_parent": {
+        "$ref": "005f59cb3759407a8ef2b1="
+       },
+       "model": {
+        "$ref": "e21da43954b44e6590d21b="
+       },
+       "subViews": [
+        {
+         "_type": "LabelView",
+         "_id": "a149d27874824e968aa726=",
+         "_parent": null,
+         "visible": true,
+         "enabled": true,
+         "lineColor": "#000000",
+         "fillColor": "#ffffff",
+         "fontColor": "#000000",
+         "font": "Arial;13;0",
+         "parentStyle": true,
+         "left": 635,
+         "top": 232,
+         "width": 154,
+         "height": 16,
+         "text": "Cambiar Idioma (ES/QU)",
+         "horizontalAlignment": 2,
+         "verticalAlignment": 5
+        }
+       ],
+       "visible": true,
+       "enabled": true,
+       "lineColor": "#000000",
+       "fillColor": "#ffffff",
+       "fontColor": "#000000",
+       "font": "Arial;13;0",
+       "parentStyle": true,
+       "showShadow": true,
+       "containerChangeable": false,
+       "left": 620,
+       "top": 220,
+       "width": 200,
+       "height": 40
+      },
+      {
+       "_type": "UMLUseCaseView",
+       "_id": "8bc4eaf9d29c46cfa1c76f=",
+       "_parent": {
+        "$ref": "005f59cb3759407a8ef2b1="
+       },
+       "model": {
+        "$ref": "49cff99015404988bb2765="
+       },
+       "subViews": [
+        {
+         "_type": "LabelView",
+         "_id": "c8ee74ed10f644c7bba04f=",
+         "_parent": null,
+         "visible": true,
+         "enabled": true,
+         "lineColor": "#000000",
+         "fillColor": "#ffffff",
+         "fontColor": "#000000",
+         "font": "Arial;13;0",
+         "parentStyle": true,
+         "left": 635,
+         "top": 312,
+         "width": 147,
+         "height": 16,
+         "text": "Consultar Institución",
+         "horizontalAlignment": 2,
+         "verticalAlignment": 5
+        }
+       ],
+       "visible": true,
+       "enabled": true,
+       "lineColor": "#000000",
+       "fillColor": "#ffffff",
+       "fontColor": "#000000",
+       "font": "Arial;13;0",
+       "parentStyle": true,
+       "showShadow": true,
+       "containerChangeable": false,
+       "left": 620,
+       "top": 300,
+       "width": 200,
+       "height": 40
+      },
+      {
+       "_type": "UMLUseCaseView",
+       "_id": "445919c438c742dcb201e4=",
+       "_parent": {
+        "$ref": "005f59cb3759407a8ef2b1="
+       },
+       "model": {
+        "$ref": "e95fa1e2f71d4cd5a08b0f="
+       },
+       "subViews": [
+        {
+         "_type": "LabelView",
+         "_id": "7a2cd2677b1b4c14a2cb03=",
+         "_parent": null,
+         "visible": true,
+         "enabled": true,
+         "lineColor": "#000000",
+         "fillColor": "#ffffff",
+         "fontColor": "#000000",
+         "font": "Arial;13;0",
+         "parentStyle": true,
+         "left": 465,
+         "top": 512,
+         "width": 203,
+         "height": 16,
+         "text": "Actualizar Base Conocimientos",
+         "horizontalAlignment": 2,
+         "verticalAlignment": 5
+        }
+       ],
+       "visible": true,
+       "enabled": true,
+       "lineColor": "#000000",
+       "fillColor": "#ffffff",
+       "fontColor": "#000000",
+       "font": "Arial;13;0",
+       "parentStyle": true,
+       "showShadow": true,
+       "containerChangeable": false,
+       "left": 450,
+       "top": 500,
+       "width": 200,
+       "height": 40
+      },
+      {
+       "_type": "UMLAssociationView",
+       "_id": "3de650f309a5403b957237=",
+       "_parent": {
+        "$ref": "005f59cb3759407a8ef2b1="
+       },
+       "model": {
+        "$ref": "f19fe139ab9540a9908ad1="
+       },
+       "subViews": [],
+       "visible": true,
+       "enabled": true,
+       "lineColor": "#000000",
+       "fillColor": "#000000",
+       "fontColor": "#000000",
+       "font": "Arial;13;0",
+       "parentStyle": true,
+       "showShadow": false,
+       "lineStyle": 0,
+       "points": "110:115;320:80",
+       "head": {
+        "$ref": "d191c748485c45cfa616ff="
+       },
+       "tail": {
+        "$ref": "4324b41b7ae047e8b7fa23="
+       }
+      },
+      {
+       "_type": "UMLAssociationView",
+       "_id": "6e8f513d354e4bb9971967=",
+       "_parent": {
+        "$ref": "005f59cb3759407a8ef2b1="
+       },
+       "model": {
+        "$ref": "52326c9c4e27460797466d="
+       },
+       "subViews": [],
+       "visible": true,
+       "enabled": true,
+       "lineColor": "#000000",
+       "fillColor": "#000000",
+       "fontColor": "#000000",
+       "font": "Arial;13;0",
+       "parentStyle": true,
+       "showShadow": false,
+       "lineStyle": 0,
+       "points": "110:115;320:160",
+       "head": {
+        "$ref": "06d2dbbf711b47dc865d7b="
+       },
+       "tail": {
+        "$ref": "4324b41b7ae047e8b7fa23="
+       }
+      },
+      {
+       "_type": "UMLAssociationView",
+       "_id": "1aaab88e3609445281a964=",
+       "_parent": {
+        "$ref": "005f59cb3759407a8ef2b1="
+       },
+       "model": {
+        "$ref": "5a6a3fcf2c6943bb9ebb1c="
+       },
+       "subViews": [],
+       "visible": true,
+       "enabled": true,
+       "lineColor": "#000000",
+       "fillColor": "#000000",
+       "fontColor": "#000000",
+       "font": "Arial;13;0",
+       "parentStyle": true,
+       "showShadow": false,
+       "lineStyle": 0,
+       "points": "110:115;320:240",
+       "head": {
+        "$ref": "b37c55d70e53465c8727aa="
+       },
+       "tail": {
+        "$ref": "4324b41b7ae047e8b7fa23="
+       }
+      },
+      {
+       "_type": "UMLAssociationView",
+       "_id": "1024f29925ac435593beda=",
+       "_parent": {
+        "$ref": "005f59cb3759407a8ef2b1="
+       },
+       "model": {
+        "$ref": "fd26592bcb9747dca72dfc="
+       },
+       "subViews": [],
+       "visible": true,
+       "enabled": true,
+       "lineColor": "#000000",
+       "fillColor": "#000000",
+       "fontColor": "#000000",
+       "font": "Arial;13;0",
+       "parentStyle": true,
+       "showShadow": false,
+       "lineStyle": 0,
+       "points": "110:115;320:320",
+       "head": {
+        "$ref": "c432e7e530ba4ccd825951="
+       },
+       "tail": {
+        "$ref": "4324b41b7ae047e8b7fa23="
+       }
+      },
+      {
+       "_type": "UMLAssociationView",
+       "_id": "46942051a3ab4f5eaa8131=",
+       "_parent": {
+        "$ref": "005f59cb3759407a8ef2b1="
+       },
+       "model": {
+        "$ref": "d86c95a4bc5a49c3a47390="
+       },
+       "subViews": [],
+       "visible": true,
+       "enabled": true,
+       "lineColor": "#000000",
+       "fillColor": "#000000",
+       "fontColor": "#000000",
+       "font": "Arial;13;0",
+       "parentStyle": true,
+       "showShadow": false,
+       "lineStyle": 0,
+       "points": "110:115;620:80",
+       "head": {
+        "$ref": "5f5fbd70e60f4c67a110d7="
+       },
+       "tail": {
+        "$ref": "4324b41b7ae047e8b7fa23="
+       }
+      },
+      {
+       "_type": "UMLAssociationView",
+       "_id": "d16469a9bfff4ba9be3a40=",
+       "_parent": {
+        "$ref": "005f59cb3759407a8ef2b1="
+       },
+       "model": {
+        "$ref": "ec5b0651190242799dd3f4="
+       },
+       "subViews": [],
+       "visible": true,
+       "enabled": true,
+       "lineColor": "#000000",
+       "fillColor": "#000000",
+       "fontColor": "#000000",
+       "font": "Arial;13;0",
+       "parentStyle": true,
+       "showShadow": false,
+       "lineStyle": 0,
+       "points": "110:115;620:160",
+       "head": {
+        "$ref": "d9616c39e81942439b3d7e="
+       },
+       "tail": {
+        "$ref": "4324b41b7ae047e8b7fa23="
+       }
+      },
+      {
+       "_type": "UMLAssociationView",
+       "_id": "d97eb0b3ea76400d838d58=",
+       "_parent": {
+        "$ref": "005f59cb3759407a8ef2b1="
+       },
+       "model": {
+        "$ref": "de4d2ab63080450fa0b16f="
+       },
+       "subViews": [],
+       "visible": true,
+       "enabled": true,
+       "lineColor": "#000000",
+       "fillColor": "#000000",
+       "fontColor": "#000000",
+       "font": "Arial;13;0",
+       "parentStyle": true,
+       "showShadow": false,
+       "lineStyle": 0,
+       "points": "110:115;620:240",
+       "head": {
+        "$ref": "e21da43954b44e6590d21b="
+       },
+       "tail": {
+        "$ref": "4324b41b7ae047e8b7fa23="
+       }
+      },
+      {
+       "_type": "UMLAssociationView",
+       "_id": "e55e156cb4894582a09e81=",
+       "_parent": {
+        "$ref": "005f59cb3759407a8ef2b1="
+       },
+       "model": {
+        "$ref": "7578946d0e1e4839b0695b="
+       },
+       "subViews": [],
+       "visible": true,
+       "enabled": true,
+       "lineColor": "#000000",
+       "fillColor": "#000000",
+       "fontColor": "#000000",
+       "font": "Arial;13;0",
+       "parentStyle": true,
+       "showShadow": false,
+       "lineStyle": 0,
+       "points": "110:115;620:320",
+       "head": {
+        "$ref": "49cff99015404988bb2765="
+       },
+       "tail": {
+        "$ref": "4324b41b7ae047e8b7fa23="
+       }
+      },
+      {
+       "_type": "UMLAssociationView",
+       "_id": "5e90d089d3f34702808a06=",
+       "_parent": {
+        "$ref": "005f59cb3759407a8ef2b1="
+       },
+       "model": {
+        "$ref": "f77626e45aaf4459871a81="
+       },
+       "subViews": [],
+       "visible": true,
+       "enabled": true,
+       "lineColor": "#000000",
+       "fillColor": "#000000",
+       "fontColor": "#000000",
+       "font": "Arial;13;0",
+       "parentStyle": true,
+       "showShadow": false,
+       "lineStyle": 0,
+       "points": "110:520;550:540",
+       "head": {
+        "$ref": "e95fa1e2f71d4cd5a08b0f="
+       },
+       "tail": {
+        "$ref": "d89f65949ff14ade9a5287="
+       }
+      }
+     ]
+    },
+    {
+     "_type": "UMLActor",
+     "_id": "4324b41b7ae047e8b7fa23=",
+     "_parent": {
+      "$ref": "e8df4e6c765b43f5bd3040="
+     },
+     "name": "Ciudadano"
+    },
+    {
+     "_type": "UMLActor",
+     "_id": "d89f65949ff14ade9a5287=",
+     "_parent": {
+      "$ref": "e8df4e6c765b43f5bd3040="
+     },
+     "name": "Administrador"
+    },
+    {
+     "_type": "UMLUseCase",
+     "_id": "d191c748485c45cfa616ff=",
+     "_parent": {
+      "$ref": "e8df4e6c765b43f5bd3040="
+     },
+     "name": "Consultar Trámite"
+    },
+    {
+     "_type": "UMLUseCase",
+     "_id": "06d2dbbf711b47dc865d7b=",
+     "_parent": {
+      "$ref": "e8df4e6c765b43f5bd3040="
+     },
+     "name": "Buscar Trámite"
+    },
+    {
+     "_type": "UMLUseCase",
+     "_id": "b37c55d70e53465c8727aa=",
+     "_parent": {
+      "$ref": "e8df4e6c765b43f5bd3040="
+     },
+     "name": "Filtrar por Categoría"
+    },
+    {
+     "_type": "UMLUseCase",
+     "_id": "c432e7e530ba4ccd825951=",
+     "_parent": {
+      "$ref": "e8df4e6c765b43f5bd3040="
+     },
+     "name": "Consultar Multas"
+    },
+    {
+     "_type": "UMLUseCase",
+     "_id": "5f5fbd70e60f4c67a110d7=",
+     "_parent": {
+      "$ref": "e8df4e6c765b43f5bd3040="
+     },
+     "name": "Usar Chatbot"
+    },
+    {
+     "_type": "UMLUseCase",
+     "_id": "d9616c39e81942439b3d7e=",
+     "_parent": {
+      "$ref": "e8df4e6c765b43f5bd3040="
+     },
+     "name": "Enviar Mensaje de Voz"
+    },
+    {
+     "_type": "UMLUseCase",
+     "_id": "e21da43954b44e6590d21b=",
+     "_parent": {
+      "$ref": "e8df4e6c765b43f5bd3040="
+     },
+     "name": "Cambiar Idioma (ES/QU)"
+    },
+    {
+     "_type": "UMLUseCase",
+     "_id": "49cff99015404988bb2765=",
+     "_parent": {
+      "$ref": "e8df4e6c765b43f5bd3040="
+     },
+     "name": "Consultar Institución"
+    },
+    {
+     "_type": "UMLUseCase",
+     "_id": "e95fa1e2f71d4cd5a08b0f=",
+     "_parent": {
+      "$ref": "e8df4e6c765b43f5bd3040="
+     },
+     "name": "Actualizar Base Conocimientos"
+    },
+    {
+     "_type": "UMLAssociation",
+     "_id": "f19fe139ab9540a9908ad1=",
+     "_parent": {
+      "$ref": "e8df4e6c765b43f5bd3040="
+     },
+     "name": "",
+     "end1": {
+      "_type": "UMLAssociationEnd",
+      "_id": "d76ec1e18ae9444e92d793=",
+      "_parent": {
+       "$ref": "f19fe139ab9540a9908ad1="
+      },
+      "reference": {
+       "$ref": "4324b41b7ae047e8b7fa23="
+      }
+     },
+     "end2": {
+      "_type": "UMLAssociationEnd",
+      "_id": "91366251e0f24d8e9af773=",
+      "_parent": {
+       "$ref": "f19fe139ab9540a9908ad1="
+      },
+      "reference": {
+       "$ref": "d191c748485c45cfa616ff="
+      }
+     }
+    },
+    {
+     "_type": "UMLAssociation",
+     "_id": "52326c9c4e27460797466d=",
+     "_parent": {
+      "$ref": "e8df4e6c765b43f5bd3040="
+     },
+     "name": "",
+     "end1": {
+      "_type": "UMLAssociationEnd",
+      "_id": "6c195227d6b14d95ac1b8e=",
+      "_parent": {
+       "$ref": "52326c9c4e27460797466d="
+      },
+      "reference": {
+       "$ref": "4324b41b7ae047e8b7fa23="
+      }
+     },
+     "end2": {
+      "_type": "UMLAssociationEnd",
+      "_id": "70fa4b0ef4c843208c9b9f=",
+      "_parent": {
+       "$ref": "52326c9c4e27460797466d="
+      },
+      "reference": {
+       "$ref": "06d2dbbf711b47dc865d7b="
+      }
+     }
+    },
+    {
+     "_type": "UMLAssociation",
+     "_id": "5a6a3fcf2c6943bb9ebb1c=",
+     "_parent": {
+      "$ref": "e8df4e6c765b43f5bd3040="
+     },
+     "name": "",
+     "end1": {
+      "_type": "UMLAssociationEnd",
+      "_id": "d146907523504e1ba22c5d=",
+      "_parent": {
+       "$ref": "5a6a3fcf2c6943bb9ebb1c="
+      },
+      "reference": {
+       "$ref": "4324b41b7ae047e8b7fa23="
+      }
+     },
+     "end2": {
+      "_type": "UMLAssociationEnd",
+      "_id": "0cc7eb8731fa4678988b70=",
+      "_parent": {
+       "$ref": "5a6a3fcf2c6943bb9ebb1c="
+      },
+      "reference": {
+       "$ref": "b37c55d70e53465c8727aa="
+      }
+     }
+    },
+    {
+     "_type": "UMLAssociation",
+     "_id": "fd26592bcb9747dca72dfc=",
+     "_parent": {
+      "$ref": "e8df4e6c765b43f5bd3040="
+     },
+     "name": "",
+     "end1": {
+      "_type": "UMLAssociationEnd",
+      "_id": "7be33eb065ea4bfd924547=",
+      "_parent": {
+       "$ref": "fd26592bcb9747dca72dfc="
+      },
+      "reference": {
+       "$ref": "4324b41b7ae047e8b7fa23="
+      }
+     },
+     "end2": {
+      "_type": "UMLAssociationEnd",
+      "_id": "6d494e856b25478992e351=",
+      "_parent": {
+       "$ref": "fd26592bcb9747dca72dfc="
+      },
+      "reference": {
+       "$ref": "c432e7e530ba4ccd825951="
+      }
+     }
+    },
+    {
+     "_type": "UMLAssociation",
+     "_id": "d86c95a4bc5a49c3a47390=",
+     "_parent": {
+      "$ref": "e8df4e6c765b43f5bd3040="
+     },
+     "name": "",
+     "end1": {
+      "_type": "UMLAssociationEnd",
+      "_id": "06bf2153d31c486aaef47e=",
+      "_parent": {
+       "$ref": "d86c95a4bc5a49c3a47390="
+      },
+      "reference": {
+       "$ref": "4324b41b7ae047e8b7fa23="
+      }
+     },
+     "end2": {
+      "_type": "UMLAssociationEnd",
+      "_id": "19563d61500b45118ead09=",
+      "_parent": {
+       "$ref": "d86c95a4bc5a49c3a47390="
+      },
+      "reference": {
+       "$ref": "5f5fbd70e60f4c67a110d7="
+      }
+     }
+    },
+    {
+     "_type": "UMLAssociation",
+     "_id": "ec5b0651190242799dd3f4=",
+     "_parent": {
+      "$ref": "e8df4e6c765b43f5bd3040="
+     },
+     "name": "",
+     "end1": {
+      "_type": "UMLAssociationEnd",
+      "_id": "6b0bfe29de4a4f37bd2773=",
+      "_parent": {
+       "$ref": "ec5b0651190242799dd3f4="
+      },
+      "reference": {
+       "$ref": "4324b41b7ae047e8b7fa23="
+      }
+     },
+     "end2": {
+      "_type": "UMLAssociationEnd",
+      "_id": "8bb1daa39cfe43f9bfa8f6=",
+      "_parent": {
+       "$ref": "ec5b0651190242799dd3f4="
+      },
+      "reference": {
+       "$ref": "d9616c39e81942439b3d7e="
+      }
+     }
+    },
+    {
+     "_type": "UMLAssociation",
+     "_id": "de4d2ab63080450fa0b16f=",
+     "_parent": {
+      "$ref": "e8df4e6c765b43f5bd3040="
+     },
+     "name": "",
+     "end1": {
+      "_type": "UMLAssociationEnd",
+      "_id": "6d734f1b45d94697824c8d=",
+      "_parent": {
+       "$ref": "de4d2ab63080450fa0b16f="
+      },
+      "reference": {
+       "$ref": "4324b41b7ae047e8b7fa23="
+      }
+     },
+     "end2": {
+      "_type": "UMLAssociationEnd",
+      "_id": "32f8adc76674473c831d60=",
+      "_parent": {
+       "$ref": "de4d2ab63080450fa0b16f="
+      },
+      "reference": {
+       "$ref": "e21da43954b44e6590d21b="
+      }
+     }
+    },
+    {
+     "_type": "UMLAssociation",
+     "_id": "7578946d0e1e4839b0695b=",
+     "_parent": {
+      "$ref": "e8df4e6c765b43f5bd3040="
+     },
+     "name": "",
+     "end1": {
+      "_type": "UMLAssociationEnd",
+      "_id": "58800568d0064d7fab0b5b=",
+      "_parent": {
+       "$ref": "7578946d0e1e4839b0695b="
+      },
+      "reference": {
+       "$ref": "4324b41b7ae047e8b7fa23="
+      }
+     },
+     "end2": {
+      "_type": "UMLAssociationEnd",
+      "_id": "144e4a30c8fd4128abe110=",
+      "_parent": {
+       "$ref": "7578946d0e1e4839b0695b="
+      },
+      "reference": {
+       "$ref": "49cff99015404988bb2765="
+      }
+     }
+    },
+    {
+     "_type": "UMLAssociation",
+     "_id": "f77626e45aaf4459871a81=",
+     "_parent": {
+      "$ref": "e8df4e6c765b43f5bd3040="
+     },
+     "name": "",
+     "end1": {
+      "_type": "UMLAssociationEnd",
+      "_id": "85bed5acc5c445b3856198=",
+      "_parent": {
+       "$ref": "f77626e45aaf4459871a81="
+      },
+      "reference": {
+       "$ref": "d89f65949ff14ade9a5287="
+      }
+     },
+     "end2": {
+      "_type": "UMLAssociationEnd",
+      "_id": "1ab9b648f783478d995a90=",
+      "_parent": {
+       "$ref": "f77626e45aaf4459871a81="
+      },
+      "reference": {
+       "$ref": "e95fa1e2f71d4cd5a08b0f="
+      }
+     }
+    }
+   ]
+  }
+ ]
+}
