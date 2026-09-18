@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Municipal de Sacaba / Sakaba Munisipyu</title>
+    <link rel="icon" type="image/webp" href="{{ url_for('static', filename='img/logo-sacaba.webp') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='chatbot/chatbot-widget.css') }}">
+</head>
+<body>
+    <!-- Barra Superior -->
+    <div class="top-bar">
+        <div class="container">
+            <div class="top-bar-left">
+                <span><i class="fas fa-phone"></i> (591) 4-XXXXXX</span>
+                <span><i class="fas fa-envelope"></i> info@sacaba.gob.bo</span>
+            </div>
+            <div class="top-bar-right">
+                <a href="#"><i class="fab fa-facebook-f"></i></a>
+                <a href="#"><i class="fab fa-twitter"></i></a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="main-header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo-section">
+                    <div class="logo-emblem"><img src="{{ url_for('static', filename='img/logo-sacaba.webp') }}" alt="Logo Sacaba"></div>
+                    <div class="logo-text">
+                        <span class="logo-subtitle" data-id="logo-sub" data-qu="Munisipyu Gobierno Autónomo">Gobierno Autónomo Municipal</span>
+                        <h1 class="logo-title">SACABA</h1>
+                        <span class="logo-location">Cochabamba - Bolivia</span>
+                    </div>
+                </div>
+                <nav class="main-nav">
+                    <a href="#inicio" class="nav-link active" data-id="nav-inicio" data-qu="Qallariy">Inicio</a>
+                    <a href="#tramites" class="nav-link" data-id="nav-tramites" data-qu="Trámitekuna">Trámites</a>
+                    <a href="#multas" class="nav-link" data-id="nav-multas" data-qu="Multakuna">Multas</a>
+                    <a href="#institucion" class="nav-link" data-id="nav-inst" data-qu="Institución">Institución</a>
+                    <a href="#contacto" class="nav-link" data-id="nav-contacto" data-qu="Contacto">Contacto</a>
+                </nav>
+                <div class="header-actions">
+                    <button class="lang-toggle" onclick="togglePageLang()"><i class="fas fa-language"></i> <span id="pageLangLabel">QU</span></button>
+                    <button class="mobile-menu-btn" id="mobileMenuBtn"><i class="fas fa-bars"></i></button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Banner -->
+    <section class="hero-banner" id="inicio">
+        <div class="hero-bg"></div>
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+        <div class="hero-grid-layer"></div>
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-logo-wrap"><img src="{{ url_for('static', filename='img/logo-sacaba.webp') }}" alt="Logo Sacaba"></div>
+                <div class="hero-badge" data-id="hero-badge" data-qu="Oficial Trámitekuna"><i class="fas fa-shield-alt"></i> Portal Oficial de Trámites</div>
+                <h1 data-id="hero-h1" data-qu="Runakunapaq Yachay<br>Sistema Digital">Sistema de Orientación<br>Ciudadana Digital</h1>
+                <p data-id="hero-p" data-qu="Trámitekuna, multakuna, munisipyuq serviciosninta utqaylla yachaykunki. P'unchay-tuta 24 horas kachkan.">Acceda de manera rápida y sencilla a información sobre trámites, multas y servicios municipales. Disponible las 24 horas del día.</p>
+                <div class="hero-buttons">
+                    <a href="#tramites" class="btn btn-primary" data-id="hero-btn1" data-qu="Trámitekuna Qhaway"><i class="fas fa-file-alt"></i> Ver Trámites</a>
+                    <a href="#multas" class="btn btn-outline" data-id="hero-btn2" data-qu="Multakuna"><i class="fas fa-exclamation-triangle"></i> Multas</a>
+                </div>
+                <div class="hero-meta">
+                    <div><i class="fas fa-clock"></i> <span data-id="hero-meta-1" data-qu="24 horas p'unchay-tuta">Disponible 24/7</span></div>
+                    <div><i class="fas fa-robot"></i> <span data-id="hero-meta-2" data-qu="Inteligencia Artificial">Inteligencia Artificial</span></div>
+                    <div><i class="fas fa-microphone-alt"></i> <span data-id="hero-meta-3" data-qu="Kunka Taqwa">Voz y Audio</span></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Accesos Rápidos -->
+    <section class="quick-access">
+        <div class="container">
+            <div class="quick-grid">
+                <a href="#carnet" class="quick-item"><div class="quick-icon"><i class="fas fa-id-card"></i></div><span data-id="q-carnet" data-qu="Carnet de Identidad">Carnet de Identidad</span></a>
+                <a href="#residencia" class="quick-item"><div class="quick-icon"><i class="fas fa-home"></i></div><span data-id="q-resid" data-qu="Tiyay Constancia">Constancia Residencia</span></a>
+                <a href="#funcionamiento" class="quick-item"><div class="quick-icon"><i class="fas fa-store"></i></div><span data-id="q-func" data-qu="Licencia Funcionamiento">Licencia Funcionamiento</span></a>
+                <a href="#agua" class="quick-item"><div class="quick-icon"><i class="fas fa-tint"></i></div><span data-id="q-agua" data-qu="Yaku (Agua)">Agua Potable</span></a>
+                <a href="#multas" class="quick-item"><div class="quick-icon"><i class="fas fa-car"></i></div><span data-id="q-multas" data-qu="Tránsito Multakuna">Multas Tránsito</span></a>
+                <a href="#contacto" class="quick-item"><div class="quick-icon"><i class="fas fa-map-marker-alt"></i></div><span data-id="q-ubic" data-qu="Ubicación">Ubicación</span></a>
+            </div>
+        </div>
+    </section>
+
+    <!-- TRÁMITES -->
+    <section class="section tramites-section" id="tramites">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag"><i class="fas fa-folder-open"></i> <span data-id="tag-tram" data-qu="Trámitekuna">Trámites</span></span>
+                <h2 data-id="h2-tram" data-qu="Munisipyuq Trámitekuna">Trámites Municipales</h2>
+                <p data-id="p-tram" data-qu="Sapanka trámiteq requisitosninta, qullqininta, ruwayninta yachaykunki.">Conozca los requisitos, costos y procedimientos para cada trámite</p>
+            </div>
+
+            <div class="filter-bar">
+                <button class="filter-btn active" data-filter="todos" data-id="f-todos" data-qu="Tukuy">Todos</button>
+                <button class="filter-btn" data-filter="identidad" data-id="f-ident" data-qu="Identidad">Identidad</button>
+                <button class="filter-btn" data-filter="vivienda" data-id="f-viv" data-qu="Wasi">Vivienda</button>
+                <button class="filter-btn" data-filter="negocio" data-id="f-neg" data-qu="Negocio">Negocio</button>
+                <button class="filter-btn" data-filter="servicios" data-id="f-serv" data-qu="Servicios">Servicios</button>
+            </div>
+
+            <div class="tramites-list">
+                <!-- 1 CARNET -->
+                <div class="tramite-item" data-category="identidad" id="carnet">
+                    <div class="tramite-num">01</div>
+                    <div class="tramite-info">
+                        <h3><i class="fas fa-id-card"></i> <span data-id="t1-n" data-qu="Carnet de Identidad (Cédula)">Carnet de Identidad (Cédula)</span></h3>
+                        <p data-id="t1-d" data-qu="Identidad documento, obligatorio tukuy runapaq. SEGIP oficinaspi qillchachikuy (mushuqta utaq renovación).">Documento de identificación personal obligatorio. Emisión o renovación en oficinas del SEGIP.</p>
+                        <div class="tramite-details">
+                            <span><i class="fas fa-dollar-sign"></i> Bs. 17</span>
+                            <span><i class="fas fa-clock"></i> <span data-id="t1-t" data-qu="Chaylla">Inmediato</span></span>
+                            <span><i class="fas fa-building"></i> SEGIP</span>
+                        </div>
+                        <div class="tramite-location">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <a href="https://maps.app.goo.gl/f27gLh5Accp2UmKW9" target="_blank" data-id="t1-map" data-qu="Google Mapspi Qhaway">Ver ubicación en Google Maps</a>
+                        </div>
+                        <div class="tramite-accordion">
+                            <button class="accordion-btn" onclick="toggleAccordion(this)"><i class="fas fa-chevron-down"></i> <span data-id="t1-acc" data-qu="Requisitokuna Qhaway">Ver requisitos y pasos</span></button>
+                            <div class="accordion-content">
+                                <div class="detail-grid">
+                                    <div class="detail-col">
+                                        <h4><i class="fas fa-clipboard-list"></i> <span data-id="t1-req" data-qu="Requisitokuna">Requisitos</span></h4>
+                                        <ul>
+                                            <li data-id="t1-r1" data-qu="Bs. 17 pagasqayki comprobante (Banco Unión)">Comprobante de pago de Bs. 17 (Banco Unión)</li>
+                                            <li data-id="t1-r2" data-qu="Ñawpaq cédula (renovación)">Anterior cédula de identidad (renovación)</li>
+                                            <li data-id="t1-r3" data-qu="Chinkachiptiykiqa denuncia rikuchiy">En caso de pérdida: denuncia policial</li>
+                                        </ul>
+                                    </div>
+                                    <div class="detail-col">
+                                        <h4><i class="fas fa-list-ol"></i> <span data-id="t1-pas" data-qu="Ruwanakuna">Pasos a Seguir</span></h4>
+                                        <ol>
+                                            <li data-id="t1-p1" data-qu="Bs. 17ta pagay Banco Uniónpi">Realizar pago de Bs. 17 en Banco Unión</li>
+                                            <li data-id="t1-p2" data-qu="SEGIP oficinasman riy">Acudir a oficinas de SEGIP</li>
+                                            <li data-id="t1-p3" data-qu="Comprobante nitaq cédulata rikuchiy">Presentar comprobante y cédula anterior</li>
+                                            <li data-id="t1-p4" data-qu="Maki huellakunata registray">Registrar huellas dactilares</li>
+                                            <li data-id="t1-p5" data-qu="Fotota horqoy">Captura de fotografía digital</li>
+                                            <li data-id="t1-p6" data-qu="Carnetta chaskikuy">Retirar el carnet</li>
+                                        </ol>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tramite-action"><button class="chat-query-btn" onclick="openChatWithQuery('carnet de identidad')"><i class="fas fa-comments"></i> <span data-id="btn-consultar" data-qu="Tapukuy">Consultar</span></button></div>
+                </div>
+
+                <!-- 2 RESIDENCIA -->
+                <div class="tramite-item" data-category="vivienda" id="residencia">
+                    <div class="tramite-num">02</div>
+                    <div class="tramite-info">
+                        <h3><i class="fas fa-home"></i> <span data-id="t2-n" data-qu="Tiyay Constancia">Constancia de Residencia</span></h3>
+                        <p data-id="t2-d" data-qu="Huk runaq Sakaba munisipyupi tiyasqanta riqsichiq documento.">Documento que certifica la residencia de una persona en el municipio.</p>
+                        <div class="tramite-details">
+                            <span><i class="fas fa-dollar-sign"></i> Bs. 15</span>
+                            <span><i class="fas fa-clock"></i> <span data-id="t2-t" data-qu="2-3 p'unchay">2-3 días</span></span>
+                            <span><i class="fas fa-building"></i> <span data-id="t2-dep" data-qu="Registro Social">Registro Social</span></span>
+                        </div>
+                        <div class="tramite-accordion">
+                            <button class="accordion-btn" onclick="toggleAccordion(this)"><i class="fas fa-chevron-down"></i> <span data-id="t2-acc" data-qu="Requisitokuna Qhaway">Ver requisitos y pasos</span></button>
+                            <div class="accordion-content"><div class="detail-grid">
+                                <div class="detail-col">
+                                    <h4><i class="fas fa-clipboard-list"></i> <span data-id="t2-req" data-qu="Requisitokuna">Requisitos</span></h4>
+                                    <ul>
+                                        <li data-id="t2-r1" data-qu="Cédula fotocopia">Fotocopia de cédula</li>
+                                        <li data-id="t2-r2" data-qu="Libreta militar fotocopia">Fotocopia libreta militar</li>
+                                        <li data-id="t2-r3" data-qu="Servicios recibo (yaku, lliphi, teléfono)">Recibo de servicios básicos</li>
+                                        <li data-id="t2-r4" data-qu="Declaración jurada">Declaración jurada</li>
+                                        <li data-id="t2-r5" data-qu="Iskay carnet fotokuna">Dos fotos carnet</li>
+                                    </ul>
+                                </div>
+                                <div class="detail-col">
+                                    <h4><i class="fas fa-list-ol"></i> <span data-id="t2-pas" data-qu="Ruwanakuna">Pasos</span></h4>
+                                    <ol>
+                                        <li data-id="t2-p1" data-qu="Formulariota apakamuy (Ventanilla Única)">Recoger formulario</li>
+                                        <li data-id="t2-p2" data-qu="Formulariota qillqay">Llenar formulario</li>
+                                        <li data-id="t2-p3" data-qu="Requisitokunata rikuchiy">Presentar requisitos</li>
+                                        <li data-id="t2-p4" data-qu="Cajapi pagay">Pagar en caja</li>
+                                        <li data-id="t2-p5" data-qu="Constanciata chaskikuy (2-3 p'unchay)">Retirar constancia</li>
+                                    </ol>
+                                </div>
+                            </div></div>
+                        </div>
+                    </div>
+                    <div class="tramite-action"><button class="chat-query-btn" onclick="openChatWithQuery('constancia de residencia')"><i class="fas fa-comments"></i> <span data-qu="Tapukuy">Consultar</span></button></div>
+                </div>
+
+                <!-- 3 LICENCIA -->
+                <div class="tramite-item" data-category="negocio" id="funcionamiento">
+                    <div class="tramite-num">03</div>
+                    <div class="tramite-info">
+                        <h3><i class="fas fa-store"></i> <span data-id="t3-n" data-qu="Licencia Funcionamiento">Licencia de Funcionamiento</span></h3>
+                        <p data-id="t3-d" data-qu="Munisipyuq suyúnpi negociota ruwanaykipaq permiso.">Permiso para operar un negocio dentro del territorio municipal.</p>
+                        <div class="tramite-details">
+                            <span><i class="fas fa-dollar-sign"></i> Bs. 50-500</span>
+                            <span><i class="fas fa-clock"></i> <span data-qu="5-10 p'unchay">5-10 días</span></span>
+                            <span><i class="fas fa-building"></i> <span data-qu="Desarrollo Económico">Des. Económico</span></span>
+                        </div>
+                        <div class="tramite-accordion">
+                            <button class="accordion-btn" onclick="toggleAccordion(this)"><i class="fas fa-chevron-down"></i> <span data-qu="Requisitokuna Qhaway">Ver requisitos</span></button>
+                            <div class="accordion-content"><div class="detail-grid">
+                                <div class="detail-col">
+                                    <h4><i class="fas fa-clipboard-list"></i> <span data-qu="Requisitokuna">Requisitos</span></h4>
+                                    <ul>
+                                        <li data-qu="Mañakuy qillqa">Solicitud</li>
+                                        <li data-qu="Propietarioq cédula">Cédula del propietario</li>
+                                        <li data-qu="RUC fotocopia">Fotocopia RUC</li>
+                                        <li data-qu="Ubicación plano">Plano de ubicación</li>
+                                        <li data-qu="Localq foto">Foto del local</li>
+                                        <li data-qu="Póliza responsabilidad">Póliza de responsabilidad</li>
+                                    </ul>
+                                </div>
+                                <div class="detail-col">
+                                    <h4><i class="fas fa-list-ol"></i> <span data-qu="Ruwanakuna">Pasos</span></h4>
+                                    <ol>
+                                        <li data-qu="Solicitudta rikuchiy">Presentar solicitud</li>
+                                        <li data-qu="Formulariota qillqay">Llenar formulario</li>
+                                        <li data-qu="Requisitokunata rikuchiy">Presentar requisitos</li>
+                                        <li data-qu="Localq qhawariy">Inspección del local</li>
+                                        <li data-qu="Pagay">Pagar</li>
+                                        <li data-qu="Licenciata chaskikuy">Retirar licencia</li>
+                                    </ol>
+                                </div>
+                            </div></div>
+                        </div>
+                    </div>
+                    <div class="tramite-action"><button class="chat-query-btn" onclick="openChatWithQuery('licencia de funcionamiento')"><i class="fas fa-comments"></i> <span data-qu="Tapukuy">Consultar</span></button></div>
+                </div>
+
+                <!-- 4 CONSTRUCCIÓN -->
+                <div class="tramite-item" data-category="vivienda" id="construccion">
+                    <div class="tramite-num">04</div>
+                    <div class="tramite-info">
+                        <h3><i class="fas fa-building"></i> <span data-id="t4-n" data-qu="Construcción Permiso">Permiso de Construcción</span></h3>
+                        <p data-id="t4-d" data-qu="Wasi ruwana utaq allchasqanapaq permiso.">Autorización para obras de construcción o modificación.</p>
+                        <div class="tramite-details">
+                            <span><i class="fas fa-dollar-sign"></i> Bs. 100-500</span>
+                            <span><i class="fas fa-clock"></i> <span data-qu="10-15 p'unchay">10-15 días</span></span>
+                            <span><i class="fas fa-building"></i> <span data-qu="Obra Pública Oficina">Obras Públicas</span></span>
+                        </div>
+                        <div class="tramite-accordion">
+                            <button class="accordion-btn" onclick="toggleAccordion(this)"><i class="fas fa-chevron-down"></i> <span data-qu="Requisitokuna Qhaway">Ver requisitos</span></button>
+                            <div class="accordion-content"><div class="detail-grid">
+                                <div class="detail-col">
+                                    <h4><i class="fas fa-clipboard-list"></i> <span data-qu="Requisitokuna">Requisitos</span></h4>
+                                    <ul><li data-qu="Mañakuy qillqa">Solicitud</li><li data-qu="Cédula">Cédula</li><li data-qu="Título de propiedad">Título de propiedad</li><li data-qu="Arquitectoq plano">Plano arquitectónico</li><li data-qu="Estructural plano">Plano estructural</li><li data-qu="Memoria de cálculo">Memoria de cálculo</li></ul>
+                                </div>
+                                <div class="detail-col">
+                                    <h4><i class="fas fa-list-ol"></i> <span data-qu="Ruwanakuna">Pasos</span></h4>
+                                    <ol><li data-qu="Obra Públicaqpi mañakuy">Solicitar en Obras Públicas</li><li data-qu="Documentokunata rikuchiy">Presentar documentos</li><li data-qu="Planokunaq qhawariy">Revisión de planos</li><li data-qu="Qhawariy">Inspección</li><li data-qu="Pagay">Pagar</li><li data-qu="Permisota chaskikuy">Retirar permiso</li></ol>
+                                </div>
+                            </div></div>
+                        </div>
+                    </div>
+                    <div class="tramite-action"><button class="chat-query-btn" onclick="openChatWithQuery('permiso de construccion')"><i class="fas fa-comments"></i> <span data-qu="Tapukuy">Consultar</span></button></div>
+                </div>
+
+                <!-- 5 PROPIEDAD -->
+                <div class="tramite-item" data-category="vivienda" id="propiedad">
+                    <div class="tramite-num">05</div>
+                    <div class="tramite-info">
+                        <h3><i class="fas fa-file-contract"></i> <span data-id="t5-n" data-qu="Propiedad Registro">Registro de Propiedad</span></h3>
+                        <p data-id="t5-d" data-qu="Propiedadyki munisipyuq registronpi qillchachikuy.">Inscripción de propiedad en el registro municipal.</p>
+                        <div class="tramite-details">
+                            <span><i class="fas fa-dollar-sign"></i> Bs. 80-300</span>
+                            <span><i class="fas fa-clock"></i> <span data-qu="15-20 p'unchay">15-20 días</span></span>
+                            <span><i class="fas fa-building"></i> <span data-qu="Catastro">Catastro</span></span>
+                        </div>
+                        <div class="tramite-accordion">
+                            <button class="accordion-btn" onclick="toggleAccordion(this)"><i class="fas fa-chevron-down"></i> <span data-qu="Requisitokuna Qhaway">Ver requisitos</span></button>
+                            <div class="accordion-content"><div class="detail-grid">
+                                <div class="detail-col"><h4><i class="fas fa-clipboard-list"></i> <span data-qu="Requisitokuna">Requisitos</span></h4><ul><li data-qu="Mañakuy qillqa">Solicitud</li><li data-qu="Cédula">Cédula</li><li data-qu="Escritura pública">Escritura pública</li><li data-qu="Ubicación plano">Plano de ubicación</li><li data-qu="Mana deuda predial">No deuda predial</li></ul></div>
+                                <div class="detail-col"><h4><i class="fas fa-list-ol"></i> <span data-qu="Ruwanakuna">Pasos</span></h4><ol><li data-qu="Catastroqpi mañakuy">Solicitar en Catastro</li><li data-qu="Escriturata rikuchiy">Presentar escritura</li><li data-qu="Qhawariy">Inspección</li><li data-qu="Catastro valor yupay">Valor catastral</li><li data-qu="Derechokunata pagay">Pagar derechos</li><li data-qu="Certificadota chaskikuy">Certificado</li></ol></div>
+                            </div></div>
+                        </div>
+                    </div>
+                    <div class="tramite-action"><button class="chat-query-btn" onclick="openChatWithQuery('registro de propiedad')"><i class="fas fa-comments"></i> <span data-qu="Tapukuy">Consultar</span></button></div>
+                </div>
+
+                <!-- 6 SOLTERÍA -->
+                <div class="tramite-item" data-category="identidad" id="solteria">
+                    <div class="tramite-num">06</div>
+                    <div class="tramite-info">
+                        <h3><i class="fas fa-user"></i> <span data-id="t6-n" data-qu="Soltería Constancia">Constancia de Soltería</span></h3>
+                        <p data-id="t6-d" data-qu="Mana casarakusqa kasqaykita riqsichiq documento.">Certifica el estado civil soltero.</p>
+                        <div class="tramite-details">
+                            <span><i class="fas fa-dollar-sign"></i> Bs. 10</span>
+                            <span><i class="fas fa-clock"></i> <span data-qu="1-2 p'unchay">1-2 días</span></span>
+                            <span><i class="fas fa-building"></i> <span data-qu="Registro Civil">Registro Civil</span></span>
+                        </div>
+                        <div class="tramite-accordion">
+                            <button class="accordion-btn" onclick="toggleAccordion(this)"><i class="fas fa-chevron-down"></i> <span data-qu="Requisitokuna Qhaway">Ver requisitos</span></button>
+                            <div class="accordion-content"><div class="detail-grid">
+                                <div class="detail-col"><h4><i class="fas fa-clipboard-list"></i> <span data-qu="Requisitokuna">Requisitos</span></h4><ul><li data-qu="Cédula">Cédula</li><li data-qu="Declaración jurada">Declaración jurada</li><li data-qu="Iskay carnet fotokuna">Dos fotos carnet</li></ul></div>
+                                <div class="detail-col"><h4><i class="fas fa-list-ol"></i> <span data-qu="Ruwanakuna">Pasos</span></h4><ol><li data-qu="Formulariota apakamuy">Recoger formulario</li><li data-qu="Formulariota qillqay">Llenar</li><li data-qu="Requisitokunata rikuchiy">Presentar</li><li data-qu="Pagay">Pagar</li><li data-qu="Chaskikuy">Retirar</li></ol></div>
+                            </div></div>
+                        </div>
+                    </div>
+                    <div class="tramite-action"><button class="chat-query-btn" onclick="openChatWithQuery('constancia de solteria')"><i class="fas fa-comments"></i> <span data-qu="Tapukuy">Consultar</span></button></div>
+                </div>
+
+                <!-- 7 IMPUESTOS -->
+                <div class="tramite-item" data-category="servicios" id="prediales">
+                    <div class="tramite-num">07</div>
+                    <div class="tramite-info">
+                        <h3><i class="fas fa-receipt"></i> <span data-id="t7-n" data-qu="Predial Impuestokuna">Impuestos Prediales</span></h3>
+                        <p data-id="t7-d" data-qu="Sapa wata propiedadyuq impuestota pagay.">Pago anual del impuesto a la propiedad.</p>
+                        <div class="tramite-details">
+                            <span><i class="fas fa-dollar-sign"></i> 0.2%</span>
+                            <span><i class="fas fa-clock"></i> <span data-qu="Chaylla">Inmediato</span></span>
+                            <span><i class="fas fa-building"></i> <span data-qu="Rentas Internas">Rentas Internas</span></span>
+                        </div>
+                        <div class="tramite-accordion">
+                            <button class="accordion-btn" onclick="toggleAccordion(this)"><i class="fas fa-chevron-down"></i> <span data-qu="Requisitokuna Qhaway">Ver requisitos</span></button>
+                            <div class="accordion-content"><div class="detail-grid">
+                                <div class="detail-col"><h4><i class="fas fa-clipboard-list"></i> <span data-qu="Requisitokuna">Requisitos</span></h4><ul><li data-qu="Cédula">Cédula</li><li data-qu="Ñawpaq recibo">Recibo anterior</li><li data-qu="Propiedad certificado">Certificado de propiedad</li></ul></div>
+                                <div class="detail-col"><h4><i class="fas fa-list-ol"></i> <span data-qu="Ruwanakuna">Pasos</span></h4><ol><li data-qu="Rentas Internasman riy">Acudir a Rentas</li><li data-qu="Requisitokunata rikuchiy">Presentar docs</li><li data-qu="Impuesto yupay">Cálculo</li><li data-qu="Pagay">Pagar</li><li data-qu="Recibota chaskikuy">Obtener recibo</li></ol></div>
+                            </div></div>
+                        </div>
+                    </div>
+                    <div class="tramite-action"><button class="chat-query-btn" onclick="openChatWithQuery('impuestos prediales')"><i class="fas fa-comments"></i> <span data-qu="Tapukuy">Consultar</span></button></div>
+                </div>
+
+                <!-- 8 AGUA -->
+                <div class="tramite-item" data-category="servicios" id="agua">
+                    <div class="tramite-num">08</div>
+                    <div class="tramite-info">
+                        <h3><i class="fas fa-tint"></i> <span data-id="t8-n" data-qu="Yaku (Agua Potable)">Agua Potable</span></h3>
+                        <p data-id="t8-d" data-qu="Munisipyuq yakunmanta servicio.">Servicio de agua potable municipal.</p>
+                        <div class="tramite-details">
+                            <span><i class="fas fa-dollar-sign"></i> Bs. 50-200</span>
+                            <span><i class="fas fa-clock"></i> <span data-qu="3-7 p'unchay">3-7 días</span></span>
+                            <span><i class="fas fa-building"></i> <span data-qu="Yaku Empresa">Empresa de Agua</span></span>
+                        </div>
+                        <div class="tramite-accordion">
+                            <button class="accordion-btn" onclick="toggleAccordion(this)"><i class="fas fa-chevron-down"></i> <span data-qu="Requisitokuna Qhaway">Ver requisitos</span></button>
+                            <div class="accordion-content"><div class="detail-grid">
+                                <div class="detail-col"><h4><i class="fas fa-clipboard-list"></i> <span data-qu="Requisitokuna">Requisitos</span></h4><ul><li data-qu="Cédula">Cédula</li><li data-qu="Propiedad utaq contrato">Propiedad o contrato</li><li data-qu="Mañakuy qillqa">Solicitud</li><li data-qu="Predioq foto">Foto del predio</li></ul></div>
+                                <div class="detail-col"><h4><i class="fas fa-list-ol"></i> <span data-qu="Ruwanakuna">Pasos</span></h4><ol><li data-qu="Yaku Empresaqpi mañakuy">Solicitar</li><li data-qu="Requisitokunata rikuchiy">Presentar</li><li data-qu="Qhawariy">Inspección</li><li data-qu="Pagay">Pagar</li><li data-qu="Yakuta churay">Habilitar</li></ol></div>
+                            </div></div>
+                        </div>
+                    </div>
+                    <div class="tramite-action"><button class="chat-query-btn" onclick="openChatWithQuery('agua potable')"><i class="fas fa-comments"></i> <span data-qu="Tapukuy">Consultar</span></button></div>
+                </div>
+
+                <!-- 9 EVENTOS -->
+                <div class="tramite-item" data-category="negocio" id="eventos">
+                    <div class="tramite-num">09</div>
+                    <div class="tramite-info">
+                        <h3><i class="fas fa-calendar-alt"></i> <span data-id="t9-n" data-qu="Eventopaq Permiso">Permiso para Eventos</span></h3>
+                        <p data-id="t9-d" data-qu="Eventokunata ruwanaykipaq munisipyuq permiso.">Autorización para eventos públicos.</p>
+                        <div class="tramite-details">
+                            <span><i class="fas fa-dollar-sign"></i> Bs. 20-200</span>
+                            <span><i class="fas fa-clock"></i> <span data-qu="3-5 p'unchay">3-5 días</span></span>
+                            <span><i class="fas fa-building"></i> <span data-qu="Cultura y Turismo">Cultura y Turismo</span></span>
+                        </div>
+                        <div class="tramite-accordion">
+                            <button class="accordion-btn" onclick="toggleAccordion(this)"><i class="fas fa-chevron-down"></i> <span data-qu="Requisitokuna Qhaway">Ver requisitos</span></button>
+                            <div class="accordion-content"><div class="detail-grid">
+                                <div class="detail-col"><h4><i class="fas fa-clipboard-list"></i> <span data-qu="Requisitokuna">Requisitos</span></h4><ul><li data-qu="Mañakuy qillqa">Solicitud</li><li data-qu="Organizadorq cédula">Cédula organizador</li><li data-qu="Programa">Programa</li><li data-qu="Seguridad plan">Plan seguridad</li><li data-qu="Póliza">Póliza</li></ul></div>
+                                <div class="detail-col"><h4><i class="fas fa-list-ol"></i> <span data-qu="Ruwanakuna">Pasos</span></h4><ol><li data-qu="Culturaqpi mañakuy">Solicitar</li><li data-qu="Yachay rikuchiy">Presentar</li><li data-qu="Qhawariy">Revisión</li><li data-qu="Pagay">Pagar</li><li data-qu="Chaskikuy">Retirar</li></ol></div>
+                            </div></div>
+                        </div>
+                    </div>
+                    <div class="tramite-action"><button class="chat-query-btn" onclick="openChatWithQuery('permiso para evento')"><i class="fas fa-comments"></i> <span data-qu="Tapukuy">Consultar</span></button></div>
+                </div>
+
+                <!-- 10 VEHÍCULOS -->
+                <div class="tramite-item" data-category="servicios" id="vehiculos">
+                    <div class="tramite-num">10</div>
+                    <div class="tramite-info">
+                        <h3><i class="fas fa-car"></i> <span data-id="t10-n" data-qu="Vehículo Registro">Registro de Vehículos</span></h3>
+                        <p data-id="t10-d" data-qu="Vehículokunata munisipyuqpi registray.">Inscripción de vehículos motorizados.</p>
+                        <div class="tramite-details">
+                            <span><i class="fas fa-dollar-sign"></i> Bs. 30-150</span>
+                            <span><i class="fas fa-clock"></i> <span data-qu="2-5 p'unchay">2-5 días</span></span>
+                            <span><i class="fas fa-building"></i> <span data-qu="Tránsito">Tránsito</span></span>
+                        </div>
+                        <div class="tramite-accordion">
+                            <button class="accordion-btn" onclick="toggleAccordion(this)"><i class="fas fa-chevron-down"></i> <span data-qu="Requisitokuna Qhaway">Ver requisitos</span></button>
+                            <div class="accordion-content"><div class="detail-grid">
+                                <div class="detail-col"><h4><i class="fas fa-clipboard-list"></i> <span data-qu="Requisitokuna">Requisitos</span></h4><ul><li data-qu="Cédula">Cédula</li><li data-qu="Tránsito libreta">Libreta tránsito</li><li data-qu="Vehículo revisión">Revisión vehicular</li><li data-qu="SOAT">SOAT</li></ul></div>
+                                <div class="detail-col"><h4><i class="fas fa-list-ol"></i> <span data-qu="Ruwanakuna">Pasos</span></h4><ol><li data-qu="Tránsitoqpi mañakuy">Solicitar</li><li data-qu="Yachay rikuchiy">Presentar</li><li data-qu="Qhawariy">Revisión</li><li data-qu="Impuestota pagay">Pagar</li><li data-qu="Placa uywaq libreta chaskikuy">Placa y libreta</li></ol></div>
+                            </div></div>
+                        </div>
+                    </div>
+                    <div class="tramite-action"><button class="chat-query-btn" onclick="openChatWithQuery('registro de vehiculo')"><i class="fas fa-comments"></i> <span data-qu="Tapukuy">Consultar</span></button></div>
+                </div>
+
+                <!-- 11 NO DEUDA -->
+                <div class="tramite-item" data-category="servicios" id="no_deuda">
+                    <div class="tramite-num">11</div>
+                    <div class="tramite-info">
+                        <h3><i class="fas fa-check-circle"></i> <span data-id="t11-n" data-qu="Mana Deuda Constancia">Constancia de No Deuda</span></h3>
+                        <p data-id="t11-d" data-qu="Munisipyuwan mana deudayuq kasqaykita riqsichiq.">Certifica que no tiene deudas con el municipio.</p>
+                        <div class="tramite-details">
+                            <span><i class="fas fa-dollar-sign"></i> Bs. 10</span>
+                            <span><i class="fas fa-clock"></i> <span data-qu="1-2 p'unchay">1-2 días</span></span>
+                            <span><i class="fas fa-building"></i> <span data-qu="Rentas Internas">Rentas Internas</span></span>
+                        </div>
+                        <div class="tramite-accordion">
+                            <button class="accordion-btn" onclick="toggleAccordion(this)"><i class="fas fa-chevron-down"></i> <span data-qu="Requisitokuna Qhaway">Ver requisitos</span></button>
+                            <div class="accordion-content"><div class="detail-grid">
+                                <div class="detail-col"><h4><i class="fas fa-clipboard-list"></i> <span data-qu="Requisitokuna">Requisitos</span></h4><ul><li data-qu="Cédula">Cédula</li><li data-qu="Propiedad certificado">Certificado propiedad</li></ul></div>
+                                <div class="detail-col"><h4><i class="fas fa-list-ol"></i> <span data-qu="Ruwanakuna">Pasos</span></h4><ol><li data-qu="Rentas Internasman riy">Acudir</li><li data-qu="Requisitokunata rikuchiy">Presentar</li><li data-qu="Deudaykita qhawariy">Verificar</li><li data-qu="Deudayuq kaspa pagay">Pagar si tiene</li><li data-qu="Qillqay">Emitir</li></ol></div>
+                            </div></div>
+                        </div>
+                    </div>
+                    <div class="tramite-action"><button class="chat-query-btn" onclick="openChatWithQuery('constancia de no deuda')"><i class="fas fa-comments"></i> <span data-qu="Tapukuy">Consultar</span></button></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- MULTAS -->
+    <section class="section multas-section" id="multas">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag"><i class="fas fa-exclamation-circle"></i> <span data-qu="Multakuna">Multas</span></span>
+                <h2 data-qu="Munisipyuq Multakuna">Multas Municipales</h2>
+                <p data-qu="Multakuna uywaq pagayninkunaq yachayninta rikuy.">Información sobre multas y procedimientos de pago</p>
+            </div>
+            <div class="multas-grid">
+                <div class="multa-card">
+                    <div class="multa-header transito"><i class="fas fa-traffic-light"></i><h3 data-qu="Tránsito Multakuna">Multas de Tránsito</h3></div>
+                    <ul class="multa-list">
+                        <li><span data-qu="Exceso de velocidad">Exceso de velocidad</span><strong>Bs. 100-300</strong></li>
+                        <li><span data-qu="Mana licencia">Sin licencia</span><strong>Bs. 200-500</strong></li>
+                        <li><span data-qu="Prohibido aparca">Estacionamiento prohibido</span><strong>Bs. 50-100</strong></li>
+                        <li><span data-qu="Semaforota mana kasukuy">No respetar semáforo</span><strong>Bs. 100-200</strong></li>
+                        <li><span data-qu="Machasqa">Ebriedad</span><strong>Bs. 500-1,000</strong></li>
+                    </ul>
+                    <button class="multa-btn" onclick="openChatWithQuery('multas transito')"><i class="fas fa-comments"></i> <span data-qu="Mas Yachay">Más Información</span></button>
+                </div>
+                <div class="multa-card">
+                    <div class="multa-header municipal"><i class="fas fa-building"></i><h3 data-qu="Munisipyu Multakuna">Multas Municipales</h3></div>
+                    <ul class="multa-list">
+                        <li><span data-qu="Basurata wikch'uy">Arrojar basura</span><strong>Bs. 50-100</strong></li>
+                        <li><span data-qu="Ancha ruido (22:00)">Ruido excesivo</span><strong>Bs. 100-200</strong></li>
+                        <li><span data-qu="Mana permiso vendiy">Vender sin permiso</span><strong>Bs. 200-500</strong></li>
+                        <li><span data-qu="Mobiliariota p'akiy">Dañar mobiliario</span><strong>Bs. 100-300</strong></li>
+                    </ul>
+                    <button class="multa-btn" onclick="openChatWithQuery('multas municipales')"><i class="fas fa-comments"></i> <span data-qu="Mas Yachay">Más Información</span></button>
+                </div>
+                <div class="multa-card">
+                    <div class="multa-header pago"><i class="fas fa-money-bill-wave"></i><h3 data-qu="Pagaypaq Yachay">Procedimiento de Pago</h3></div>
+                    <ul class="multa-list">
+                        <li><span data-qu="Munisipyu Caja">Caja Municipal</span><strong>Efectivo</strong></li>
+                        <li><span data-qu="Bancokuna">Bancos</span><strong>Transferencia</strong></li>
+                        <li><span data-qu="Electrónico">Electrónico</span><strong>Online</strong></li>
+                    </ul>
+                    <div class="multa-info"><p><strong data-qu="Apelación p'unchay:">Plazo apelación:</strong> 5 <span data-qu="llamkaq p'unchaykuna">días hábiles</span></p></div>
+                    <button class="multa-btn" onclick="openChatWithQuery('pago multa')"><i class="fas fa-comments"></i> <span data-qu="Mas Yachay">Más Información</span></button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- INSTITUCIÓN -->
+    <section class="section institucion-section" id="institucion">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag"><i class="fas fa-info-circle"></i> <span data-qu="Institución">Institución</span></span>
+                <h2 data-qu="Sakaba Munisipyu Autónomo">Gobierno Autónomo Municipal de Sacaba</h2>
+            </div>
+            <div class="institucion-grid">
+                <div class="inst-card">
+                    <div class="inst-icon"><i class="fas fa-clock"></i></div>
+                    <h3 data-qu="Horario Atención">Horarios de Atención</h3>
+                    <ul>
+                        <li><strong>Lun-Vie:</strong> 8:00 - 12:00 / 14:30 - 18:30</li>
+                        <li><strong>Sáb:</strong> 8:00 - 12:00</li>
+                        <li data-qu="Dom: Wisq'asqa">Dom: Cerrado</li>
+                    </ul>
+                </div>
+                <div class="inst-card">
+                    <div class="inst-icon"><i class="fas fa-map-marker-alt"></i></div>
+                    <h3 data-qu="Ubicación">Ubicación</h3>
+                    <ul>
+                        <li data-qu="Plaza Principal s/n">Plaza Principal s/n</li>
+                        <li>SEGIP: <a href="https://maps.app.goo.gl/f27gLh5Accp2UmKW9" target="_blank" data-qu="Google Mapspi Qhaway">Ver mapa</a></li>
+                    </ul>
+                </div>
+                <div class="inst-card">
+                    <div class="inst-icon"><i class="fas fa-phone-alt"></i></div>
+                    <h3 data-qu="Contacto">Contacto</h3>
+                    <ul>
+                        <li><strong>Tel:</strong> (591) 4-XXXXXX</li>
+                        <li><strong>Email:</strong> info@sacaba.gob.bo</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="main-footer">
+        <div class="container">
+            <div class="footer-top">
+                <div class="footer-col">
+                    <div class="footer-logo"><img src="{{ url_for('static', filename='img/logo-sacaba.webp') }}" alt="Logo Sacaba" class="footer-logo-img"><div><span data-qu="Munisipyu Gobierno Autónomo">Gobierno Autónomo Municipal</span><strong>SACABA</strong></div></div>
+                </div>
+                <div class="footer-col">
+                    <h4 data-qu="Tupachina">Enlaces</h4>
+                    <a href="#inicio" data-qu="Qallariy">Inicio</a>
+                    <a href="#tramites" data-qu="Trámitekuna">Trámites</a>
+                    <a href="#multas" data-qu="Multakuna">Multas</a>
+                </div>
+                <div class="footer-col">
+                    <h4 data-qu="Contacto">Contacto</h4>
+                    <p><i class="fas fa-phone"></i> (591) 4-XXXXXX</p>
+                    <p><i class="fas fa-envelope"></i> info@sacaba.gob.bo</p>
+                </div>
+            </div>
+            <div class="footer-bottom"><p>&copy; 2026 <span data-qu="Sakaba Munisipyu">Municipal de Sacaba</span></p></div>
+        </div>
+    </footer>
+
+    <!-- Chatbot Widget -->
+    <div id="chatbot-widget"></div>
+
+    <!-- Scripts -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script src="{{ url_for('static', filename='chatbot/chatbot-widget.js') }}"></script>
+    <script>initChatbotWidget({defaultLanguage:'en'});</script>
+</body>
+</html>
