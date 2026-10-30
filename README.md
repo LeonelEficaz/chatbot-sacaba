@@ -5,7 +5,7 @@ Asistente virtual y portal de trámites del **Gobierno Autónomo Municipal de Sa
 trámites, incluye voz neuronal (Edge TTS), dictado por micrófono, mapas con
 OpenStreetMap y un panel administrativo con roles.
 
-- **Aplicación publicada:** pendiente de la primera publicación (ver *Despliegue*).
+- **Aplicación publicada:** <https://sami-sacaba.onrender.com> (Render, plan Free)
 - **Repositorio:** <https://github.com/LeonelEficaz/chatbot-sacaba>
 
 ## Requisitos
