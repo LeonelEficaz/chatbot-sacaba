@@ -2707,6 +2707,8 @@ function init(options) {
         var inp = document.getElementById('cw-in');
         var msg = inp.value.trim();
         if (!msg || S.busy) return;
+        // Lo escrito tambien se interpreta: "multa cuna" se muestra "multakuna".
+        msg = interpretarQuechua(msg);
         addMsg(msg, 'user');
         inp.value = '';
         playSound('send');
