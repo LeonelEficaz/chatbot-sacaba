@@ -34,7 +34,7 @@
             abrirFicha: 'Ver ficha y horarios', masBuscados: 'Los más buscados',
             horarios: 'Horarios de atención', abrirPagina: 'Abrir página del trámite',
             resumenQu: 'Resumen en quechua', fichaEs: 'El detalle completo está en español.',
-            saludo: '¡Allillanchu! Soy Sami, tu asistente de trámites de Sacaba. Dime qué necesitas y te muestro la ficha completa.',
+            saludo: '¡Hola! Soy Sami, tu asistente municipal de Sacaba. Cuéntame qué necesitas, te escucho.',
             hablar: 'Hablar con Sami', buscarFicha: 'Buscar trámite'
         },
         qu: {
@@ -49,7 +49,7 @@
             abrirFicha: 'Ficha qhaway', masBuscados: 'Aswan maskasqakuna',
             horarios: 'Yanapay pachakuna', abrirPagina: 'Tramitep p’anqanta kichay',
             resumenQu: 'Runasimipi pisichay', fichaEs: 'Tukuy willakuy español simipi.',
-            saludo: '¡Allillanchu! Sami kani, Sakaba tramitekuna yanapaq. Imata munasqaykita niway, ficha hunt’asqata qhawachisqayki.',
+            saludo: '¡Imaynallan! Noqaqa Sami, Sakaba Munisipyuq yanapayniyki. Imata munasqaykita niway, uyarishayki.',
             hablar: 'Samiwan rimay', buscarFicha: 'Trámite maskay'
         }
     };

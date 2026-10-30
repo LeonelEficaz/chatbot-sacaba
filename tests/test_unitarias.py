@@ -175,8 +175,8 @@ class TestGetResp(unittest.TestCase):
 
     def test_pu27_saludo_es(self):
         resp = get_resp("hola")
-        self.assertIn("chatbot municipal", resp)
-        self.assertIn("carnet de identidad", resp)
+        self.assertIn("Soy **Sami**", resp)
+        self.assertIn("multas", resp)
 
     def test_pu28_costo_tramite(self):
         resp = get_resp("¿Cuánto cuesta el carnet?", "es")

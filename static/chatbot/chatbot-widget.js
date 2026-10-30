@@ -717,10 +717,9 @@ var UI = {
         ph: "Escribe o habla tu consulta...",
         presentando: "Escuchando la presentaci\u00f3n...",
         powered: "Sami - Municipio de Sacaba",
-        greeting: "\u00a1Hola! \ud83d\ude0a Soy **Sami**, tu asistente municipal de Sacaba. Cu\u00e9ntame qu\u00e9 necesitas y preparo la ficha completa en pantalla mientras conversamos.",
+        greeting: "\u00a1Hola! \ud83d\ude0a Soy **Sami**, tu asistente municipal de Sacaba. Te ayudo con tr\u00e1mites, licencias, catastro, veh\u00edculos y multas. Cu\u00e9ntame, te escucho.",
         smalltalk: "\u00a1Muy bien, gracias por preguntar! \ud83d\ude0a \u00bfEn qu\u00e9 tr\u00e1mite te acompa\u00f1o hoy?",
         identity: "Soy **Sami**, la asistente del Municipio de Sacaba. Te oriento en tr\u00e1mites, licencias, catastro, veh\u00edculos y multas, y te muestro la ficha completa mientras conversamos.",
-        greeting2: "Preg\u00fantame como se lo dir\u00edas a una amiga: \u00abquiero sacar mi carnet\u00bb, \u00aby d\u00f3nde pago mi multa?\u00bb.",
         farewell: "\u00a1Gracias a ti! \ud83d\ude0a Que te vaya muy bien en tu tr\u00e1mite.",
         greeting_opts: ["\u2728 Ver consultas disponibles"],
         consultas_btn: "\u2728 Ver consultas disponibles",
@@ -752,10 +751,9 @@ var UI = {
         ph: "Tapukuyniykita qillqay utaq rimay...",
         presentando: "Napaykuta uyarishayku...",
         powered: "Sami - Sakaba Munisipyu",
-        greeting: "Imaynallan! \ud83d\udc4b Noqaqa **Sami**, Sakaba Munisipyuq yanapayniyki. Imata munanki niway, noqataq pantallapi fichata rikuchisaq.",
+        greeting: "Imaynallan! \ud83d\udc4b Noqaqa **Sami**, Sakaba Munisipyuq yanapayniyki. Tramitekuna, licenciakuna, catastro, carrokuna nitaq multakunapi yanapayta atiymi. Imata munanki? Uyarishayki.",
         smalltalk: "Allinmi, tapukusqaykimanta yusulpayki! \ud83d\ude0a \u00bfIma tramitepi yanapaykayman?",
         identity: "Noqaqa **Sami** kani, Sakaba Munisipyuq yanapaq. Tramitekuna, licenciakuna, catastro, carrokuna nitaq multakunapi yanapayta atiymi.",
-        greeting2: "Tapuway imayna rimasqaykita: \u00abcarnetyta horqoyta munani\u00bb, \u00abmaypitaq multayta pagani?\u00bb.",
         farewell: "\u00a1Yusulpayki! \ud83d\ude0a Allin p'unchay kachun.",
         greeting_opts: ["\u2728 Tapukuykunata qhaway"],
         consultas_btn: "\u2728 Tapukuykunata qhaway",
@@ -939,7 +937,7 @@ function getResp(msg) {
     var intent = detectIntent(msg);
     var tramite = detectTramite(msg);
 
-    if (intent === 'greeting') return UI[lang].greeting + "\n\n" + UI[lang].greeting2;
+    if (intent === 'greeting') return UI[lang].greeting;
     if (intent === 'farewell') return UI[lang].farewell;
     if (intent === 'smalltalk') return UI[lang].smalltalk || UI.es.smalltalk;
     if (intent === 'identity') return UI[lang].identity || UI.es.identity;
@@ -1884,7 +1882,7 @@ function bloquearChat(on) {
 
 function textoPresentacion(lang) {
     var ui = UI[lang] || UI.es;
-    return ui.greeting + ' ' + ui.greeting2;
+    return ui.greeting;
 }
 
 function iniciarEscuchaAuto() {
@@ -2567,10 +2565,7 @@ function renderConversation(lang) {
             hideTyping();
             S.silent = false;
             addMsg(UI[lang].greeting, 'bot');
-            setTimeout(function() {
-                addMsg(UI[lang].greeting2, 'bot');
-                showOpts(UI[lang].greeting_opts);
-            }, 500);
+            setTimeout(function () { showOpts(UI[lang].greeting_opts); }, 450);
         }, 400);
         return;
     }
@@ -2630,15 +2625,12 @@ function greet() {
         hideTyping();
         addMsg(UI[S.lang].greeting, 'bot');
         playSound('message');
+        // Sami se presenta y deja el turno al ciudadano: no pide frases modelo.
+        showOpts(UI[S.lang].greeting_opts);
         setTimeout(function() {
-            addMsg(UI[S.lang].greeting2, 'bot');
-            showOpts(UI[S.lang].greeting_opts);
-            // La bienvenida se lee desde el inicio, sin saltar al final.
-            setTimeout(function() {
-                var msgs = document.getElementById('cw-msgs');
-                if (msgs && !S.log.length) msgs.scrollTop = 0;
-            }, 350);
-        }, 600);
+            var msgs = document.getElementById('cw-msgs');
+            if (msgs && !S.log.length) msgs.scrollTop = 0;
+        }, 350);
     }, 900);
 }
 
