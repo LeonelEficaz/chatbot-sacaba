@@ -1,0 +1,83 @@
+{% extends 'admin_base.html' %}
+{% block title %}Panel{% endblock %}
+{% block contenido %}
+<div class="titulo">
+    <div>
+        <h1>Hola, {{ session.get('nombre', '').split(' ')[0] }}</h1>
+        <p>Este es el estado del portal ciudadano y del equipo municipal.</p>
+    </div>
+    <a class="enlace-tenue" href="{{ url_for('index') }}" target="_blank" rel="noopener"><i class="fas fa-arrow-up-right-from-square"></i> Ver portal ciudadano</a>
+</div>
+
+<section class="tarjetas">
+    <div class="tarjeta destacada">
+        <div class="rotulo">Trámites publicados</div>
+        <div class="valor">{{ total_tramites }}</div>
+        <div class="nota">Fichas visibles en el portal y en Sami</div>
+    </div>
+    <div class="tarjeta">
+        <div class="rotulo">Con datos actualizados</div>
+        <div class="valor">{{ total_cambios }}</div>
+        <div class="nota">Editados por funcionarios</div>
+    </div>
+    <div class="tarjeta">
+        <div class="rotulo">Usuarios del panel</div>
+        <div class="valor">{{ total_usuarios }}</div>
+        <div class="nota">{{ usuarios_activos }} activos · {{ por_rol.get('administrador', 0) }} administradores</div>
+    </div>
+    <div class="tarjeta">
+        <div class="rotulo">Categorías</div>
+        <div class="valor">{{ categorias }}</div>
+        <div class="nota">Identidad, catastro, vehículos y más</div>
+    </div>
+</section>
+
+<div class="rejilla">
+    <section class="panel">
+        <div class="panel-cab">
+            <div>
+                <h2>Primeras fichas del portal</h2>
+                <p>Actualiza costos, requisitos y horarios.</p>
+            </div>
+            <a class="enlace-tenue" href="{{ url_for('admin_tramites') }}">Ver todos <i class="fas fa-arrow-right"></i></a>
+        </div>
+        <div class="panel-cuerpo" style="padding:0 8px 8px">
+            <table>
+                <thead>
+                    <tr><th>Trámite</th><th>Costo</th><th>Tiempo</th><th></th></tr>
+                </thead>
+                <tbody>
+                {% for t in recientes %}
+                    <tr>
+                        <td><strong>{{ t.n }}</strong><br><span style="color:var(--gris);font-size:11.5px">{{ t.cat }}</span></td>
+                        <td>{{ t.costo }}</td>
+                        <td>{{ t.tiempo }}</td>
+                        <td><a class="enlace-tenue" href="{{ url_for('admin_tramites', editar=t.id) }}">Editar</a></td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <aside class="panel">
+        <div class="panel-cab">
+            <div>
+                <h2>Atajos</h2>
+                <p>Lo que más se usa en ventanilla.</p>
+            </div>
+        </div>
+        <div class="panel-cuerpo">
+            <a class="boton secundario" style="margin-top:0;text-decoration:none" href="{{ url_for('admin_tramites') }}"><i class="fas fa-pen-to-square"></i> Actualizar un trámite</a>
+            {% if es_admin %}
+            <a class="boton secundario" style="text-decoration:none" href="{{ url_for('admin_usuarios') }}"><i class="fas fa-user-plus"></i> Registrar funcionario</a>
+            {% endif %}
+            <a class="boton secundario" style="text-decoration:none" href="{{ url_for('admin_cuenta') }}"><i class="fas fa-key"></i> Cambiar mi contraseña</a>
+            <a class="boton secundario" style="text-decoration:none" href="{{ url_for('index') }}" target="_blank" rel="noopener"><i class="fas fa-globe"></i> Abrir el portal</a>
+            <p class="ayuda" style="margin-top:16px">Los cambios se aplican al instante en el portal y en las respuestas de Sami; no hace falta reiniciar el sistema.</p>
+        </div>
+    </aside>
+</div>
+
+<p class="pie">Gobierno Autónomo Municipal de Sacaba · <a href="{{ url_for('index') }}">Volver al portal ciudadano</a></p>
+{% endblock %}

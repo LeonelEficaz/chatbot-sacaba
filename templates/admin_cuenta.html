@@ -1,0 +1,56 @@
+{% extends 'admin_base.html' %}
+{% block title %}Mi cuenta{% endblock %}
+{% block contenido %}
+<div class="titulo">
+    <div>
+        <h1>Mi cuenta</h1>
+        <p>Cambia la contraseña con la que entras al panel.</p>
+    </div>
+</div>
+
+{% if error %}
+<div class="aviso error" role="alert"><i class="fas fa-circle-exclamation"></i><span>{{ error }}</span></div>
+{% endif %}
+
+<div class="rejilla" style="grid-template-columns:1fr 1fr">
+    <section class="panel">
+        <div class="panel-cab"><div><h2>Datos de la cuenta</h2><p>Sesión actual</p></div></div>
+        <div class="panel-cuerpo">
+            <table>
+                <tbody>
+                    <tr><th style="width:38%">Usuario</th><td><strong>{{ session.get('usuario') }}</strong></td></tr>
+                    <tr><th>Nombre</th><td>{{ session.get('nombre') }}</td></tr>
+                    <tr><th>Rol</th><td style="text-transform:capitalize">{{ session.get('rol') }}</td></tr>
+                </tbody>
+            </table>
+            <p class="ayuda">Si olvidaste la contraseña, un administrador puede registrar una cuenta nueva o ejecutar el restablecimiento local del servidor.</p>
+        </div>
+    </section>
+
+    <section class="panel">
+        <div class="panel-cab"><div><h2>Cambiar contraseña</h2><p>Mínimo 8 caracteres</p></div></div>
+        <div class="panel-cuerpo">
+            <form method="post" action="{{ url_for('admin_cuenta') }}" novalidate>
+                <input type="hidden" name="csrf" value="{{ csrf_token() }}">
+
+                <label for="actual">Contraseña actual</label>
+                <input id="actual" name="actual" type="password" autocomplete="current-password">
+                <p class="bloq-mayus ayuda" style="display:none;color:#b45309">Mayúsculas activadas</p>
+
+                <label for="nueva">Nueva contraseña</label>
+                <div style="position:relative">
+                    <input id="nueva" name="nueva" type="password" autocomplete="new-password">
+                    <button type="button" data-ver="nueva" aria-label="Mostrar contraseña" style="position:absolute;right:8px;top:8px;border:none;background:none;color:#64748b;cursor:pointer;padding:4px"><i class="fas fa-eye"></i></button>
+                </div>
+
+                <label for="confirmar">Confirmar nueva contraseña</label>
+                <input id="confirmar" name="confirmar" type="password" autocomplete="new-password">
+
+                <button class="boton" type="submit"><i class="fas fa-key"></i> Actualizar contraseña</button>
+            </form>
+        </div>
+    </section>
+</div>
+
+<p class="pie"><a href="{{ url_for('admin_panel') }}"><i class="fas fa-arrow-left"></i> Volver al panel</a></p>
+{% endblock %}

@@ -715,32 +715,72 @@ var UI = {
         title: "Asistente Municipal",
         sub: "En linea",
         ph: "Escribe o habla tu consulta...",
-        powered: "IA ChatGPT - Munic. Sacaba",
-        greeting: "\u00a1Hola! \ud83d\ude0a Soy el chatbot municipal de **Sacaba** y estoy para ayudarte. \u00bfNecesitas sacar tu **carnet de identidad**? \u00bfQuieres informaci\u00f3n sobre **tr\u00e1mites** como residencia, licencias o veh\u00edculos? \u00bfO tal vez sobre **multas y c\u00f3mo pagarlas**? D\u00edme, \u00bfen qu\u00e9 te ayudo hoy?",
-        smalltalk: "\u00a1Bien, muy bien! \ud83d\ude0a Gracias por preguntar. Estoy para guiarte en tus tr\u00e1mites: carnet, residencia, licencias, catastro, veh\u00edculos y el pago de multas. \u00bfDe qu\u00e9 te gustar\u00eda informarte?",
-        identity: "Soy **Tu Gobierno en Sacaba**, el asistente virtual oficial con inteligencia artificial del municipio. Te oriento en tr\u00e1mites como **carnet de identidad**, constancias, licencias, catastro, veh\u00edculos y te ayudo con **multas** (montos y pago en banco o con QR). Adem\u00e1s \u00a1aprendo de cada conversaci\u00f3n para ayudarte mejor!",
-        greeting2: "Puedo ayudarte con:\n\n\ud83e\udeaa **Tr\u00e1mites** - Carnet, residencia, licencia, catastro, veh\u00edculos...\n\ud83d\udcb0 **Multas** - Montos, pago en banco o con QR\n\ud83d\udccb **Informaci\u00f3n** - Horarios, requisitos, costos\n\n**Preg\u00fandame lo que necesites o presiona el micr\u00f3fono para hablar:**",
-        farewell: "\u00a1Gracias por tu consulta! \ud83d\ude0a Si tienes otra pregunta, escr\u00edbeme. \u00a1Que tengas un excelente d\u00eda!",
-        greeting_opts: ["\ud83e\udeaa Ver tr\u00e1mites", "\ud83d\udcb0 Multas", "\ud83d\udd50 Horarios", "\ud83d\udcde Contacto"],
-        tramite_opts: ["\ud83d\udccd Donde hago...?", "\ud83d\udcb0 Cuanto cuesta?", "\ud83d\udccb Que necesito?", "\ud83d\udcdd Como tramito...?"]
+        presentando: "Escuchando la presentaci\u00f3n...",
+        powered: "Sami - Municipio de Sacaba",
+        greeting: "\u00a1Hola! \ud83d\ude0a Soy **Sami**, tu asistente municipal de Sacaba. Cu\u00e9ntame qu\u00e9 necesitas y preparo la ficha completa en pantalla mientras conversamos.",
+        smalltalk: "\u00a1Muy bien, gracias por preguntar! \ud83d\ude0a \u00bfEn qu\u00e9 tr\u00e1mite te acompa\u00f1o hoy?",
+        identity: "Soy **Sami**, la asistente del Municipio de Sacaba. Te oriento en tr\u00e1mites, licencias, catastro, veh\u00edculos y multas, y te muestro la ficha completa mientras conversamos.",
+        greeting2: "Preg\u00fantame como se lo dir\u00edas a una amiga: \u00abquiero sacar mi carnet\u00bb, \u00aby d\u00f3nde pago mi multa?\u00bb.",
+        farewell: "\u00a1Gracias a ti! \ud83d\ude0a Que te vaya muy bien en tu tr\u00e1mite.",
+        greeting_opts: ["\u2728 Ver consultas disponibles"],
+        consultas_btn: "\u2728 Ver consultas disponibles",
+        consultas_titulo: "\ud83d\udccb Consultas disponibles",
+        consultas_hint: "Toca una consulta y te la explico con datos oficiales.",
+        consultas_volver: "\u2190 Volver",
+        consulta_prefijo: "Quiero consultar sobre ",
+        escuchando: "Te escucho...",
+        no_entendi: "No pude escuchar bien. \u00bfMe lo repites, por favor?",
+        manos_libres_on: "Modo manos libres activo. Di \u00abSami...\u00bb y te escucho.",
+        manos_libres_off: "Modo manos libres desactivado.",
+        wake_ack: "\u00bfS\u00ed? Te escucho.",
+        stop_ack: "Listo, me quedo en silencio. \ud83d\ude0a",
+        mic_denegado: "No tengo permiso para usar el micr\u00f3fono. Toca el candado de la barra de direcciones, permite el micr\u00f3fono y vuelve a intentar.",
+        mic_error: "No pude escuchar. Revisa tu micr\u00f3fono o escr\u00edbeme la consulta.",
+        mic_inseguro: "El navegador solo permite el micr\u00f3fono en localhost o HTTPS. Abre el portal en http://127.0.0.1:5000 y vuelve a probar.",
+        mic_no_soportado: "Este navegador no permite dictado por voz. Abre Sami en Microsoft Edge o Google Chrome.",
+        mic_sin_equipo: "No encuentro un micr\u00f3fono conectado. Revisa que est\u00e9 enchufado y activo en Windows.",
+        mic_ocupado: "Otro programa est\u00e1 usando el micr\u00f3fono. Ci\u00e9rralo y vuelve a intentar.",
+        mic_red: "El servicio de voz del navegador no respondi\u00f3. Revisa tu conexi\u00f3n a internet e int\u00e9ntalo otra vez.",
+        mic_espera: "Pidiendo permiso para el micr\u00f3fono...",
+        tramite_opts: []
     },
     qu: {
         title: "Munisipyu Yanapay",
         sub: "Kachkani",
-        ph: "Tapukuyniykita qillqay o wasinchik...",
-        powered: "IA - Munis. Sakaba",
-        greeting: "Imaynallan! \ud83d\udc4b Noqaqa **Sakaba Munisipyuq** asistente kachkani. Tramitekuna, multakuna nitaq serviciosmanta yanapayta atiymanni.",
-        smalltalk: "Allinmi, allinmi kachkani! \ud83d\ude0a Tapukusqaykimanta yusulpayki. Sakaba municipalidadpaq tramite utaq servicio mañaptiykiqa kaypi kachkani. Imawan yanapaykayman?",
-        identity: "Noqaqa **Sakaba Munisipyuq Asistente** kachkani, inteligencia artificialwan (ChatGPT) ruwasqa. Carnet, residencia, licencia, multas, horariospi yanapayta atiymi.",
-        greeting2: "Kaykunapi yanapayta atiymi:\n\n\ud83e\udeaa **Tramitekuna** - Carnet, residencia, licencia...\n\ud83d\udcb0 **Multakuna** - Transito, munisipyu\n\ud83d\udccb **Yachaykuna** - Horarios, requisitokuna, qullqikuna\n\n**Imata munanki qillqaway utaq micrófonoqta rimariy:**",
-        farewell: "\u00a1Yusulpayki! \ud83d\ude0a Huk tapukuypipas kaptinqa qillqaway. \u00a1Allin p'unchay kachun!",
-        greeting_opts: ["\ud83e\udeaa Tramitekuna", "\ud83d\udcb0 Multakuna", "\ud83d\udd50 Horarios", "\ud83d\udcde Contacto"],
-        tramite_opts: ["\ud83d\udccd Maypitaq?", "\ud83d\udcb0 Hayk'a qullqi?", "\ud83d\udccb Imatataq necesitani?", "\ud83d\udcdd Imaynataq tramitaykuni?"]
+        ph: "Tapukuyniykita qillqay utaq rimay...",
+        presentando: "Napaykuta uyarishayku...",
+        powered: "Sami - Sakaba Munisipyu",
+        greeting: "Imaynallan! \ud83d\udc4b Noqaqa **Sami**, Sakaba Munisipyuq yanapayniyki. Imata munanki niway, noqataq pantallapi fichata rikuchisaq.",
+        smalltalk: "Allinmi, tapukusqaykimanta yusulpayki! \ud83d\ude0a \u00bfIma tramitepi yanapaykayman?",
+        identity: "Noqaqa **Sami** kani, Sakaba Munisipyuq yanapaq. Tramitekuna, licenciakuna, catastro, carrokuna nitaq multakunapi yanapayta atiymi.",
+        greeting2: "Tapuway imayna rimasqaykita: \u00abcarnetyta horqoyta munani\u00bb, \u00abmaypitaq multayta pagani?\u00bb.",
+        farewell: "\u00a1Yusulpayki! \ud83d\ude0a Allin p'unchay kachun.",
+        greeting_opts: ["\u2728 Tapukuykunata qhaway"],
+        consultas_btn: "\u2728 Tapukuykunata qhaway",
+        consultas_titulo: "\ud83d\udccb Tapukuykuna",
+        consultas_hint: "Huk tapukuyta akllay, chiqa willaywan willasqayki.",
+        consultas_volver: "\u2190 Kutiy",
+        consulta_prefijo: "Tapuyta munani kaymanta: ",
+        escuchando: "Uyarishayki...",
+        no_entendi: "Allinta uyarirqanichu. \u00bfKutin niway, ama hina kaspa?",
+        manos_libres_on: "Manos libres kachkan. \u00abSami...\u00bb niy, uyarisqayki.",
+        manos_libres_off: "Manos libres wa\u00f1uchisqa.",
+        wake_ack: "\u00bfAr\u00ed? Uyarishayki.",
+        stop_ack: "Ar\u00ed, ch'inlla\u00f1a kasqani. \ud83d\ude0a",
+        mic_denegado: "Micr\u00f3fonoq permisonniyuq kani\u00f1achu. Barra de direccionespi candadota kichay, micr\u00f3fonota saqilliy, hinaspa kutiy.",
+        mic_error: "Manan uyarirqanichu. Micr\u00f3fonoykita qhaway utaq qillqaway.",
+        mic_inseguro: "Navegadorqa localhost utaq HTTPS llallipim micr\u00f3fonota saqillin. http://127.0.0.1:5000 llallipim kichay.",
+        mic_no_soportado: "Kay navegadorqa rimay dictadota manan saqillinchu. Microsoft Edge utaq Google Chrome llallipim Samita kichay.",
+        mic_sin_equipo: "Manan micr\u00f3fonota tarinichu. Enchufasqa kasqanta qhaway.",
+        mic_ocupado: "Huk programa micr\u00f3fonota apaykachashan. Chayta wisq'ay hinaspa kutiy.",
+        mic_red: "Navegadorpa rimayninqa manan kutichinchu. Internetniykita qhaway hinaspa kutiy.",
+        mic_espera: "Micr\u00f3fonoq permisonta mashkhaspa...",
+        tramite_opts: []
     }
 };
 
 /* ===== STATE ===== */
-var S = { open: false, lang: 'es', busy: false, recording: false, mediaRecorder: null, audioChunks: [], recognition: null, sttFinal: '', sttHeard: false, log: [], silent: false, logoSrc: '/static/img/logo-sacaba.svg' };
+var S = { open: false, lang: 'es', busy: false, recording: false, recognition: null, hfPause: false, sttFallo: false, sttFinal: '', sttHeard: false, log: [], silent: false, silentFijo: false, embedded: false, voice: true, audio: null, speakSeq: 0, logoSrc: '/static/img/sami-gato.svg', handsFree: false, speaking: false, consultas: false, sttTimer: null, restartSTT: false, vozCola: [], vozActual: null, vozOcupada: false, vozGen: 0, presentado: false, presentando: false, bloqueado: false, autoListen: false, autoTurno: false, autoIntentos: 0, micListo: null, modoServidor: false, recLang: null, sttReintento: false };
 
 /* ===== AUDIO EFFECTS ===== */
 var AudioCtx = window.AudioContext || window.webkitAudioContext;
@@ -944,7 +984,143 @@ function getResp(msg) {
         "\ud83e\udd14 A\u00fan no tengo la respuesta a esa consulta, pero **puedo aprenderla**. Ay\u00fadame escribiendo:\n\n**aprende: tu pregunta = la respuesta**\n\nEjemplo:\n`aprende: \u00bfcu\u00e1nto cuesta el certificado? = Bs. 10`\n\nO consulta estos temas:\n\n- \ud83e\udeaa \"\u00bfC\u00f3mo saco mi carnet?\"\n- \ud83d\udccd \"\u00bfD\u00f3nde hago la residencia?\"\n- \ud83d\udcb0 \"\u00bfCu\u00e1nto cuesta la licencia?\"\n- \ud83d\udc54 \"\u00bfQu\u00e9 necesito para...?\"";
 }
 
-function getOpts() { return UI[S.lang].opts || UI[S.lang].greeting_opts; }
+function getOpts() {
+    var o = UI[S.lang].greeting_opts || [];
+    return [UI[S.lang].consultas_btn || o[0] || 'Consultas'];
+}
+
+/* ===== CONSULTAS DISPONIBLES (unica lista predeterminada) ===== */
+function consultasDisponibles() {
+    var keys = Object.keys(KB);
+    var items = [];
+    for (var i = 0; i < keys.length; i++) {
+        var t = KB[keys[i]][S.lang] || KB[keys[i]].es;
+        if (t && t.n) items.push(t.n);
+    }
+    return items;
+}
+
+function showConsultas() {
+    var c = document.getElementById('cw-opts');
+    if (!c) return;
+    S.consultas = true;
+    c.innerHTML = '';
+    c.classList.add('is-open');
+
+    var items = consultasDisponibles();
+    var box = document.createElement('div');
+    box.className = 'cw-consultas';
+    var head = document.createElement('div');
+    head.className = 'cw-consultas-head';
+    head.innerHTML = '<b>' + UI[S.lang].consultas_titulo +
+        ' <em>' + items.length + '</em></b><span>' + UI[S.lang].consultas_hint + '</span>';
+    box.appendChild(head);
+
+    var list = document.createElement('div');
+    list.className = 'cw-consultas-list';
+    items.forEach(function (nombre) {
+        var b = document.createElement('button');
+        b.className = 'cw-consulta';
+        b.type = 'button';
+        b.textContent = nombre;
+        b.onclick = function () {
+            c.innerHTML = '';
+            c.classList.remove('is-open');
+            S.consultas = false;
+            var q = UI[S.lang].consulta_prefijo + nombre.toLowerCase();
+            addMsg(nombre, 'user');
+            playSound('send');
+            sendToAI(q, { etiqueta: nombre });
+        };
+        list.appendChild(b);
+    });
+    box.appendChild(list);
+
+    var back = document.createElement('button');
+    back.className = 'cw-opt cw-consultas-back';
+    back.type = 'button';
+    back.textContent = UI[S.lang].consultas_volver;
+    back.onclick = function () {
+        S.consultas = false;
+        c.classList.remove('is-open');
+        showOpts(getOpts());
+    };
+    box.appendChild(back);
+    c.appendChild(box);
+    var msgs = document.getElementById('cw-msgs');
+    if (msgs) msgs.scrollTop = msgs.scrollHeight;
+}
+
+function bindConsultaBtn(btn) {
+    btn.onclick = function () {
+        playSound('open');
+        showConsultas();
+    };
+}
+
+/* ===== IDIOMA AUTOMATICO (quechua) ===== */
+var QU_HINTS = ['imaynalla', 'imaynallan', 'allillan', 'allinlla', 'yusulpayki', 'yuspagara',
+    'maypi', 'maypitaq', 'hayka', 'haykataq', 'imata', 'imatataq', 'imayna', 'imaynata',
+    'munani', 'munayman', 'qullqi', 'kullki', 'tramitayta', 'rimay', 'niway', 'tapuy', 'wasiy',
+    'carnetyta', 'multayta', 'ñan', 'ama hina', 'upallay', 'kanchu', 'tiyanchu', 'chayqa',
+    'horqoy', 'horqoyta', 'ruway', 'ruwayta', 'ruwakun', 'ruwana', 'qhaway', 'willay',
+    'apay', 'pusay', 'pagay', 'pagayta', 'yachay', 'llamkay', 'qhatu', 'wasita', 'yaku',
+    'punchaw', 'p\'unchaw', 'simana', 'qillqay', 'kasqan', 'nitaq', 'utaq', 'paykuna',
+    'yupay', 'waqaychay', 'apamuy', 'qhapaq', 'tramitata', 'multata'];
+
+var QU_SUFIJOS = /(yta|manta|kuna|nchik|yman|puni|qta|yki|niy|chik|qti)$/;
+var QU_SIN_SUFIJO = { manta: 1, amamanta: 1 };
+
+function looksQuechua(text) {
+    var t = String(text || '').toLowerCase();
+    for (var i = 0; i < QU_HINTS.length; i++) {
+        if (t.indexOf(QU_HINTS[i]) !== -1) return true;
+    }
+    // El dictado devuelve una grafia aproximada: los sufijos quechuas
+    // (horqoyta, wasimanta, tramitekuna...) delatan el idioma sin depender
+    // de que el reconocedor escriba la palabra exacta.
+    var palabras = t.split(/[^a-z\u00e0-\u00ff']+/);
+    for (var j = 0; j < palabras.length; j++) {
+        var p = palabras[j];
+        if (p.length >= 6 && !QU_SIN_SUFIJO[p] && QU_SUFIJOS.test(p)) return true;
+    }
+    return false;
+}
+
+function switchLang(lang, quiet) {
+    if (lang !== 'es' && lang !== 'qu') return;
+    if (S.lang === lang) return;
+    applyLanguageUI(lang);
+    if (quiet) {
+        if (window.SacabaApplyPageLanguage) window.SacabaApplyPageLanguage(lang, { quiet: true });
+    } else {
+        renderConversation(lang);
+        if (window.SacabaSetLang) window.SacabaSetLang(lang);
+    }
+}
+
+function historyForAI() {
+    var out = [];
+    for (var i = 0; i < S.log.length; i++) {
+        var e = S.log[i];
+        if (e.type === 'user') out.push({ role: 'user', content: e.text });
+        else if (e.resp && e.respLang === S.lang) out.push({ role: 'assistant', content: e.resp });
+    }
+    return out.slice(-8);
+}
+
+/* ===== COMANDOS DE VOZ ===== */
+var STOP_RE = /(ya no hables|no hables mas|no hables más|deja de hablar|dejá de hablar|callate|cállate|silencio|detente|para de hablar|basta de hablar|upallay|amaña rimaychu|ama rimaychu|ch\'inlla)/i;
+
+function isStopCommand(text) {
+    var t = String(text || '').toLowerCase().trim();
+    if (!t || t.split(/\s+/).length > 6) return false;
+    return STOP_RE.test(t);
+}
+
+function isMuteCommand(text) {
+    return /^(sami[,\s]+)?(ya no hables|no hables|cállate|callate|silencio|detente|para)(\s+por favor)?[.!]?$/i.test(String(text || '').trim());
+}
 
 /* ===== APRENDIZAJE local en el widget (memoria por navegador) ===== */
 var LEARN_KEY = 'sacaba_aprendido_v1';
@@ -1001,13 +1177,83 @@ function lookupLearned(msg) {
     return best;
 }
 
-/* ===== AUDIO/VIDA: RECONOCIMIENTO EN VIVO (tecleo) o grabacion de audio ===== */
+/* ===== VOZ: dictado, manos libres y comandos ===== */
+function avisoMic(clave) {
+    addMsg(UI[S.lang][clave] || UI[S.lang].mic_error, 'bot', { silent: true });
+}
+
+function hayMicSeguro() {
+    var host = location.hostname;
+    return !!window.isSecureContext || host === 'localhost' || host === '127.0.0.1' || host === '';
+}
+
+function claveErrorMic(nombre) {
+    if (nombre === 'NotAllowedError' || nombre === 'SecurityError') return 'mic_denegado';
+    if (nombre === 'NotFoundError' || nombre === 'OverconstrainedError') return 'mic_sin_equipo';
+    if (nombre === 'NotReadableError' || nombre === 'AbortError') return 'mic_ocupado';
+    return 'mic_error';
+}
+
+function pedirPermisoMic() {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        return Promise.reject('mic_no_soportado');
+    }
+    return navigator.mediaDevices.getUserMedia({ audio: true }).then(function (stream) {
+        stream.getTracks().forEach(function (t) { t.stop(); });
+        return true;
+    }).catch(function (err) {
+        throw claveErrorMic((err && err.name) || '');
+    });
+}
+
+function retomarManosLibres() {
+    if (!S.handsFree || !S.open || S.hfPause) return;
+    if (S.speaking) { setTimeout(retomarManosLibres, 700); return; }
+    if (!S.recognition && !S.recording) empezarManosLibres();
+}
+
 function startRecording() {
     stopSpeaking();
     if (S.recording) return stopRecording();
     var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (S.lang !== 'qu' && SR) { startLiveSTT(SR); }
-    else { startAudioRecording(); }
+    if (!SR) return avisoMic('mic_no_soportado');
+    if (!hayMicSeguro()) return avisoMic('mic_inseguro');
+
+    if (S.handsFree) {
+        S.hfPause = true;
+        if (S.recognition) { try { S.recognition.abort(); } catch (e) {} }
+        S.recognition = null;
+    } else if (S.recognition) {
+        try { S.recognition.abort(); } catch (e) {}
+        S.recognition = null;
+    }
+
+    var micBtn = document.getElementById('cw-mic');
+    if (micBtn) micBtn.classList.add('waiting');
+    pedirPermisoMic().then(function () {
+        if (micBtn) micBtn.classList.remove('waiting');
+        if (S.open) startLiveSTT(SR);
+    }).catch(function (clave) {
+        if (micBtn) micBtn.classList.remove('waiting');
+        S.hfPause = false;
+        avisoMic(clave);
+        retomarManosLibres();
+    });
+}
+
+function enviarTexto(msg) {
+    var inp = document.getElementById('cw-in');
+    if (inp) inp.value = '';
+    var opts = document.getElementById('cw-opts');
+    if (opts) { opts.innerHTML = ''; opts.classList.remove('is-open'); }
+    if (isMuteCommand(msg)) {
+        stopSpeaking();
+        addMsg(UI[S.lang].stop_ack, 'bot', { silent: true });
+        return;
+    }
+    addMsg(msg, 'user');
+    playSound('send');
+    sendToAI(msg, { porVoz: true });
 }
 
 function startLiveSTT(SR) {
@@ -1015,11 +1261,20 @@ function startLiveSTT(SR) {
     var rec = new SR();
     S.sttFinal = '';
     S.sttHeard = false;
-    rec.lang = 'es-BO';
+    S.restartSTT = false;
+    rec.lang = S.recLang || ((S.lang === 'qu') ? 'qu-BO' : 'es-BO');
     rec.continuous = true;
     rec.interimResults = true;
     rec.maxAlternatives = 1;
-    rec.onresult = function(event) {
+
+    function cerrarPorSilencio() {
+        clearTimeout(S.sttTimer);
+        S.sttTimer = setTimeout(function () {
+            if (S.recording) stopRecording();
+        }, 2400);
+    }
+
+    rec.onresult = function (event) {
         S.sttHeard = true;
         var finalText = '';
         var interim = '';
@@ -1029,214 +1284,845 @@ function startLiveSTT(SR) {
             else { interim += r[0].transcript; }
         }
         S.sttFinal += finalText;
-        inp.value = S.sttFinal + (interim ? ' ' + interim : '');
+        if (inp) inp.value = (S.sttFinal + (interim ? ' ' + interim : '')).trim();
         var msgs = document.getElementById('cw-msgs');
-        msgs.scrollTop = msgs.scrollHeight;
-    };
-    rec.onerror = function(event) {
-        if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
-            addMsg("No se pudo acceder al microfono. Verifica los permisos del navegador.", 'bot');
-        } else if (event.error === 'no-speech') {
-            // se espera que termine onend y se avise
-        } else {
-            // navegador o idioma no soportado -> grabar y transcribir en el servidor
-            try { rec.abort(); } catch (e) {}
-            S.recognition = null;
-            S.recording = false;
-            updateMicUI(false);
-            startAudioRecording();
-        }
-    };
-    rec.onend = function() {
-        S.recording = false;
-        S.recognition = null;
-        updateMicUI(false);
-        var msg = (S.sttFinal || '').trim();
-        S.sttFinal = '';
-        if (!S.sttHeard) {
-            addMsg("No pude escuchar nada. Intenta de nuevo hablando mas claro.", 'bot');
+        if (msgs) msgs.scrollTop = msgs.scrollHeight;
+        if (isStopCommand(S.sttFinal + ' ' + interim)) {
+            S.sttFinal = '';
+            if (inp) inp.value = '';
+            stopRecording();
+            stopSpeaking();
+            addMsg(UI[S.lang].stop_ack, 'bot', { silent: true });
             return;
         }
-        if (msg) {
-            inp.value = '';
-            addMsg(msg, 'user');
-            playSound('send');
-            document.getElementById('cw-opts').innerHTML = '';
-            setTimeout(function() { sendToAI(msg); }, 200);
+        cerrarPorSilencio();
+    };
+    rec.onerror = function (event) {
+        clearTimeout(S.sttTimer);
+        var err = event.error;
+        if (err === 'no-speech' || err === 'aborted') return;
+        // Si el navegador no puede reconocer (servicio de voz bloqueado o
+        // idioma sin modelo) se pasa al dictado del servidor, que si funciona.
+        if (err === 'network' || err === 'service-not-allowed') {
+            S.modoServidor = true;
+            S.sttFallo = true;
+            S.sttReintento = true;
+            try { rec.abort(); } catch (e) {}
+            if (S.recognition === rec) S.recognition = null;
+            S.recording = false;
+            updateMicUI(false);
+            return;
+        }
+        if (err === 'language-not-supported') {
+            var intentado = rec.lang;
+            var siguiente = intentado === 'qu-BO' ? 'es-BO' : (intentado === 'es-BO' ? 'es-ES' : null);
+            if (siguiente) S.recLang = siguiente;
+            else S.modoServidor = true;
+            S.sttReintento = true;
+            S.sttFallo = true;
+            try { rec.abort(); } catch (e) {}
+            if (S.recognition === rec) S.recognition = null;
+            S.recording = false;
+            updateMicUI(false);
+            return;
+        }
+        var clave = 'mic_error';
+        if (err === 'not-allowed') clave = 'mic_denegado';
+        else if (err === 'audio-capture') clave = 'mic_sin_equipo';
+        S.sttFallo = true;
+        try { rec.abort(); } catch (e) {}
+        if (S.recognition === rec) S.recognition = null;
+        S.recording = false;
+        updateMicUI(false);
+        avisoMic(clave);
+    };
+    rec.onend = function () {
+        clearTimeout(S.sttTimer);
+        S.recording = false;
+        if (S.recognition === rec) S.recognition = null;
+        updateMicUI(false);
+        if (S.sttReintento) {
+            S.sttReintento = false;
+            S.sttFallo = false;
+            S.sttFinal = '';
+            S.sttHeard = false;
+            S.hfPause = false;
+            if (S.open) {
+                if (S.modoServidor) grabarServidor(!S.autoListen);
+                else startLiveSTT(SR);
+            }
+            return;
+        }
+        var fallo = S.sttFallo;
+        var msg = (S.sttFinal || '').trim();
+        S.sttFallo = false;
+        S.sttFinal = '';
+        S.hfPause = false;
+        if (!fallo) {
+            if (msg) {
+                S.autoTurno = !!S.autoListen;
+                S.autoIntentos = 0;
+                enviarTexto(msg);
+            } else if (!S.sttHeard && !S.autoListen) {
+                addMsg(UI[S.lang].no_entendi, 'bot', { silent: true });
+            }
+        }
+        if (!fallo && S.autoListen && !msg && !S.sttHeard && S.autoIntentos < 3) {
+            S.autoIntentos++;
+            setTimeout(function () {
+                if (S.autoListen && !S.recording && !S.recognition) iniciarEscuchaAuto();
+            }, 400);
+        } else if (!fallo && S.autoListen && !msg && !S.sttHeard) {
+            // El dictado del navegador no devolvio nada: se graba en el servidor.
+            S.modoServidor = true;
+            if (S.open) grabarServidor(false);
+        } else if (!S.autoListen) {
+            setTimeout(retomarManosLibres, 500);
         }
     };
     S.recognition = rec;
     S.recording = true;
     updateMicUI(true);
     playSound('record');
-    rec.start();
+    try { rec.start(); }
+    catch (e) {
+        if (S.recognition === rec) S.recognition = null;
+        S.recording = false;
+        S.hfPause = false;
+        updateMicUI(false);
+        avisoMic('mic_error');
+        setTimeout(retomarManosLibres, 500);
+    }
 }
 
-function startAudioRecording() {
-    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        addMsg("Tu navegador no soporta reconocimiento de voz. Usa Chrome o Edge, o escribe tu mensaje.", 'bot');
+/* ===== DICTADO DEL SERVIDOR (Web Speech no disponible) ===== */
+var GRAB = { activa: false, media: null, stream: null, ctx: null, vigia: null, tope: null, trozos: [], hablo: false, inicio: 0, ultimoRuido: 0, manual: false };
+
+/* Abre el microfono con reintentos: al terminar el dictado del navegador
+   el dispositivo puede seguir ocupado unos instantes. */
+function abrirMic(intentos) {
+    var pedido = {
+        audio: {
+            channelCount: 1,
+            echoCancellation: true,
+            noiseSuppression: true,
+            autoGainControl: true
+        }
+    };
+    return navigator.mediaDevices.getUserMedia(pedido).catch(function (err) {
+        var nombre = (err && err.name) || '';
+        if (intentos > 1 && (nombre === 'NotReadableError' || nombre === 'AbortError')) {
+            return new Promise(function (listo) { setTimeout(listo, 350); })
+                .then(function () { return abrirMic(intentos - 1); });
+        }
+        throw claveErrorMic(nombre);
+    });
+}
+
+function grabarServidor(manual) {
+    if (GRAB.activa) return;
+    if (!navigator.mediaDevices || !window.MediaRecorder) { avisoMic('mic_no_soportado'); return; }
+    if (!hayMicSeguro()) { avisoMic('mic_inseguro'); return; }
+    GRAB.manual = !!manual;
+    abrirMic(3).then(function (stream) {
+        GRAB.stream = stream;
+        GRAB.trozos = [];
+        GRAB.hablo = false;
+        GRAB.inicio = Date.now();
+        GRAB.ultimoRuido = Date.now();
+        var preferidos = ['audio/webm;codecs=opus', 'audio/ogg;codecs=opus', 'audio/webm'];
+        var opciones = {};
+        for (var i = 0; i < preferidos.length; i++) {
+            if (window.MediaRecorder.isTypeSupported && window.MediaRecorder.isTypeSupported(preferidos[i])) {
+                opciones = { mimeType: preferidos[i] };
+                break;
+            }
+        }
+        GRAB.media = new MediaRecorder(stream, opciones);
+        GRAB.media.ondataavailable = function (e) { if (e.data && e.data.size) GRAB.trozos.push(e.data); };
+        GRAB.media.onstop = finalizarGrabacion;
+        GRAB.activa = true;
+        GRAB.media.start(200);
+        S.recording = true;
+        updateMicUI(true);
+        var campo = document.getElementById('cw-in');
+        if (campo) campo.placeholder = UI[S.lang].escuchando;
+        playSound('record');
+        GRAB.tope = setTimeout(detenerGrabacionServidor, manual ? 25000 : 15000);
+        vigilarNivel();
+    }).catch(function (clave) {
+        avisoMic(typeof clave === 'string' ? clave : claveErrorMic((clave && clave.name) || ''));
+    });
+}
+
+/* Detecta el volumen del microfono para cortar solo cuando el usuario calla. */
+function vigilarNivel() {
+    try {
+        var AC = window.AudioContext || window.webkitAudioContext;
+        var ctx = new AC();
+        var fuente = ctx.createMediaStreamSource(GRAB.stream);
+        var anal = ctx.createAnalyser();
+        anal.fftSize = 1024;
+        fuente.connect(anal);
+        var datos = new Uint8Array(anal.fftSize);
+        GRAB.ctx = ctx;
+        GRAB.vigia = setInterval(function () {
+            anal.getByteTimeDomainData(datos);
+            var suma = 0;
+            for (var i = 0; i < datos.length; i++) {
+                var v = (datos[i] - 128) / 128;
+                suma += v * v;
+            }
+            var rms = Math.sqrt(suma / datos.length);
+            var ahora = Date.now();
+            if (rms > 0.012) { GRAB.hablo = true; GRAB.ultimoRuido = ahora; }
+            var silencio = GRAB.manual ? 2600 : 2200;
+            var espera = GRAB.manual ? 12000 : 9000;
+            var tope = GRAB.manual ? 25000 : 15000;
+            if (GRAB.hablo && ahora - GRAB.ultimoRuido > silencio) return detenerGrabacionServidor();
+            if (!GRAB.hablo && ahora - GRAB.inicio > espera) return detenerGrabacionServidor();
+            if (ahora - GRAB.inicio > tope) return detenerGrabacionServidor();
+        }, 100);
+    } catch (e) {}
+}
+
+function detenerGrabacionServidor() {
+    if (GRAB.vigia) { clearInterval(GRAB.vigia); GRAB.vigia = null; }
+    if (GRAB.tope) { clearTimeout(GRAB.tope); GRAB.tope = null; }
+    if (GRAB.media && GRAB.media.state !== 'inactive') {
+        try { GRAB.media.stop(); } catch (e) {}
+    }
+}
+
+function finalizarGrabacion() {
+    var hablo = GRAB.hablo;
+    GRAB.activa = false;
+    GRAB.media = null;
+    if (GRAB.vigia) { clearInterval(GRAB.vigia); GRAB.vigia = null; }
+    if (GRAB.tope) { clearTimeout(GRAB.tope); GRAB.tope = null; }
+    if (GRAB.ctx) { try { GRAB.ctx.close(); } catch (e) {} GRAB.ctx = null; }
+    if (GRAB.stream) {
+        GRAB.stream.getTracks().forEach(function (t) { t.stop(); });
+        GRAB.stream = null;
+    }
+    updateMicUI(false);
+    var campo = document.getElementById('cw-in');
+    if (campo) campo.placeholder = S.bloqueado ? UI[S.lang].presentando : UI[S.lang].ph;
+    var trozos = GRAB.trozos;
+    GRAB.trozos = [];
+    if (!hablo || !trozos.length) {
+        sinVozDetectada();
         return;
     }
-    navigator.mediaDevices.getUserMedia({ audio: true })
-        .then(function(stream) {
-            S.recording = true;
-            S.audioChunks = [];
-            S.mediaRecorder = new MediaRecorder(stream);
-            S.mediaRecorder.ondataavailable = function(e) { if (e.data.size > 0) S.audioChunks.push(e.data); };
-            S.mediaRecorder.onstop = function() {
-                stream.getTracks().forEach(function(t) { t.stop(); });
-                processAudio();
-            };
-            S.mediaRecorder.start();
-            updateMicUI(true);
-            playSound('record');
-        })
-        .catch(function(err) {
-            addMsg("No se pudo acceder al microfono. Verifica los permisos del navegador.", 'bot');
+    var blob = new Blob(trozos, { type: trozos[0].type || 'audio/webm' });
+    showTyping();
+    convertirAWav(blob).then(function (base64) {
+        return fetch('/api/stt', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ audio: base64, language: S.lang })
         });
+    }).then(function (r) {
+        if (!r.ok) throw new Error('stt ' + r.status);
+        return r.json();
+    }).then(function (d) {
+        hideTyping();
+        var texto = ((d && d.text) || '').trim();
+        if (!texto) {
+            addMsg(UI[S.lang].no_entendi, 'bot', { silent: true });
+            return;
+        }
+        S.autoTurno = !!S.autoListen;
+        S.autoIntentos = 0;
+        enviarTexto(texto);
+    }).catch(function () {
+        hideTyping();
+        avisoMic('mic_red');
+    });
+}
+
+/* No se detecto voz: en modo automatico reintenta un par de veces antes de avisar. */
+function sinVozDetectada() {
+    if (S.autoListen && S.autoIntentos < 2) {
+        S.autoIntentos++;
+        S.autoTurno = false;
+        setTimeout(iniciarEscuchaAuto, 700);
+        return;
+    }
+    S.autoIntentos = 0;
+    addMsg(UI[S.lang].no_entendi, 'bot', { silent: true });
+}
+
+/* Convierte el audio grabado a WAV 16 kHz mono (lo que espera el servidor). */
+function convertirAWav(blob) {
+    var AC = window.AudioContext || window.webkitAudioContext;
+    var ctx = new AC();
+    return blob.arrayBuffer().then(function (buffer) {
+        return new Promise(function (resolve, reject) {
+            ctx.decodeAudioData(buffer, resolve, reject);
+        });
+    }).then(function (audio) {
+        try { ctx.close(); } catch (e) {}
+        var ritmo = 16000;
+        var destino = new OfflineAudioContext(1, Math.ceil(audio.duration * ritmo), ritmo);
+        var fuente = destino.createBufferSource();
+        fuente.buffer = audio;
+        fuente.connect(destino.destination);
+        fuente.start(0);
+        return destino.startRendering();
+    }).then(function (render) {
+        return wavBase64(render.getChannelData(0), render.sampleRate);
+    });
+}
+
+function wavBase64(muestras, ritmo) {
+    var total = muestras.length;
+    var buffer = new ArrayBuffer(44 + total * 2);
+    var vista = new DataView(buffer);
+    function escribir(pos, texto) {
+        for (var i = 0; i < texto.length; i++) vista.setUint8(pos + i, texto.charCodeAt(i));
+    }
+    escribir(0, 'RIFF');
+    vista.setUint32(4, 36 + total * 2, true);
+    escribir(8, 'WAVE');
+    escribir(12, 'fmt ');
+    vista.setUint32(16, 16, true);
+    vista.setUint16(20, 1, true);
+    vista.setUint16(22, 1, true);
+    vista.setUint32(24, ritmo, true);
+    vista.setUint32(28, ritmo * 2, true);
+    vista.setUint16(32, 2, true);
+    vista.setUint16(34, 16, true);
+    escribir(36, 'data');
+    vista.setUint32(40, total * 2, true);
+    var pos = 44;
+    for (var i = 0; i < total; i++, pos += 2) {
+        var m = Math.max(-1, Math.min(1, muestras[i]));
+        vista.setInt16(pos, m < 0 ? m * 0x8000 : m * 0x7FFF, true);
+    }
+    var bytes = new Uint8Array(buffer);
+    var binario = '';
+    for (var j = 0; j < bytes.length; j += 0x8000) {
+        binario += String.fromCharCode.apply(null, bytes.subarray(j, j + 0x8000));
+    }
+    return btoa(binario);
+}
+
+/* ===== MANOS LIBRES: escucha "Sami" y obedece ordenes ===== */
+function toggleHandsFree() {
+    S.handsFree = !S.handsFree;
+    if (S.handsFree) S.autoListen = false;
+    S.autoTurno = false;
+    updateHandsFreeUI();
+    if (S.handsFree) {
+        playSound('open');
+        addMsg(UI[S.lang].manos_libres_on, 'bot', { silent: true });
+        empezarManosLibres();
+    } else {
+        playSound('stop');
+        S.restartSTT = false;
+        S.hfPause = false;
+        if (S.recognition && !S.recording) { try { S.recognition.abort(); } catch (e) {} }
+        addMsg(UI[S.lang].manos_libres_off, 'bot', { silent: true });
+    }
+}
+
+function empezarManosLibres() {
+    if (!S.handsFree) return;
+    var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SR) { S.handsFree = false; updateHandsFreeUI(); return avisoMic('mic_no_soportado'); }
+    if (!hayMicSeguro()) { S.handsFree = false; updateHandsFreeUI(); return avisoMic('mic_inseguro'); }
+    if (S.recording || S.recognition) return;
+
+    var rec = new SR();
+    rec.lang = 'es-BO';
+    rec.continuous = true;
+    rec.interimResults = true;
+    rec.maxAlternatives = 1;
+
+    rec.onresult = function (event) {
+        var dicho = '';
+        for (var i = event.resultIndex; i < event.results.length; i++) {
+            var r = event.results[i];
+            if (r.isFinal) dicho += r[0].transcript + ' ';
+        }
+        dicho = dicho.trim();
+        if (dicho) manejarManosLibres(dicho);
+    };
+    rec.onerror = function (event) {
+        var err = event.error;
+        if (err === 'no-speech' || err === 'aborted') return;
+        var clave = 'mic_error';
+        if (err === 'not-allowed' || err === 'service-not-allowed') clave = 'mic_denegado';
+        else if (err === 'audio-capture') clave = 'mic_sin_equipo';
+        else if (err === 'network') clave = 'mic_red';
+        S.handsFree = false;
+        if (S.recognition === rec) S.recognition = null;
+        updateHandsFreeUI();
+        avisoMic(clave);
+    };
+    rec.onend = function () {
+        if (S.recognition === rec) S.recognition = null;
+        setTimeout(retomarManosLibres, 300);
+    };
+    S.recognition = rec;
+    try { rec.start(); }
+    catch (e) {
+        if (S.recognition === rec) S.recognition = null;
+        S.handsFree = false;
+        updateHandsFreeUI();
+        avisoMic('mic_error');
+    }
+}
+
+function manejarManosLibres(texto) {
+    var t = String(texto || '').trim();
+    if (!t) return;
+
+    if (isStopCommand(t)) {
+        if (S.speaking) stopSpeaking();
+        addMsg(UI[S.lang].stop_ack, 'bot', { silent: true });
+        return;
+    }
+    if (S.speaking || S.busy) return;
+
+    var low = t.toLowerCase();
+    var m = low.match(/\b(sami|samita|samiy)\b/);
+    if (!m) return;
+
+    var cola = t.slice(m.index + m[1].length).replace(/^[\s,.:;¡!¿?\-]+/, '').trim();
+    if (!cola) {
+        addMsg(UI[S.lang].wake_ack, 'bot', { silent: true });
+        return;
+    }
+    if (/^(habla|responde|contesta)\s+en\s+quechua/.test(cola.toLowerCase()) || /quechuapi rimay/.test(cola.toLowerCase())) {
+        switchLang('qu');
+        addMsg('Ar\u00ed, quechuapi rimasaq. \ud83d\ude0a', 'bot');
+        return;
+    }
+    if (/^(habla|responde|contesta)\s+en\s+espa/.test(cola.toLowerCase())) {
+        switchLang('es');
+        addMsg('\u00a1Claro! Sigo en espa\u00f1ol.', 'bot');
+        return;
+    }
+    var opts = document.getElementById('cw-opts');
+    if (opts) { opts.innerHTML = ''; opts.classList.remove('is-open'); }
+    addMsg(cola, 'user');
+    playSound('send');
+    sendToAI(cola, { porVoz: true });
 }
 
 function stopRecording() {
-    if (S.recognition && S.recording) { S.recognition.stop(); return; }
-    if (S.mediaRecorder && S.recording) {
-        S.recording = false;
-        S.mediaRecorder.stop();
-        updateMicUI(false);
-        playSound('stop');
-    }
-}
-
-function processAudio() {
-    if (S.audioChunks.length === 0) return;
-    var blob = new Blob(S.audioChunks, { type: 'audio/webm' });
-    var reader = new FileReader();
-    reader.onload = function() {
-        var b64 = reader.result.split(',')[1];
-        addMsg("\ud83c\udfa4 Grabando audio...", 'user');
-        showTyping();
-
-        fetch('/audio-to-text', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ audio: b64, language: S.lang })
-        })
-        .then(function(r) { return r.json(); })
-        .then(function(data) {
-            hideTyping();
-            if (data.error) {
-                addMsg("Error al procesar audio: " + data.error, 'bot');
-                return;
-            }
-            var text = data.text || '';
-            if (!text.trim()) {
-                addMsg("No pude escuchar nada. Intenta de nuevo hablando mas claro.", 'bot');
-                return;
-            }
-            document.getElementById('cw-msgs').lastChild.remove();
-            addMsg(text, 'user');
-            playSound('send');
-            sendToAI(text);
-        })
-        .catch(function(err) {
-            hideTyping();
-            addMsg("Error de conexion al procesar audio.", 'bot');
-        });
-    };
-    reader.readAsDataURL(blob);
+    clearTimeout(S.sttTimer);
+    if (GRAB.activa) { detenerGrabacionServidor(); return; }
+    if (S.recognition && S.recording) { try { S.recognition.stop(); } catch (e) {} }
 }
 
 function updateMicUI(isRecording) {
+    S.recording = !!isRecording;
     var micBtn = document.getElementById('cw-mic');
-    if (!micBtn) return;
-    if (isRecording) {
-        micBtn.classList.add('recording');
-        micBtn.innerHTML = '<svg viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2" fill="white"/></svg>';
-    } else {
-        micBtn.classList.remove('recording');
-        micBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm-1-9c0-.55.45-1 1-1s1 .45 1 1v6c0 .55-.45 1-1 1s-1-.45-1-1V5z"/><path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg>';
+    if (micBtn) {
+        if (isRecording) {
+            micBtn.classList.add('recording');
+            micBtn.innerHTML = '<svg viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2" fill="white"/></svg>';
+        } else {
+            micBtn.classList.remove('recording');
+            micBtn.innerHTML = MIC_ICON;
+        }
     }
+    var input = document.querySelector('.cw-input');
+    if (input) input.classList.toggle('is-listening', !!isRecording);
+}
+
+function updateHandsFreeUI() {
+    var btn = document.getElementById('cw-hf');
+    if (!btn) return;
+    btn.classList.toggle('active', S.handsFree);
+    btn.setAttribute('aria-pressed', S.handsFree ? 'true' : 'false');
+    btn.title = S.handsFree ? 'Manos libres activo' : 'Activar manos libres (di "Sami...")';
+    var input = document.querySelector('.cw-input');
+    if (input) input.classList.toggle('is-handsfree', S.handsFree);
+}
+
+/* ===== PRESENTACION INICIAL Y MICROFONO AUTOMATICO ===== */
+function bloquearChat(on) {
+    S.bloqueado = !!on;
+    var win = document.getElementById('cw-window');
+    if (win) win.classList.toggle('cw-presentando', !!on);
+    var ids = ['cw-in', 'cw-send', 'cw-mic', 'cw-hf'];
+    for (var i = 0; i < ids.length; i++) {
+        var el = document.getElementById(ids[i]);
+        if (el) el.disabled = !!on;
+    }
+    var inp = document.getElementById('cw-in');
+    if (inp) inp.placeholder = on ? UI[S.lang].presentando : UI[S.lang].ph;
+}
+
+function textoPresentacion(lang) {
+    var ui = UI[lang] || UI.es;
+    return ui.greeting + ' ' + ui.greeting2;
+}
+
+function iniciarEscuchaAuto() {
+    if (!S.embedded || !S.autoListen || S.handsFree || S.bloqueado || !S.open) return;
+    if (S.presentando || S.micListo !== true) return;
+    if (!hayMicSeguro()) return;
+    if (S.recording || S.recognition || GRAB.activa) return;
+    if (S.busy || S.speaking || S.vozOcupada) { setTimeout(iniciarEscuchaAuto, 700); return; }
+    // El dictado del servidor escucha de verdad en cualquier navegador;
+    // el reconocimiento propio del navegador solo se usa si no hay grabadora.
+    if (navigator.mediaDevices && window.MediaRecorder) {
+        grabarServidor(false);
+        return;
+    }
+    var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SR) { avisoMic('mic_no_soportado'); return; }
+    startLiveSTT(SR);
+}
+
+function reanudarEscuchaAuto() {
+    if (!S.autoListen || !S.autoTurno) return;
+    S.autoTurno = false;
+    iniciarEscuchaAuto();
+}
+
+/* La cola de voz se vacio: si el turno vino del microfono, se vuelve a escuchar. */
+function alQuedarEnSilencio() {
+    if (!S.autoListen || !S.autoTurno) return;
+    setTimeout(reanudarEscuchaAuto, 600);
+}
+
+function presentarSami() {
+    if (S.presentado) { bloquearChat(false); iniciarEscuchaAuto(); return; }
+    if (S.presentando) return;
+    S.presentado = true;
+    S.presentando = true;
+    bloquearChat(true);
+    encolarVoz(textoPresentacion(S.lang), S.lang, true).then(function () {
+        S.presentando = false;
+        S.silentFijo = false;
+        bloquearChat(false);
+        if (S.micListo !== true && typeof S.micListo === 'string') avisoMic(S.micListo);
+        iniciarEscuchaAuto();
+    });
+}
+
+window.SacabaStartPresentation = function () {
+    if (!S.embedded) return;
+    S.autoListen = true;
+    S.autoIntentos = 0;
+    presentarSami();
+};
+
+window.SacabaSkipPresentation = function () {
+    if (!S.embedded || S.presentado) return;
+    S.presentado = true;
+    S.presentando = false;
+    S.silentFijo = false;
+    S.autoListen = true;
+    S.autoIntentos = 0;
+    bloquearChat(false);
+    iniciarEscuchaAuto();
+};
+
+window.SacabaPrepararMicro = function () {
+    if (S.micListo === true) return Promise.resolve(true);
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        S.micListo = 'mic_no_soportado';
+        return Promise.resolve(false);
+    }
+    return pedirPermisoMic().then(function () {
+        S.micListo = true;
+        // Si la presentacion ya termino mientras el usuario decidia el permiso.
+        iniciarEscuchaAuto();
+        return true;
+    }).catch(function (clave) {
+        S.micListo = clave || 'mic_error';
+        return false;
+    });
+};
+
+var MIC_ICON = '<svg viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm-1-9c0-.55.45-1 1-1s1 .45 1 1v6c0 .55-.45 1-1 1s-1-.45-1-1V5z"/><path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg>';
+
+/* ===== PANEL DINAMICO (ficha a la derecha) ===== */
+function syncPanel(text, apiTramite) {
+    try {
+        if (window.SacabaPanel) window.SacabaPanel.fromQuery(text, apiTramite || null);
+    } catch (e) {}
 }
 
 /* ===== ENVIAR A AI ===== */
-function sendToAI(text) {
+function sendToAI(text, meta) {
+    if (isMuteCommand(text)) {
+        stopSpeaking();
+        addMsg(UI[S.lang].stop_ack, 'bot', { silent: true });
+        return;
+    }
+    var porVoz = !!(meta && meta.porVoz);
+    var vozQuechua = porVoz && looksQuechua(text);
+    if (S.lang === 'es' && vozQuechua) switchLang('qu', true);
+
     S.busy = true;
     showTyping();
+    syncPanel(text, meta && meta.tramite);
 
+    var historial = historyForAI();
     fetch('/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: text, language: S.lang === 'qu' ? 'qu' : 'auto', useAI: true })
+        body: JSON.stringify({
+            message: text,
+            // Lo dictado se deja detectar al servidor: asi cambia a espanol o
+            // quechua segun lo que realmente hablo el ciudadano.
+            language: vozQuechua ? 'qu' : (porVoz ? 'auto' : (S.lang === 'qu' ? 'qu' : 'auto')),
+            useAI: true,
+            history: historial
+        })
     })
     .then(function(r) { return r.json(); })
     .then(function(data) {
         hideTyping();
-        var resp = data.response || UI[S.lang].default;
+        var det = data && (data.detected === 'qu' || data.detected === 'es') ? data.detected : null;
+        if (vozQuechua) det = 'qu';
+        // Por voz se sigue el idioma detectado en los dos sentidos; al escribir
+        // solo se pasa a quechua para no cambiar la pagina por un descuido.
+        if (det && det !== S.lang && (porVoz || det === 'qu')) switchLang(det, true);
+        var resp = (data && data.response) || getResp(text);
         addMsg(resp, 'bot');
         S.log.push({ type: 'user', text: text });
-        S.log.push({ type: 'bot', query: text, resp: resp });
+        S.log.push({ type: 'bot', query: text, resp: resp, respLang: S.lang });
         playSound('message');
-        var tramite = detectTramite(text);
-        if (tramite) {
-            setTimeout(function() { showOpts(UI[S.lang].tramite_opts); }, 500);
-        } else {
-            setTimeout(function() { showOpts(getOpts()); }, 500);
-        }
+        if (data && data.tramite) syncPanel(text, data.tramite);
+        setTimeout(showConsultaBtn, 450);
         S.busy = false;
+        flushPendingLang();
     })
     .catch(function() {
         hideTyping();
         var resp = getResp(text);
         addMsg(resp, 'bot');
         S.log.push({ type: 'user', text: text });
-        S.log.push({ type: 'bot', query: text, resp: resp });
+        S.log.push({ type: 'bot', query: text, resp: resp, respLang: S.lang });
         playSound('message');
         S.busy = false;
+        flushPendingLang();
     });
 }
 
-/* ===== SPEAK RESPONSE (voz natural en espanol, menos robotica) ===== */
+/* ===== VOZ (Edge TTS servidor + respaldo del navegador) ===== */
+var VOCES_TTS = [
+    { id: 'es-BO-SofiaNeural', nombre: 'Sofía' },
+    { id: 'es-BO-MarceloNeural', nombre: 'Marcelo' }
+];
+var VOZ_KEY = 'sacaba_tts_voice';
+
+function nombreVoz(id) {
+    for (var i = 0; i < VOCES_TTS.length; i++) {
+        if (VOCES_TTS[i].id === id) return VOCES_TTS[i].nombre;
+    }
+    return VOCES_TTS[0].nombre;
+}
+
+function vozGuardada() {
+    try {
+        var guardada = localStorage.getItem(VOZ_KEY);
+        for (var i = 0; i < VOCES_TTS.length; i++) {
+            if (VOCES_TTS[i].id === guardada) return guardada;
+        }
+    } catch (e) {}
+    return VOCES_TTS[0].id;
+}
+
+S.vozTTS = vozGuardada();
+
 function pickEspVoice(needQu) {
+    if (!window.speechSynthesis) return null;
     var voices = window.speechSynthesis.getVoices();
     if (!voices || !voices.length) return null;
     var pool = [];
     for (var i = 0; i < voices.length; i++) {
         var l = (voices[i].lang || '').toLowerCase();
-        if (needQu && (l.indexOf('qu') === 0 || l.indexOf('quz') === 0 || l.indexOf('ay') === 0)) pool.push(voices[i]);
+        if (needQu && (l.indexOf('qu') === 0 || l.indexOf('quz') === 0)) pool.push(voices[i]);
         else if (!needQu && l.indexOf('es') === 0) pool.push(voices[i]);
     }
+    // Si no existe voz nativa quechua, se usa la mejor voz espanola con ritmo lento.
     if (!pool.length) {
         for (var k = 0; k < voices.length; k++) {
-            var lk = (voices[k].lang || '').toLowerCase();
-            if (needQu ? lk.indexOf('es') === 0 : lk.indexOf('es') === 0) pool.push(voices[k]);
+            if ((voices[k].lang || '').toLowerCase().indexOf('es') === 0) pool.push(voices[k]);
         }
     }
     if (!pool.length) return null;
 
-    var female = /helena|sabina|andrea|laura|marta|maria|mari[aá]|raquel|camila|elena|fernanda|paulina|karina|silvia|sonia|paloma|patricia|rosa|valeria|julia|sofia|sara|nuria|lupe|delia|esmeralda|gabriela|evita|dalia|gemma|alba|carmen|adriana|miguel|raul|jorge|pablo|diego|luis|antonio|francisco|jose|pedro/i;
     var best = null;
     var bestScore = -1;
     for (var j = 0; j < pool.length; j++) {
         var v = pool[j];
         var nm = v.name || '';
         var score = 0;
-        if (/sabina|helena|gd_/i.test(nm)) score += 60;
-        if (/natural|neural|online|premium|wavenet|xbox|narrator/i.test(nm)) score += 45;
-        if (/microsoft|edge|google/i.test(nm)) score += 20;
-        if (/\b(es-mx|es-es|qu-pe|qu-ec|quz)\b/i.test(v.lang)) score += 8;
-        if (female.test(nm)) score += 12;
-        if (/local/i.test(nm)) score -= 40;
+        if (/sofia|sabina|helena|elvira|estrella|paulina|catalina|laura|monica/i.test(nm)) score += 60;
+        if (/neural|natural|online|premium|wavenet|google/i.test(nm)) score += 40;
+        if (/\bes-bo\b/i.test(v.lang)) score += 30;
+        if (/\bes-(ar|cl|co|pe|mx|es)\b/i.test(v.lang)) score += 10;
+        if (/local|desktop/i.test(nm)) score -= 40;
+        if (v.localService === false) score += 15;
         if (score > bestScore) { bestScore = score; best = v; }
     }
     return best || pool[0];
 }
 
-function stopSpeaking() {
-    if (window.speechSynthesis) window.speechSynthesis.cancel();
+function terminarVoz() {
+    S.speaking = false;
+    if (window.sacabaMascotTalking) window.sacabaMascotTalking(false);
 }
 
-function speakText(text, lang) {
-    if (!window.speechSynthesis) return;
-    window.speechSynthesis.cancel();
+function stopSpeaking() {
+    // Corta lo que suena y vacia la cola: las respuestas se leen una tras otra,
+    // pero un corte explicito (escribir, dictar, silenciar) descarta lo pendiente.
+    S.vozGen++;
+    var cola = S.vozCola;
+    var actual = S.vozActual;
+    S.vozCola = [];
+    S.vozActual = null;
+    S.vozOcupada = false;
+    S.speakSeq++;
+    S.speaking = false;
+    if (S.audio) {
+        try { S.audio.pause(); } catch (e) {}
+        S.audio = null;
+    }
+    if (window.speechSynthesis) window.speechSynthesis.cancel();
+    if (window.sacabaMascotTalking) window.sacabaMascotTalking(false);
+    for (var i = 0; i < cola.length; i++) { try { cola[i].done(); } catch (e) {} }
+    if (actual) { try { actual.done(); } catch (e) {} }
+    alQuedarEnSilencio();
+}
+
+/* Divide el texto en frases cortas: cada trozo suena antes y evita
+   que Chrome corte la sintesis del navegador a los 15 segundos. */
+function trocearVoz(texto, maximo) {
+    var frases = String(texto).match(/[^.!?;:]+[.!?;:]*/g) || [String(texto)];
+    var trozos = [];
+    var actual = '';
+    for (var i = 0; i < frases.length; i++) {
+        var frase = frases[i].trim();
+        if (!frase) continue;
+        var junto = (actual ? actual + ' ' : '') + frase;
+        if (junto.length > maximo && actual) {
+            trozos.push(actual);
+            actual = frase;
+        } else {
+            actual = junto;
+        }
+    }
+    if (actual) trozos.push(actual);
+    if (trozos.length > 6) {
+        trozos = trozos.slice(0, 5).concat([trozos.slice(5).join(" ")]);
+    }
+    return trozos;
+}
+
+/* Adapta el quechua a la fonetica castellana (igual que el servidor):
+   q->k, qu+e/i->k, h->j, sh->s, w->hu al final -u, y acento en la penultima
+   silaba de las palabras graves. Los prestamos castellanos no se tocan. */
+var ACENTOS_QU = { a: 'á', e: 'é', i: 'í', o: 'ó', u: 'ú' };
+var LEXICO_QU = {
+    'quechua': 'kechua', 'quechuapi': 'kechuapi', 'quechuata': 'kechuata',
+    'quechuamanta': 'kechuamanta', 'quichua': 'kichua',
+    'qhapaq': 'japak', 'qhapaqnan': 'japakñan', 'qhapaqñan': 'japakñan',
+    'ñoqanchik': 'nukanchik', 'ñuqanchik': 'nukanchik',
+    'ñoqayku': 'nukayku', 'ñuqayku': 'nukayku',
+    'tupananchiskama': 'tupanchiskama', 'tupananchikama': 'tupanchikama'
+};
+var H_MUDA_QU = {
+    hospital: 1, hospitales: 1, hotel: 1, hora: 1, horas: 1, horario: 1,
+    horarios: 1, humano: 1, humana: 1, historia: 1, hielo: 1, alcohol: 1,
+    hola: 1, hasta: 1
+};
+
+function aplicarLexicoQu(palabra) {
+    var rep = LEXICO_QU[palabra.toLowerCase()];
+    if (!rep) return palabra;
+    if (palabra === palabra.toUpperCase()) return rep.toUpperCase();
+    if (/^[A-ZÁÉÍÓÚÑ]/.test(palabra)) return rep.charAt(0).toUpperCase() + rep.slice(1);
+    return rep;
+}
+
+function prepararPalabraQu(palabra) {
+    var minus = palabra.toLowerCase();
+    if (H_MUDA_QU[minus]) return palabra.replace(/^h/i, '');
+    if (/[áéíóú]/.test(minus)) return palabra;
+    return palabra
+        .replace(/qu(?=[ei])/gi, 'k')
+        .replace(/q/gi, 'k')
+        .replace(/(?<!c)h/gi, 'j');
+}
+
+function acentuarPalabraQu(palabra) {
+    var minus = palabra.toLowerCase();
+    if (/[áéíóú]/.test(minus)) return palabra;
+    var inicios = [];
+    for (var i = 0; i < minus.length; i++) {
+        if ('aeiou'.indexOf(minus[i]) >= 0 && (i === 0 || 'aeiou'.indexOf(minus[i - 1]) < 0)) inicios.push(i);
+    }
+    if (inicios.length < 2) return palabra;
+    var fin = minus.charAt(minus.length - 1);
+    if ('kqylrmpw\u0003'.indexOf(fin) < 0) return palabra;
+    var pos = inicios[inicios.length - 2];
+    var acento = ACENTOS_QU[minus.charAt(pos)];
+    if (!acento) return palabra;
+    if (palabra.charAt(pos) !== minus.charAt(pos)) acento = acento.toUpperCase();
+    return palabra.slice(0, pos) + acento + palabra.slice(pos + 1);
+}
+
+function adaptarQuechua(texto) {
+    var t = String(texto == null ? '' : texto);
+    if (!t) return t;
+    t = t.replace(/['’`]/g, '');
+    t = t.replace(/[A-Za-zÁÉÍÓÚÑáéíóúñ]+/g, aplicarLexicoQu);
+    t = t.replace(/chh/gi, 'ch').replace(/qh/gi, 'k').replace(/sh/gi, 's');
+    t = t.replace(/[A-Za-zÁÉÍÓÚÑáéíóúñ]+/g, prepararPalabraQu);
+    t = t.replace(/w(?=[aeiouáéíóú])/gi, '\u0003');
+    t = t.replace(/w/gi, 'u');
+    t = t.replace(/[A-Za-zÁÉÍÓÚÑáéíóúñ\u0003]+/g, acentuarPalabraQu);
+    return t.replace(/\u0003/g, 'hu');
+}
+
+function speakBrowser(texto, lang, seq) {
+    if (!window.speechSynthesis) return Promise.resolve();
+    var qu = lang === 'qu';
+    var trozos = trocearVoz(texto, 180);
+    return new Promise(function (resolve) {
+        var i = 0;
+        function cortado() { return !S.voice || (seq != null && seq !== S.speakSeq); }
+        function hablar() {
+            if (cortado() || i >= trozos.length) { resolve(); return; }
+            var trozo = trozos[i++];
+            var u = new SpeechSynthesisUtterance(qu ? adaptarQuechua(trozo) : trozo);
+            u.rate = qu ? 0.78 : 1;
+            u.pitch = qu ? 1 : 1.04;
+            u.volume = 1;
+            var v = pickEspVoice(qu);
+            if (v) { u.voice = v; u.lang = v.lang; }
+            else { u.lang = 'es-BO'; }
+            u.onend = u.onerror = function () { setTimeout(hablar, qu ? 260 : 70); };
+            window.speechSynthesis.speak(u);
+        }
+        if (!window.speechSynthesis.getVoices().length) {
+            var arrancado = false;
+            var arrancar = function () {
+                if (arrancado) return;
+                arrancado = true;
+                hablar();
+            };
+            window.speechSynthesis.onvoiceschanged = arrancar;
+            setTimeout(arrancar, 1200);
+        } else {
+            hablar();
+        }
+    });
+}
+
+function limpiarParaVoz(text) {
     var clean = String(text)
         // 1) Quitar enlaces y citas antes de limpiar simbolos.
         .replace(/\[([^\]]+)\]\([^)]*\)/g, '$1')
@@ -1245,14 +2131,19 @@ function speakText(text, lang) {
         .replace(/&amp;/g, 'y')
         // 2) Unidades y abreviaturas para leer con naturalidad.
         .replace(/\bBs\.?\s*(\d+(?:[.,]\d+)?)/gi, '$1 bolivianos')
-        .replace(/\bAv\.\b/gi, 'avenida')
-        .replace(/\bSt\.\b/gi, 'santo')
+        .replace(/\bAv\.\s*/gi, 'avenida ')
+        .replace(/\bSt\.\s*/gi, 'santo ')
+        .replace(/\bN[°º]\s*/gi, 'número ')
+        .replace(/\bS\/N\b/gi, 'sin número')
+        .replace(/(\d+(?:[.,]\d+)?)\s*%/g, '$1 por ciento')
+        .replace(/\bkm\/h\b/gi, 'kilómetros por hora')
+        .replace(/\bkm\b/gi, 'kilómetros')
         // 3) Listas y saltos de linea -> frases fluidas con pausa.
         .replace(/^\s*[-•·◦▪–—]\s*/gm, '')
         .replace(/\n{2,}/g, '. ')
         .replace(/\n/g, '. ')
-        // 4) QUITAR TODO LO QUE NO SEA LETRA, NUMERO, ESPACIO O PUNTUACION BASICA.
-        //    Asi la voz NUNCA pronuncia emojis ni simbolos (cualquier rango Unicode).
+        // 4) Quitar todo lo que no sea letra, numero, espacio o puntuacion basica:
+        //    la voz nunca pronuncia emojis ni simbolos.
         .replace(/[^\p{L}\p{N}\s.,;:!?¿¡'"()%+/&@-]/gu, ' ')
         // 5) Puntuacion: pausa despues de cada signo, sin romper decimales ni abreviaturas.
         .replace(/([,;:!?¿¡.])(?![ \s\d])/g, '$1 ')
@@ -1260,69 +2151,211 @@ function speakText(text, lang) {
         .replace(/\s+/g, ' ')
         .replace(/^[.?\s]+/, '')
         .trim();
-
-    if (!clean) return;
-    if (clean.length > 600) clean = clean.substring(0, 600).replace(/[^.!?;:]*$/, '') + '...';
-
-    var utterance = new SpeechSynthesisUtterance(clean);
-    // Voz conversacional natural: velocidad un poco mas lenta y tono calido,
-    // para que la voz (Sabina/Helena/Google) se entienda con claridad.
-    var qu = lang === 'qu';
-    utterance.rate = qu ? 0.92 : 0.96;
-    utterance.pitch = 1.02;
-    var v = pickEspVoice(qu);
-    if (v) {
-        utterance.voice = v;
-        utterance.lang = v.lang;
-    } else {
-        utterance.lang = qu ? 'es-BO' : 'es-BO';
+    if (clean.length > 1400) {
+        clean = clean.substring(0, 1400);
+        var corte = Math.max(clean.lastIndexOf('.'), clean.lastIndexOf('!'), clean.lastIndexOf('?'));
+        clean = corte > 200 ? clean.substring(0, corte + 1) : clean;
     }
-    window.speechSynthesis.speak(utterance);
+    return clean;
+}
+
+function pedirTTS(texto, lang) {
+    var control = window.AbortController ? new AbortController() : null;
+    var reloj = control ? setTimeout(function () { control.abort(); }, 9000) : null;
+    return fetch('/api/tts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            text: texto,
+            language: lang === 'qu' ? 'qu' : 'es',
+            voice: S.vozTTS || ''
+        }),
+        signal: control ? control.signal : undefined
+    })
+    .then(function (r) { return r.ok ? r.json() : null; })
+    .catch(function () { return null; })
+    .then(function (data) {
+        if (reloj) clearTimeout(reloj);
+        return data;
+    });
+}
+
+function reproducirAudio(url, seq) {
+    return new Promise(function (resolve, reject) {
+        var audio = new Audio();
+        audio.preload = 'auto';
+        audio.src = url;
+        S.audio = audio;
+        var cerrado = false;
+        function fin() {
+            if (cerrado) return;
+            cerrado = true;
+            if (S.audio === audio) S.audio = null;
+            resolve();
+        }
+        function fallo() {
+            if (cerrado) return;
+            cerrado = true;
+            if (S.audio === audio) S.audio = null;
+            reject(new Error('sin-audio'));
+        }
+        audio.onended = fin;
+        audio.onerror = fallo;
+        audio.onpause = function () { if (seq !== S.speakSeq) fin(); };
+        var intento = audio.play();
+        if (intento && intento.catch) intento.catch(fallo);
+    });
+}
+
+/* ===== COLA DE VOZ: cada respuesta espera su turno ===== */
+function encolarVoz(text, lang, cortar) {
+    if (cortar) stopSpeaking();
+    if (!S.voice) return Promise.resolve();
+    var clean = limpiarParaVoz(text);
+    if (!clean) return Promise.resolve();
+    return new Promise(function (resolve) {
+        S.vozCola.push({ texto: clean, lang: lang || S.lang, done: resolve });
+        reproducirCola();
+    });
+}
+
+function reproducirCola() {
+    if (S.vozOcupada) return;
+    S.vozOcupada = true;
+    var gen = S.vozGen;
+    function siguiente() {
+        if (gen !== S.vozGen) return;
+        if (!S.vozCola.length) {
+            S.vozOcupada = false;
+            terminarVoz();
+            alQuedarEnSilencio();
+            return;
+        }
+        var item = S.vozCola.shift();
+        S.vozActual = item;
+        var cerrado = false;
+        function fin() {
+            if (cerrado) return;
+            cerrado = true;
+            if (S.vozActual === item) S.vozActual = null;
+            try { item.done(); } catch (e) {}
+            siguiente();
+        }
+        hablarItem(item, gen, fin);
+    }
+    siguiente();
+}
+
+function hablarItem(item, gen, fin) {
+    var seq = S.speakSeq;
+    S.speaking = true;
+    if (window.sacabaMascotTalking) window.sacabaMascotTalking(true);
+
+    // Red de seguridad: si el audio se queda colgado, la cola no se detiene.
+    var limite = setTimeout(function () {
+        item.vencido = true;
+        S.speakSeq++;
+        if (S.audio) { try { S.audio.pause(); } catch (e) {} S.audio = null; }
+        if (window.speechSynthesis) window.speechSynthesis.cancel();
+        fin();
+    }, Math.max(12000, item.texto.length * 95));
+
+    // Se piden todas las frases a la vez: la primera suena en ~1 s y las
+    // demas ya estan listas mientras se reproduce la anterior.
+    var trozos = trocearVoz(item.texto, 110);
+    var pedidos = trozos.map(function (trozo) { return pedirTTS(trozo, item.lang); });
+    function detenido() { return item.vencido || gen !== S.vozGen || seq !== S.speakSeq || !S.voice; }
+
+    function paso(i) {
+        if (detenido() || i >= pedidos.length) return Promise.resolve();
+        return pedidos[i].then(function (data) {
+            if (detenido()) return;
+            if (!data || !data.audio_url) {
+                return speakBrowser(trozos.slice(i).join(' '), item.lang, seq);
+            }
+            return reproducirAudio(data.audio_url, seq).then(function () {
+                if (detenido()) return;
+                return paso(i + 1);
+            }, function () {
+                if (detenido()) return;
+                return speakBrowser(trozos.slice(i).join(' '), item.lang, seq);
+            });
+        }, function () {
+            if (detenido()) return;
+            return speakBrowser(trozos.slice(i).join(' '), item.lang, seq);
+        });
+    }
+
+    paso(0).then(function () {
+        clearTimeout(limite);
+        fin();
+    }, function () {
+        clearTimeout(limite);
+        fin();
+    });
+}
+
+function speakText(text, lang, cortar) {
+    if (!S.voice) return Promise.resolve();
+    return encolarVoz(text, lang || S.lang, cortar);
 }
 
 /* ===== CONSTRUIR HTML ===== */
 function buildHTML() {
     return '<button class="cw-fab" id="cw-fab">' +
         '<span class="cw-pulse"></span>' +
-        '<img class="cw-fab-logo" src="/static/img/logo-sacaba.svg" alt="Asistente Municipal de Sacaba">' +
+        '<img class="cw-fab-logo" src="' + S.logoSrc + '" alt="Sami, asistente de Sacaba">' +
         '<svg class="cw-fab-close" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>' +
         '<span class="cw-badge" id="cw-badge">1</span></button>' +
     '<div class="cw-window" id="cw-window">' +
-        '<div class="cw-header"><div class="cw-h-left"><div class="cw-h-avatar"><img class="cw-h-logo" src="/static/img/logo-sacaba.svg" alt="Escudo de Sacaba"></div>' +
+        '<div class="cw-header"><div class="cw-h-left"><div class="cw-h-avatar"><img class="cw-h-logo" src="' + S.logoSrc + '" alt="Sami, asistente municipal"></div>' +
         '<div class="cw-h-info"><h3 id="cw-title">' + UI.es.title + '</h3><span id="cw-sub"><span class="cw-online-dot"></span>' + UI.es.sub + '</span></div></div>' +
         '<div class="cw-h-actions">' +
+            '<div class="cw-voz"><button id="cw-voz" type="button" title="Voz de Sami">Voz · ' + nombreVoz(S.vozTTS) + '</button></div>' +
             '<div class="cw-lang"><button class="active" data-lang="es">ES</button><button data-lang="qu">QU</button></div>' +
         '</div></div>' +
         '<div class="cw-msgs" id="cw-msgs"></div>' +
         '<div class="cw-typing" id="cw-typing"><span></span><span></span><span></span></div>' +
         '<div class="cw-opts" id="cw-opts"></div>' +
         '<div class="cw-input">' +
-            '<button id="cw-mic" class="cw-mic-btn" title="Hablar - Grabar audio"><svg viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm-1-9c0-.55.45-1 1-1s1 .45 1 1v6c0 .55-.45 1-1 1s-1-.45-1-1V5z"/><path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg></button>' +
+            '<button id="cw-hf" class="cw-hf-btn" type="button" aria-pressed="false" title="Manos libres: di &quot;Sami, quiero saber...&quot;"><svg viewBox="0 0 24 24"><path d="M12 1a9 9 0 0 0-9 9v7a3 3 0 0 0 3 3h3v-8H5v-2a7 7 0 0 1 14 0v2h-4v8h4a3 3 0 0 0 3-3v-7a9 9 0 0 0-9-9z"/></svg></button>' +
+            '<button id="cw-mic" class="cw-mic-btn" type="button" title="Hablar - dictado por voz">' + MIC_ICON + '</button>' +
             '<input type="text" id="cw-in" placeholder="' + UI.es.ph + '" autocomplete="off">' +
-            '<button id="cw-send" title="Enviar mensaje"><svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg></button>' +
+            '<button id="cw-send" type="button" title="Enviar mensaje"><svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg></button>' +
         '</div>' +
         '<div class="cw-powered">' + UI.es.powered + '</div></div>';
 }
 
-function addMsg(text, type) {
+function escapeHtml(s) {
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function linkify(html) {
+    return html.replace(/(^|[\s(])((?:https?:\/\/|\/tramite\/)[^\s<>"'()]+)/g, function(m, pre, url) {
+        return pre + '<a class="cw-link" href="' + url + '" target="_blank" rel="noopener">' + url + '</a>';
+    });
+}
+
+function addMsg(text, type, opts) {
     if (type === 'user') stopSpeaking();
     var msgs = document.getElementById('cw-msgs');
     var d = document.createElement('div');
     d.className = 'cw-msg ' + type;
-    var av = type === 'bot' ? '<div class="cw-msg-av"><img src="' + S.logoSrc + '" alt="Sacaba"></div>' : '<div class="cw-msg-av"><i class="fas fa-user"></i></div>';
-    var formatted = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
+    var av = type === 'bot' ? '<div class="cw-msg-av"><img src="' + S.logoSrc + '" alt="Sami"></div>' : '<div class="cw-msg-av"><i class="fas fa-user"></i></div>';
+    var formatted = linkify(escapeHtml(text).replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>'));
     var speakBtn = type === 'bot' ? '<button class="cw-speak-btn" onclick="window._speakMsg(this)" title="Escuchar respuesta"><svg viewBox="0 0 24 24" width="14" height="14"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg></button>' : '';
     d.innerHTML = av + '<div class="cw-msg-b">' + formatted + '</div>' + speakBtn;
     msgs.appendChild(d);
     msgs.scrollTop = msgs.scrollHeight;
-    if (type === 'bot' && !S.silent) speakText(text, S.lang);
+    if (type === 'bot' && !S.silent && !S.silentFijo && !(opts && opts.silent)) speakText(text, S.lang);
 }
 
 window._speakMsg = function(btn) {
     var msgEl = btn.closest('.cw-msg');
     if (msgEl) {
         var textEl = msgEl.querySelector('.cw-msg-b');
-        if (textEl) speakText(textEl.textContent, S.lang);
+        if (textEl) speakText(textEl.textContent, S.lang, true);
     }
 };
 
@@ -1338,19 +2371,32 @@ function hideTyping() {
 
 function showOpts(opts) {
     var c = document.getElementById('cw-opts');
+    c.classList.remove('is-open');
     c.innerHTML = '';
     opts.forEach(function(o) {
         var b = document.createElement('button');
         b.className = 'cw-opt';
+        b.type = 'button';
         b.textContent = o;
-        b.onclick = function() {
-            addMsg(o, 'user');
-            c.innerHTML = '';
-            playSound('send');
-            sendToAI(o);
-        };
+        if (o === UI.es.consultas_btn || o === UI.qu.consultas_btn) {
+            bindConsultaBtn(b);
+        } else {
+            b.onclick = function() {
+                addMsg(o, 'user');
+                c.innerHTML = '';
+                playSound('send');
+                sendToAI(o);
+            };
+        }
         c.appendChild(b);
     });
+}
+
+function showConsultaBtn() {
+    if (S.consultas) return;
+    var c = document.getElementById('cw-opts');
+    if (!c) return;
+    showOpts([UI[S.lang].consultas_btn]);
 }
 
 /* ===== RE-RENDER conversacion traducida (ES <-> QU) ===== */
@@ -1364,9 +2410,15 @@ function translateUser(text, lang) {
 }
 
 function renderConversation(lang) {
+    if (S.busy) {
+        S.pendingLang = lang;
+        return;
+    }
     var msgs = document.getElementById('cw-msgs');
     msgs.innerHTML = '';
     document.getElementById('cw-opts').innerHTML = '';
+    document.getElementById('cw-opts').classList.remove('is-open');
+    S.consultas = false;
     S.silent = true;
 
     if (!S.log.length) {
@@ -1387,7 +2439,7 @@ function renderConversation(lang) {
     function next() {
         if (i >= S.log.length) {
             S.silent = false;
-            showOpts(getOpts());
+            showConsultaBtn();
             S.busy = false;
             return;
         }
@@ -1395,49 +2447,121 @@ function renderConversation(lang) {
         if (entry.type === 'user') {
             addMsg(translateUser(entry.text, lang), 'user');
             next();
-        } else {
-            fetch('/chat', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message: entry.query, language: lang === 'qu' ? 'qu' : 'auto', useAI: false })
-            }).then(function(r) { return r.json(); })
-              .then(function(data) {
-                  addMsg(data.response || getResp(entry.query), 'bot');
-                  next();
-              })
-              .catch(function() {
-                  addMsg(getResp(entry.query), 'bot');
-                  next();
-              });
+            return;
         }
+        if (entry.resp && entry.respLang === lang) {
+            addMsg(entry.resp, 'bot');
+            next();
+            return;
+        }
+        showTyping();
+        fetch('/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message: entry.query, language: lang === 'qu' ? 'qu' : 'auto', useAI: false })
+        }).then(function(r) { return r.json(); })
+          .then(function(data) {
+              hideTyping();
+              entry.resp = data.response || getResp(entry.query);
+              entry.respLang = lang;
+              addMsg(entry.resp, 'bot');
+              next();
+          })
+          .catch(function() {
+              hideTyping();
+              addMsg(getResp(entry.query), 'bot');
+              next();
+          });
     }
     next();
 }
 
-function init() {
+function flushPendingLang() {
+    if (!S.pendingLang) return;
+    var lang = S.pendingLang;
+    S.pendingLang = null;
+    renderConversation(lang);
+}
+
+function greet() {
+    if (document.getElementById('cw-msgs').children.length) return;
+    showTyping();
+    setTimeout(function() {
+        hideTyping();
+        addMsg(UI[S.lang].greeting, 'bot');
+        playSound('message');
+        setTimeout(function() {
+            addMsg(UI[S.lang].greeting2, 'bot');
+            showOpts(UI[S.lang].greeting_opts);
+            // La bienvenida se lee desde el inicio, sin saltar al final.
+            setTimeout(function() {
+                var msgs = document.getElementById('cw-msgs');
+                if (msgs && !S.log.length) msgs.scrollTop = 0;
+            }, 350);
+        }, 600);
+    }, 900);
+}
+
+function applyLanguageUI(lang) {
+    S.lang = lang;
+    var title = document.getElementById('cw-title');
+    if (title) title.textContent = UI[lang].title;
+    var sub = document.getElementById('cw-sub');
+    if (sub) sub.innerHTML = '<span class="cw-online-dot"></span>' + UI[lang].sub;
+    var inp = document.getElementById('cw-in');
+    if (inp && !S.bloqueado) inp.placeholder = UI[lang].ph;
+    var pwr = document.querySelector('.cw-powered');
+    if (pwr) pwr.textContent = UI[lang].powered;
+    document.querySelectorAll('.cw-lang button').forEach(function(b) {
+        b.classList.toggle('active', b.dataset.lang === lang);
+    });
+    if (S.consultas) showConsultas();
+}
+
+function init(options) {
     var el = document.getElementById('chatbot-widget');
     if (!el) return;
+    options = options || {};
+    S.embedded = !!options.embedded;
+    S.voice = options.voice !== false;
     el.innerHTML = buildHTML();
 
-    document.getElementById('cw-fab').onclick = function() {
-        S.open = !S.open;
-        document.getElementById('cw-window').classList.toggle('open', S.open);
-        document.getElementById('cw-fab').classList.toggle('open', S.open);
-        document.getElementById('cw-badge').style.display = 'none';
-        playSound('open');
-        if (S.open && document.getElementById('cw-msgs').children.length === 0) {
-            showTyping();
-            setTimeout(function() {
-                hideTyping();
-                addMsg(UI[S.lang].greeting, 'bot');
-                playSound('message');
-                setTimeout(function() {
-                    addMsg(UI[S.lang].greeting2, 'bot');
-                    showOpts(UI[S.lang].greeting_opts);
-                }, 600);
-            }, 1000);
+    var fab = document.getElementById('cw-fab');
+    var win = document.getElementById('cw-window');
+
+    if (S.embedded) {
+        el.classList.add('is-embedded');
+        S.open = true;
+        win.classList.add('open');
+        fab.setAttribute('aria-hidden', 'true');
+        fab.style.display = 'none';
+        if (options.defaultLanguage === 'qu') applyLanguageUI('qu');
+        // La presentacion habla por su cuenta: la bienvenida escrita no debe
+        // adelantarse ni duplicar el audio, y el chat espera su turno.
+        S.silentFijo = true;
+        greet();
+        bloquearChat(true);
+
+        // En el portal el widget va embebido y su cabecera no se muestra:
+        // el selector de voz pasa a la barra visible junto al botón de reinicio.
+        var barra = document.querySelector('.p-chat-top');
+        var selectorVoz = document.querySelector('.cw-voz');
+        var reinicio = document.getElementById('btnResetChat');
+        if (barra && selectorVoz) {
+            if (reinicio && reinicio.parentNode === barra) barra.insertBefore(selectorVoz, reinicio);
+            else barra.appendChild(selectorVoz);
         }
-    };
+    } else {
+        fab.onclick = function() {
+            S.open = !S.open;
+            win.classList.toggle('open', S.open);
+            fab.classList.toggle('open', S.open);
+            document.getElementById('cw-badge').style.display = 'none';
+            playSound('open');
+            if (S.open) greet();
+        };
+        setTimeout(function() { document.getElementById('cw-badge').style.display = 'flex'; }, 2000);
+    }
 
     document.getElementById('cw-send').onclick = function() {
         var inp = document.getElementById('cw-in');
@@ -1455,23 +2579,52 @@ function init() {
         if (e.key === 'Enter') document.getElementById('cw-send').click();
     };
 
-    document.getElementById('cw-mic').onclick = function() { startRecording(); };
+    document.getElementById('cw-mic').onclick = function() {
+        // El microfono manual manda: apaga la escucha automatica y alterna dictado.
+        S.autoListen = false;
+        S.autoTurno = false;
+        if (S.handsFree) toggleHandsFree();
+        stopSpeaking();
+        if (navigator.mediaDevices && window.MediaRecorder) {
+            if (GRAB.activa) detenerGrabacionServidor();
+            else grabarServidor(true);
+            return;
+        }
+        startRecording();
+    };
+    var hf = document.getElementById('cw-hf');
+    if (hf) hf.onclick = function() { toggleHandsFree(); };
 
     document.querySelectorAll('.cw-lang button').forEach(function(btn) {
         btn.onclick = function() {
-            if (S.lang === this.dataset.lang) return;
-            S.lang = this.dataset.lang;
-            document.querySelectorAll('.cw-lang button').forEach(function(b) { b.classList.remove('active'); });
-            this.classList.add('active');
-            document.getElementById('cw-title').textContent = UI[S.lang].title;
-            document.getElementById('cw-sub').innerHTML = '<span class="cw-online-dot"></span>' + UI[S.lang].sub;
-            document.getElementById('cw-in').placeholder = UI[S.lang].ph;
-            document.querySelector('.cw-powered').textContent = UI[S.lang].powered;
-            renderConversation(S.lang);
+            var lang = this.dataset.lang;
+            if (S.lang === lang) return;
+            if (typeof window.SacabaSetLang === 'function') window.SacabaSetLang(lang);
+            else switchLang(lang);
         };
     });
 
-    setTimeout(function() { document.getElementById('cw-badge').style.display = 'flex'; }, 2000);
+    var botonVoz = document.getElementById('cw-voz');
+    if (botonVoz) {
+        botonVoz.title = 'Voz de Sami: ' + nombreVoz(S.vozTTS) + ' (toca para cambiar)';
+        botonVoz.onclick = function() {
+            var actual = 0;
+            for (var i = 0; i < VOCES_TTS.length; i++) {
+                if (VOCES_TTS[i].id === S.vozTTS) actual = i;
+            }
+            var siguiente = VOCES_TTS[(actual + 1) % VOCES_TTS.length];
+            S.vozTTS = siguiente.id;
+            try { localStorage.setItem(VOZ_KEY, siguiente.id); } catch (e) {}
+            this.textContent = 'Voz · ' + siguiente.nombre;
+            this.title = 'Voz de Sami: ' + siguiente.nombre + ' (toca para cambiar)';
+            speakText(S.lang === 'qu'
+                ? 'Allillanchu, kay hina rimani.'
+                : 'Hola, así suena mi voz.', S.lang, true);
+        };
+        fetch('/api/tts/status').then(function(r) { return r.json(); }).then(function(d) {
+            if (d && d.disponible === false) botonVoz.style.display = 'none';
+        }).catch(function() {});
+    }
 
     if (window.speechSynthesis) {
         window.speechSynthesis.onvoiceschanged = function() { window.speechSynthesis.getVoices(); };
@@ -1479,15 +2632,43 @@ function init() {
 }
 
 window.initChatbotWidget = init;
-window.openChatbot = function() { if (!S.open) document.getElementById('cw-fab').click(); };
-window.openChatWithQuery = function(q) {
+window.openChatbot = function() {
+    if (S.embedded) return;
     if (!S.open) document.getElementById('cw-fab').click();
+};
+window.openChatWithQuery = function(q, opts) {
+    if (!S.embedded && !S.open) document.getElementById('cw-fab').click();
     setTimeout(function() {
         addMsg(q, 'user');
         playSound('send');
         document.getElementById('cw-opts').innerHTML = '';
-        sendToAI(q);
-    }, 400);
+        sendToAI(q, opts && opts.porVoz ? { porVoz: true } : undefined);
+    }, S.embedded ? 100 : 400);
+};
+
+/* ===== API PUBLICA PARA EL PORTAL ===== */
+window.sacabaSpeak = function(text, lang) { return speakText(text, lang || S.lang); };
+window.sacabaStopSpeaking = stopSpeaking;
+window.sacabaSetVoice = function(on) { S.voice = !!on; if (!S.voice) stopSpeaking(); };
+window.sacabaSetLang = function(lang) {
+    if (lang !== 'es' && lang !== 'qu') return;
+    if (S.lang !== lang) {
+        applyLanguageUI(lang);
+        renderConversation(lang);
+    }
+};
+window.SacabaDetectarIdioma = looksQuechua;
+window.sacabaResetChat = function() {
+    stopSpeaking();
+    S.log = [];
+    S.busy = false;
+    S.silent = true;
+    S.silentFijo = false;
+    document.getElementById('cw-msgs').innerHTML = '';
+    document.getElementById('cw-opts').innerHTML = '';
+    hideTyping();
+    S.silent = false;
+    greet();
 };
 
 })();

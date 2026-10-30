@@ -6,11 +6,19 @@ import threading
 import webbrowser
 
 from dotenv import load_dotenv
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, flash, jsonify, redirect, render_template, request, session, url_for
+
+from chatbot.auth import (
+    admin_required, alternar_activo, autenticar, buscar_por_id, cambiar_contrasena,
+    crear_usuario, csrf_token, csrf_valido, listar_usuarios, panel_required,
+)
+from chatbot import tramites as tramites_data
+from chatbot.tts import estado as tts_estado, sintetizar as tts_sintetizar
+from chatbot import stt as stt_servidor
 
 # Importar funciones del motor del chatbot
 from chatbot.engine import (
-    LANGUAGES, detect_language, get_ai_resp, is_ai_available,
+    LANGUAGES, detect_language, get_ai_resp, is_ai_available, ai_provider,
     translate_page, transcribe_audio, search_tramites, get_search_suggestions,
     get_office_location, search_offices, get_all_offices, get_directions,
     get_nearby_places, generate_map_embed, geocode_address, reverse_geocode,
@@ -31,28 +39,36 @@ app = Flask(
     template_folder=str(BASE_DIR / 'templates'),
     static_folder=str(BASE_DIR / 'static'),
 )
-app.secret_key = 'chatbot-sacaba-2026'
+app.secret_key = os.environ.get('SECRET_KEY') or os.environ.get('FLASK_SECRET_KEY') \
+    or 'chatbot-sacaba-2026'
+app.jinja_env.globals['csrf_token'] = csrf_token
 
-# Configuración del servidor
+# Configuración del servidor. En local se conserva 127.0.0.1:5000; en un
+# hosting el puerto y la interfaz los impone la plataforma por entorno.
 DEFAULT_LANGUAGE = 'es'  # Idioma por defecto: español
-HOST = '127.0.0.1'       # Dirección del servidor
-PORT = 5000              # Puerto del servidor
+HOST = os.environ.get('HOST') or '127.0.0.1'
+PORT = int(os.environ.get('PORT') or 5000)
 
 
 def _open_browser() -> None:
-    webbrowser.open(f'http://{HOST}:{PORT}')
+    webbrowser.open(f'http://127.0.0.1:{PORT}')
 
 
 def run_app(open_browser: bool = True) -> None:
     if open_browser:
         threading.Timer(1.0, _open_browser).start()
 
-    app.run(debug=False, host=HOST, port=PORT, use_reloader=False)
+    app.run(debug=False, host=HOST, port=PORT, use_reloader=False,
+         threaded=True)   # un solo hilo bloqueaba /chat tras una consulta lenta
 
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return render_template(
+        'index.html',
+        tramites=tramites_data.listado(),
+        categorias=tramites_data.CATEGORIES,
+    )
 
 
 @app.route('/chat', methods=['POST'])
@@ -70,10 +86,144 @@ def chat():
     language = data.get('language', DEFAULT_LANGUAGE)
     if not isinstance(language, str) or language not in LANGUAGES:
         language = detect_language(message)
+    detected = detect_language(message)
 
-    response = get_ai_resp(message.strip(), language)
+    history = data.get('history')
+    if not isinstance(history, list):
+        history = None
+    use_ai = data.get('useAI', True) is not False
 
-    return jsonify({'response': response, 'options': [], 'language': language})
+    response = get_ai_resp(message.strip(), language, history=history, allow_ai=use_ai)
+
+    return jsonify({
+        'response': response,
+        'options': [],
+        'language': language,
+        'detected': detected,
+        'tramite': tramites_data.detect(message),
+    })
+
+
+@app.route('/api/tramites')
+def api_tramites():
+    """Listado de los 20 trámites con búsqueda y filtro por categoría."""
+    query = (request.args.get('q') or '').strip().lower()
+    categoria = (request.args.get('cat') or request.args.get('category') or '').strip()
+
+    items = tramites_data.listado()
+    if categoria and categoria not in tramites_data.CATEGORIES:
+        return jsonify({'error': 'Categoría no válida.', 'categorias': tramites_data.CATEGORIES}), 400
+    if categoria:
+        items = [t for t in items if t['cat'] == categoria]
+    if query:
+        def coincide(t):
+            texto = ' '.join([t['n'], t['resumen'], ' '.join(t['keywords'])]).lower()
+            return query in texto
+        items = [t for t in items if coincide(t)]
+
+    return jsonify({
+        'total': len(items),
+        'categorias': tramites_data.CATEGORIES,
+        'tramites': [tramites_data.resumen(t['id']) for t in items],
+    })
+
+
+@app.route('/api/tramites/<ident>')
+def api_tramite(ident):
+    ficha = tramites_data.get(ident)
+    if not ficha:
+        return jsonify({'error': 'Trámite no encontrado.'}), 404
+    return jsonify(ficha)
+
+
+@app.route('/api/tramites/<ident>/relacionados')
+def api_tramite_relacionados(ident):
+    ficha = tramites_data.get(ident)
+    if not ficha:
+        return jsonify({'error': 'Trámite no encontrado.'}), 404
+    return jsonify({
+        'tramites': [tramites_data.resumen(r) for r in ficha['relacionados']
+                     if tramites_data.get(r)],
+    })
+
+
+@app.route('/tramite/<slug>')
+def pagina_tramite(slug):
+    ficha = tramites_data.get_by_slug(slug)
+    if not ficha:
+        return render_template('404.html'), 404
+    relacionados = [tramites_data.get(r) for r in ficha['relacionados']]
+    return render_template(
+        'tramite.html', t=ficha,
+        relacionados=[r for r in relacionados if r],
+        categorias=tramites_data.CATEGORIES,
+    )
+
+
+@app.route('/api/tts/status')
+def tts_status():
+    return jsonify(tts_estado())
+
+
+@app.route('/api/tts', methods=['POST'])
+def tts():
+    """Genera voz neuronal gratuita (Edge TTS). Devuelve la URL del MP3."""
+    data = request.get_json(silent=True)
+    if not isinstance(data, dict):
+        return jsonify({'error': 'Cuerpo JSON inválido.'}), 400
+    texto = data.get('text')
+    if not isinstance(texto, str) or not texto.strip():
+        return jsonify({'error': 'Se requiere el campo "text".'}), 400
+    if len(texto) > 1500:
+        return jsonify({'error': 'El texto supera el máximo de 1500 caracteres.'}), 400
+
+    lang = data.get('language', 'es')
+    if lang not in LANGUAGES:
+        lang = 'es'
+    voz = data.get('voice', '')
+
+    ruta = tts_sintetizar(texto, voz=voz, lang=lang)
+    if not ruta:
+        return jsonify({'error': 'La voz neuronal no está disponible.', 'fallback': 'browser'}), 503
+
+    url = url_for('static', filename='audio/tts/' + ruta.name)
+    return jsonify({'audio_url': url, 'voice': voz or 'es-BO-SofiaNeural', 'language': lang})
+
+
+@app.route('/api/stt/status')
+def stt_status():
+    return jsonify(stt_servidor.estado())
+
+
+@app.route('/api/stt', methods=['POST'])
+def stt():
+    """Transcribe audio WAV grabado por el navegador (respaldo del dictado)."""
+    data = request.get_json(silent=True)
+    if not isinstance(data, dict):
+        return jsonify({'error': 'Cuerpo JSON invalido.'}), 400
+    audio_b64 = data.get('audio')
+    if not isinstance(audio_b64, str) or not audio_b64:
+        return jsonify({'error': 'Falta el campo "audio".'}), 400
+
+    language = data.get('language', 'es')
+    if language not in LANGUAGES:
+        language = 'es'
+
+    try:
+        audio_bytes = base64.b64decode(audio_b64)
+    except Exception:
+        return jsonify({'error': 'El audio no esta codificado en base64.'}), 400
+
+    try:
+        texto = stt_servidor.transcribir(audio_bytes, language)
+    except ValueError:
+        return jsonify({'error': 'El audio no se pudo leer como WAV.'}), 400
+    except Exception:
+        return jsonify({'error': 'No se pudo transcribir el audio.'}), 503
+
+    if not texto:
+        return jsonify({'text': '', 'error': 'No se entendio el audio.'}), 200
+    return jsonify({'text': texto, 'language': language})
 
 
 @app.route('/audio-to-text', methods=['POST'])
@@ -111,7 +261,7 @@ def language():
 
 @app.route('/api/ai-status')
 def ai_status():
-    return jsonify({'ai': is_ai_available()})
+    return jsonify({'ai': is_ai_available(), 'provider': ai_provider()})
 
 
 @app.route('/api/translate', methods=['POST'])
@@ -698,6 +848,186 @@ Responde de forma breve y didáctico."""
         })
     else:
         return jsonify({'error': result.get('error', 'Error en traducción.')}), 500
+
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if session.get('usuario_id'):
+        return redirect(url_for('admin_panel'))
+
+    error = None
+    usuario = ''
+    if request.method == 'POST':
+        usuario = (request.form.get('usuario') or '').strip()
+        contrasena = request.form.get('contrasena') or request.form.get('password') or ''
+        if not usuario or not contrasena:
+            error = 'Todos los campos son obligatorios'
+        elif not csrf_valido():
+            error = 'La sesión del formulario expiró. Vuelva a intentarlo.'
+        else:
+            registro = autenticar(usuario, contrasena)
+            if registro is None:
+                error = 'Usuario o contraseña incorrectos'
+            else:
+                session.clear()
+                session['usuario_id'] = registro['id']
+                session['usuario'] = registro['usuario']
+                session['nombre'] = registro['nombre']
+                session['rol'] = registro['rol']
+                destino = request.args.get('siguiente', '')
+                if not destino.startswith('/'):
+                    destino = url_for('admin_panel')
+                return redirect(destino)
+
+    return render_template('login.html', error=error, usuario=usuario)
+
+
+@app.route('/logout', methods=['POST'])
+def logout():
+    if not csrf_valido():
+        return 'Solicitud no válida', 400
+    session.clear()
+    return redirect(url_for('login'))
+
+
+@app.route('/admin/usuarios')
+@admin_required
+def admin_usuarios():
+    return render_template(
+        'admin_usuarios.html',
+        usuarios=listar_usuarios(),
+        valores={'usuario': '', 'nombre': '', 'rol': ''},
+        error=None,
+    )
+
+
+@app.route('/admin/usuarios', methods=['POST'])
+@admin_required
+def crear_usuario_admin():
+    valores = {
+        'usuario': (request.form.get('usuario') or '').strip(),
+        'nombre': (request.form.get('nombre') or '').strip(),
+        'rol': (request.form.get('rol') or '').strip(),
+    }
+    error = None
+    if not csrf_valido():
+        error = 'La sesión del formulario expiró. Vuelva a intentarlo.'
+    else:
+        registro, error = crear_usuario(request.form)
+        if registro is not None:
+            flash(f"Usuario {registro['usuario']} registrado correctamente", 'success')
+            return redirect(url_for('admin_usuarios'), code=303)
+
+    return render_template(
+        'admin_usuarios.html',
+        usuarios=listar_usuarios(),
+        valores=valores,
+        error=error,
+    )
+
+
+@app.route('/admin')
+@panel_required
+def admin_panel():
+    fichas = tramites_data.listado()
+    usuarios = listar_usuarios()
+    cambios = tramites_data.overrides()
+    activos = [u for u in usuarios if u.get('activo', True)]
+    por_rol = {}
+    for usuario in usuarios:
+        por_rol[usuario.get('rol', 'ciudadano')] = por_rol.get(usuario.get('rol', 'ciudadano'), 0) + 1
+    return render_template(
+        'admin_panel.html',
+        total_tramites=len(fichas),
+        total_usuarios=len(usuarios),
+        usuarios_activos=len(activos),
+        por_rol=por_rol,
+        total_cambios=len(cambios),
+        categorias=len(tramites_data.CATEGORIES),
+        recientes=fichas[:5],
+        es_admin=session.get('rol') == 'administrador',
+    )
+
+
+@app.route('/admin/tramites')
+@panel_required
+def admin_tramites():
+    buscar = (request.args.get('buscar') or '').strip().lower()
+    fichas = tramites_data.listado()
+    if buscar:
+        fichas = [
+            f for f in fichas
+            if buscar in f['n'].lower() or buscar in f['cat'].lower()
+            or buscar in ' '.join(f.get('keywords') or []).lower()
+        ]
+    editar = request.args.get('editar') or ''
+    ficha = tramites_data.get(editar) if editar else None
+    return render_template(
+        'admin_tramites.html',
+        tramites=fichas,
+        categorias=tramites_data.CATEGORIES,
+        ficha=ficha,
+        cambios=tramites_data.overrides().get(editar, {}) if ficha else {},
+        buscar=buscar,
+        campos=tramites_data.CAMPOS_EDITABLES,
+    )
+
+
+@app.route('/admin/tramites/<ident>', methods=['POST'])
+@panel_required
+def admin_tramite_guardar(ident):
+    if not csrf_valido():
+        flash('La sesión del formulario expiró. Vuelva a intentarlo.', 'error')
+        return redirect(url_for('admin_tramites', editar=ident), code=303)
+    if request.form.get('restablecer'):
+        tramites_data.guardar_override(ident, {})
+        flash('Se restauraron los datos oficiales.', 'success')
+        return redirect(url_for('admin_tramites', editar=ident), code=303)
+    if not tramites_data.guardar_override(ident, request.form):
+        flash('No encontramos ese trámite.', 'error')
+        return redirect(url_for('admin_tramites'), code=303)
+    detalle = tramites_data.get(ident)
+    flash('Datos actualizados: ' + (detalle['n'] if detalle else ident), 'success')
+    return redirect(url_for('admin_tramites', editar=ident), code=303)
+
+
+@app.route('/admin/usuarios/<usuario_id>/estado', methods=['POST'])
+@admin_required
+def admin_usuario_estado(usuario_id):
+    if not csrf_valido():
+        flash('La sesión del formulario expiró. Vuelva a intentarlo.', 'error')
+        return redirect(url_for('admin_usuarios'), code=303)
+    if usuario_id == session.get('usuario_id'):
+        flash('No puede desactivar su propia cuenta.', 'error')
+        return redirect(url_for('admin_usuarios'), code=303)
+    registro = buscar_por_id(usuario_id)
+    if registro is None:
+        flash('No encontramos ese usuario.', 'error')
+        return redirect(url_for('admin_usuarios'), code=303)
+    nuevo = not registro.get('activo', True)
+    alternar_activo(usuario_id, nuevo)
+    flash(('Usuario activado: ' if nuevo else 'Usuario desactivado: ') + registro['usuario'], 'success')
+    return redirect(url_for('admin_usuarios'), code=303)
+
+
+@app.route('/admin/cuenta', methods=['GET', 'POST'])
+@panel_required
+def admin_cuenta():
+    error = None
+    if request.method == 'POST':
+        if not csrf_valido():
+            error = 'La sesión del formulario expiró. Vuelva a intentarlo.'
+        else:
+            _, error = cambiar_contrasena(
+                session.get('usuario_id'),
+                request.form.get('actual') or '',
+                request.form.get('nueva') or '',
+                request.form.get('confirmar') or '',
+            )
+            if error is None:
+                flash('Contraseña actualizada. Úsela la próxima vez que ingrese.', 'success')
+                return redirect(url_for('admin_cuenta'), code=303)
+    return render_template('admin_cuenta.html', error=error)
 
 
 if __name__ == '__main__':

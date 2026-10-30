@@ -491,3 +491,173 @@
         border-radius: 18px;
     }
 }
+
+
+/* ====== REDISENO 2026 - MOSTRADOR DE ATENCION ====== */
+
+#chatbot-widget{ --cw-grad: linear-gradient(135deg,#052e16 0%,#14532d 48%,#0f766e 100%); }
+
+/* ---------- PANEL DE CRISTAL (escritorio) ---------- */
+@media (min-width:1101px){
+    body.split-mode #chatbot-widget{
+        position: relative !important;
+        top: auto !important; right: auto !important;
+        bottom: auto !important; left: auto !important;
+        width: 100%; height: 100%;
+        z-index: 70;
+        transition: width .35s cubic-bezier(.4,0,.2,1);
+    }
+    body.split-mode #chatbot-widget .cw-window{
+        position: relative !important;
+        top: auto !important; right: auto !important;
+        bottom: auto !important; left: auto !important;
+        width: 100% !important;
+        height: 100% !important;
+        border-radius: 0 !important;
+        display: flex !important;
+        box-shadow: -28px 0 64px -26px rgba(0,0,0,.55);
+        animation: cwGlassIn .5s cubic-bezier(.2,.9,.25,1);
+        overflow: hidden;
+    }
+    body.split-mode #chatbot-widget .cw-window::before{
+        content:''; position:absolute; inset:0; z-index:0; pointer-events:none;
+        background:
+            radial-gradient(60% 40% at 85% 6%, rgba(52,211,153,.20), transparent 60%),
+            radial-gradient(50% 35% at 10% 96%, rgba(45,212,191,.16), transparent 60%);
+        animation: cwAurora 18s ease-in-out infinite alternate;
+    }
+    body.split-mode #chatbot-widget .cw-header,
+    body.split-mode #chatbot-widget .cw-msgs,
+    body.split-mode #chatbot-widget .cw-opts,
+    body.split-mode #chatbot-widget .cw-input,
+    body.split-mode #chatbot-widget .cw-powered{ position: relative; z-index: 1; }
+
+    body.split-mode #chatbot-widget .cw-fab{
+        position: absolute !important;
+        top: 14px; right: 14px; bottom: auto; left: auto;
+        width: 38px; height: 38px; border-radius: 12px; z-index: 45;
+        background: rgba(255,255,255,.14);
+        border: 1px solid rgba(255,255,255,.28);
+        box-shadow: none;
+        animation: none;
+    }
+    body.split-mode #chatbot-widget .cw-fab .cw-fab-logo{ display: none !important; }
+    body.split-mode #chatbot-widget .cw-fab .cw-fab-close{ display: block !important; }
+    body.split-mode #chatbot-widget .cw-fab .cw-pulse{ display: none; }
+    body.split-mode #chatbot-widget .cw-h-actions{ margin-right: 46px; }
+    body.split-mode #chatbot-widget .cw-msgs{ flex: 1; }
+
+    body.split-mode #chatbot-widget.cw-collapsed{ width: 62px; }
+    body.split-mode #chatbot-widget.cw-collapsed .cw-window{ display: none !important; }
+    body.split-mode #chatbot-widget.cw-collapsed .cw-fab{
+        top: 16px; right: 12px; width: 38px; height: 38px;
+    }
+    body.split-mode .pane-chat{
+        background:
+            radial-gradient(70% 40% at 90% 0%, rgba(34,197,94,.10), transparent 60%),
+            linear-gradient(180deg, rgba(3,16,10,.35), rgba(3,16,10,.12));
+        backdrop-filter: blur(10px) saturate(140%);
+        -webkit-backdrop-filter: blur(10px) saturate(140%);
+    }
+}
+@keyframes cwGlassIn{
+    from{ opacity:0; transform: translateX(28px) scale(.985); filter: blur(6px); }
+    to  { opacity:1; transform: none; filter: blur(0); }
+}
+@keyframes cwAurora{
+    0%  { transform: translate3d(0,0,0) scale(1); opacity:.85; }
+    100%{ transform: translate3d(-4%,3%,0) scale(1.12); opacity:1; }
+}
+
+/* ---------- AVATAR CON ANILLO GIRATORIO ---------- */
+#chatbot-widget .cw-h-avatar{ position: relative; }
+#chatbot-widget .cw-h-avatar::before{
+    content:''; position:absolute; inset:-3px; border-radius: 16px; z-index:0;
+    background: conic-gradient(from 0deg,#fbbf24,#22c55e,#2dd4bf,#fbbf24);
+    animation: cwSpin 5.5s linear infinite; opacity:.9;
+}
+#chatbot-widget .cw-h-avatar::after{
+    content:''; position:absolute; inset:-8px; border-radius: 20px; z-index:-1;
+    background: rgba(52,211,153,.35); filter: blur(10px);
+    animation: cwHalo 3.2s ease-in-out infinite;
+}
+#chatbot-widget .cw-h-avatar .cw-h-logo,
+#chatbot-widget .cw-h-avatar svg{ position: relative; z-index: 1; }
+@keyframes cwSpin{ to{ transform: rotate(360deg); } }
+@keyframes cwHalo{ 0%,100%{ opacity:.35; transform:scale(1);} 50%{ opacity:.75; transform:scale(1.12);} }
+
+/* ---------- BURBUJAS DE CRISTAL CON COLA ---------- */
+#chatbot-widget .cw-msg.bot .cw-msg-b{
+    border-left: 3px solid transparent;
+    border-image: linear-gradient(180deg,#22c55e,#14b8a6) 1;
+    border-radius: 16px 16px 16px 5px;
+    backdrop-filter: blur(6px);
+    background: rgba(255,255,255,.94);
+}
+html[data-theme="dark"] #chatbot-widget .cw-msg.bot .cw-msg-b{
+    background: rgba(20,32,50,.92); color:#e6eef8; border-color: transparent;
+}
+html[data-theme="dark"] #chatbot-widget .cw-msg.bot .cw-msg-b strong{ color:#6ee7b7; }
+html[data-theme="dark"] #chatbot-widget .cw-msgs{
+    background: linear-gradient(180deg,#070f1c,#05101a);
+}
+html[data-theme="dark"] #chatbot-widget .cw-window{ background:#070f1c; }
+html[data-theme="dark"] #chatbot-widget .cw-opts{ background: rgba(11,21,36,.92); border-top-color: rgba(148,180,220,.14); }
+html[data-theme="dark"] #chatbot-widget .cw-opt{ background: rgba(11,21,36,.9); border-color: rgba(34,197,94,.35); color:#bbf7d0; }
+html[data-theme="dark"] #chatbot-widget .cw-input{ background: rgba(11,21,36,.94); border-top-color: rgba(148,180,220,.14); }
+html[data-theme="dark"] #chatbot-widget .cw-input input{
+    background: rgba(6,14,26,.9); border-color: rgba(148,180,220,.2); color:#e6eef8;
+}
+html[data-theme="dark"] #chatbot-widget .cw-input input::placeholder{ color:#7b8ea6; }
+html[data-theme="dark"] #chatbot-widget .cw-powered{ background: rgba(6,14,26,.95); color:#6d829b; border-top-color: rgba(148,180,220,.12); }
+html[data-theme="dark"] #chatbot-widget .cw-msgs::-webkit-scrollbar-thumb{ background:#1d3350; }
+html[data-theme="dark"] #chatbot-widget .cw-msg.user .cw-msg-b{
+    background: linear-gradient(135deg,#0f766e,#14b8a6);
+}
+
+/* Marca de tiempo */
+#chatbot-widget .cw-msg-time{
+    font-size: 10px; color: rgba(90,110,130,.85); margin-top: 4px;
+    display: block; letter-spacing: .02em;
+}
+#chatbot-widget .cw-msg.user .cw-msg-time{ text-align: right; }
+html[data-theme="dark"] #chatbot-widget .cw-msg-time{ color: rgba(150,175,200,.7); }
+
+/* Indicador con texto */
+#chatbot-widget .cw-typing .cw-typing-label{
+    font-size: 11.5px; color: #4d7c5f; margin-left: 6px; font-weight: 600;
+    letter-spacing: .01em;
+}
+html[data-theme="dark"] #chatbot-widget .cw-typing .cw-typing-label{ color:#7fb89a; }
+
+/* ---------- ONDA EN EL BOTON ENVIAR ---------- */
+#chatbot-widget .cw-input button#cw-send{ position: relative; overflow: hidden; }
+#chatbot-widget .cw-input button#cw-send .cw-ripple{
+    position: absolute; border-radius: 50%; transform: scale(0);
+    background: rgba(255,255,255,.55); pointer-events: none;
+    animation: cwRipple .6s ease-out forwards;
+}
+@keyframes cwRipple{ to{ transform: scale(3.4); opacity: 0; } }
+
+/* ---------- CHIPS DE RESPUESTA RAPIDA ---------- */
+#chatbot-widget .cw-opt{ position: relative; overflow: hidden; }
+#chatbot-widget .cw-opt:hover{ animation: cwChip .3s ease; }
+@keyframes cwChip{ 50%{ transform: translateY(-3px) scale(1.04); } }
+
+/* ---------- HOJA INFERIOR EN MOVIL ---------- */
+@media (max-width: 600px){
+    body.split-mode #chatbot-widget .cw-window{
+        width: calc(100vw - 20px) !important;
+        right: -6px;
+        border-radius: 20px !important;
+    }
+}
+
+/* Accesibilidad */
+@media (prefers-reduced-motion: reduce){
+    #chatbot-widget *, #chatbot-widget *::before, #chatbot-widget *::after{
+        animation-duration:.001ms !important; animation-iteration-count:1 !important;
+        transition-duration:.001ms !important;
+    }
+}
+

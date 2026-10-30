@@ -43,6 +43,26 @@ Thumbs.db
 *.jpg
 *.jpeg
 
-# Archivos de caché
+# ...pero el logo del portal si forma parte de la aplicacion
+!static/img/logo-sacaba-2026.png
+
+# Caché
 .pytest_cache/
 .cache/
+.coverage
+htmlcov/
+coverage.xml
+
+# Datos generados en tiempo de ejecucion (no versionar)
+data/
+chatbot/aprendido.json
+chatbot/preguntas_sin_responder.json
+chatbot/data/
+static/audio/
+*.log
+
+# Archivos empaquetados
+*.zip
+ENTREGABLES_*/
+GESTION_*/
+EVIDENCIA_*/

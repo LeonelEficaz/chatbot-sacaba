@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 210" width="200" height="210" role="img" aria-label="Sami, la gatita asistente del Municipio de Sacaba">
+  <g class="sami-tail">
+    <path d="M132 182C166 190 186 172 184 150C183 137 168 132 161 141C155 150 161 160 170 158C175 157 177 151 174 147" fill="none" stroke="#101816" stroke-width="19" stroke-linecap="round"/>
+  </g>
+  <g class="sami-ears">
+    <path d="M52 66L55 18Q56 7 67 13L96 40Z" fill="#ffffff" stroke="#101816" stroke-width="5.5" stroke-linejoin="round"/>
+    <path d="M63 57L65 28L87 48Z" fill="#101816"/>
+    <path d="M148 66L145 18Q144 7 133 13L104 40Z" fill="#ffffff" stroke="#101816" stroke-width="5.5" stroke-linejoin="round"/>
+    <path d="M137 57L135 28L113 48Z" fill="#101816"/>
+  </g>
+  <g class="sami-body">
+    <path d="M78 120C60 132 54 154 54 172C54 188 76 196 100 196C124 196 146 188 146 172C146 154 140 132 122 120Z" fill="#ffffff" stroke="#101816" stroke-width="5"/>
+    <path d="M78 120C62 132 55 152 54 172C54 188 66 195 82 196C76 172 75 144 78 120Z" fill="#101816"/>
+    <path d="M74 180Q100 194 126 180" fill="none" stroke="#e3e8e4" stroke-width="6" stroke-linecap="round"/>
+    <rect x="73" y="154" width="20" height="41" rx="10" fill="#ffffff" stroke="#101816" stroke-width="4"/>
+    <rect x="107" y="154" width="20" height="41" rx="10" fill="#ffffff" stroke="#101816" stroke-width="4"/>
+    <path d="M78 188v5M84 188v5M90 188v5M112 188v5M118 188v5M124 188v5" stroke="#101816" stroke-width="2.2" stroke-linecap="round"/>
+  </g>
+  <g class="sami-head">
+    <path d="M100 24C131 24 157 46 157 79C157 108 132 131 100 131C68 131 43 108 43 79C43 46 69 24 100 24Z" fill="#ffffff" stroke="#101816" stroke-width="5.5"/>
+    <path d="M100 24C131 24 157 46 157 79C157 106 134 129 106 131C104 120 110 110 107 98C105 86 102 84 103 72C104 56 101 36 100 24Z" fill="#101816"/>
+    <g class="sami-collar">
+      <path d="M62 132Q100 150 138 132L140 142Q100 160 60 142Z" fill="#dfe5e1"/>
+    </g>
+    <g class="sami-eye sami-eye-l">
+      <circle cx="75" cy="85" r="10" fill="#101816"/>
+      <circle cx="71.5" cy="80.5" r="3.4" fill="#ffffff"/>
+    </g>
+    <g class="sami-eye sami-eye-r">
+      <ellipse cx="125" cy="85" rx="8.5" ry="10.5" fill="#ffffff"/>
+      <circle cx="118" cy="65" r="2.4" fill="#ffffff"/>
+      <circle cx="128" cy="62" r="2.4" fill="#ffffff"/>
+    </g>
+    <path d="M95 93Q100 90 105 93Q104 99.5 100 100.5Q96 99.5 95 93Z" fill="#101816"/>
+    <path class="sami-smile" d="M90 103Q95.5 110 100 104Q104.5 110 110 103" fill="none" stroke="#101816" stroke-width="3.4" stroke-linecap="round"/>
+    <g class="sami-whiskers" fill="none" stroke="#101816" stroke-width="3.2" stroke-linecap="round">
+      <path d="M58 95Q38 90 16 86"/>
+      <path d="M56 102Q34 102 12 102"/>
+      <path d="M58 109Q38 115 18 121"/>
+      <path d="M144 102Q166 104 190 100"/>
+      <path d="M144 110Q164 116 188 120"/>
+      <path d="M142 117Q160 125 180 134"/>
+    </g>
+  </g>
+</svg>

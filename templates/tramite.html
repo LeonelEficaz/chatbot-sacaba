@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ t.n }} · Trámites de Sacaba | Sami</title>
+    <meta name="description" content="{{ t.resumen }}">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/logo-sacaba-2026.png') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/portal-2026.css') }}?v=20261030c">
+</head>
+<body class="portal-body">
+
+    <header class="p-header">
+        <div class="p-header-inner">
+            <a class="p-brand" href="/" aria-label="Gobierno Autónomo Municipal de Sacaba">
+                <span class="p-brand-logo"><img src="{{ url_for('static', filename='img/logo-sacaba-2026.png') }}" alt="Escudo de Sacaba"></span>
+                <span class="p-brand-text">
+                    <small>Gobierno Autónomo Municipal</small>
+                    <strong>SACABA</strong>
+                    <em>Cochabamba · Bolivia</em>
+                </span>
+            </a>
+            <div class="p-actions">
+                <button class="p-icon-btn" id="btnTheme" aria-label="Cambiar tema" title="Cambiar tema"><i class="fas fa-moon"></i></button>
+                <a class="p-login" href="/#/inicio"><i class="fas fa-arrow-left"></i><span>Volver al portal</span></a>
+            </div>
+        </div>
+    </header>
+
+    <main class="p-standalone">
+        <div class="p-standalone-bar">
+            <nav class="p-breadcrumb" aria-label="Ruta">
+                <a href="/"><i class="fas fa-house"></i> Inicio</a>
+                <span>/</span>
+                <a href="/#/inicio">{{ categorias[t.cat].nombre }}</a>
+                <span>/</span>
+                <span>{{ t.n }}</span>
+            </nav>
+            <div class="p-main-tools">
+                <button class="p-tool" onclick="window.print()"><i class="fas fa-print"></i><span>Imprimir</span></button>
+                <button class="p-tool" id="btnShare"><i class="fas fa-link"></i><span>Copiar enlace</span></button>
+            </div>
+        </div>
+
+        <article class="p-article">
+            <header class="art-hero">
+                <div class="art-icon-float"><i class="fas fa-{{ t.icon }}"></i></div>
+                <div class="art-top">
+                    <span class="art-cat"><i class="fas fa-{{ categorias[t.cat].icono }}"></i> {{ categorias[t.cat].nombre }}</span>
+                    <span class="art-tag">{{ t.tag }}</span>
+                </div>
+                <h1>{{ t.n }}</h1>
+                <p class="art-summary">{{ t.resumen }}</p>
+                <div class="art-icons">
+                    <span><i class="fas fa-coins"></i>{{ t.costo }}</span>
+                    <span><i class="fas fa-clock"></i>{{ t.tiempo }}</span>
+                    <span><i class="fas fa-location-dot"></i>{{ t.oficina.nombre }}</span>
+                </div>
+            </header>
+
+            <div class="art-layout">
+                <div class="art-body">
+                    <section class="art-block art-intro">
+                        <h2><i class="fas fa-circle-info"></i> Introducción</h2>
+                        {% for p in t.intro %}<p>{{ p }}</p>{% endfor %}
+                        <div class="art-qu">
+                            <span>Resumen en quechua</span>
+                            <p>{{ t.qu.resumen }}</p>
+                        </div>
+                    </section>
+
+                    <section class="art-block">
+                        <h2><i class="fas fa-clipboard-list"></i> Requisitos</h2>
+                        <ul class="art-req">
+                            {% for r in t.requisitos %}<li>{{ r }}</li>{% endfor %}
+                        </ul>
+                    </section>
+
+                    <section class="art-block">
+                        <h2><i class="fas fa-list-ol"></i> Pasos a seguir</h2>
+                        <div class="art-steps">
+                            {% for p in t.pasos %}
+                            <div class="art-step">
+                                <span class="art-step-num">{{ loop.index }}</span>
+                                <div><h3>{{ p.t }}</h3><p>{{ p.d }}</p></div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </section>
+
+                    <section class="art-block">
+                        <h2><i class="fas fa-lightbulb"></i> Recomendaciones</h2>
+                        <ul class="art-tips">
+                            {% for r in t.recomendaciones %}
+                            <li><i class="fas fa-lightbulb"></i><span>{{ r }}</span></li>
+                            {% endfor %}
+                        </ul>
+                    </section>
+                </div>
+
+                <aside class="art-side">
+                    <div class="art-side-card">
+                        <h3>Costo</h3>
+                        <div class="art-price">{{ t.costo }}</div>
+                        <p class="art-price-note">{{ t.costo_detalle }}</p>
+                        <div class="art-facts">
+                            <div><span>Tiempo</span><strong>{{ t.tiempo }}</strong></div>
+                            <div><span>Modalidad</span><strong>{{ t.modalidad }}</strong></div>
+                        </div>
+                        <a class="p-btn p-btn-primary" style="width:100%;margin-top:14px" href="/?pregunta={{ t.n|urlencode }}">
+                            <i class="fas fa-comments"></i> Preguntar a Sami
+                        </a>
+                    </div>
+
+                    <div class="art-side-card art-office">
+                        <h3>Oficina</h3>
+                        <div class="art-office-name">{{ t.oficina.nombre }}</div>
+                        <p><i class="fas fa-location-dot"></i><span>{{ t.oficina.direccion }}</span></p>
+                        <p><i class="fas fa-clock"></i><span>{{ t.oficina.horario }}</span></p>
+                        <p><i class="fas fa-phone"></i><span>{{ t.oficina.telefono }}</span></p>
+                        {% if t.oficina.mapa %}
+                        <a class="art-map-btn" href="{{ t.oficina.mapa }}" target="_blank" rel="noopener">
+                            <i class="fas fa-map-location-dot"></i> Ver ubicación en el mapa
+                        </a>
+                        {% endif %}
+                    </div>
+
+                    <div class="art-side-card art-hours">
+                        <h3><i class="fas fa-clock" style="color:var(--g-600);margin-right:6px"></i> Horarios de atención</h3>
+                        <div class="art-hours-list">
+                            {% for h in t.horarios %}
+                            <div class="art-hours-row">
+                                <div><b>{{ h.dias }}</b><span>{{ h.nota }}</span></div>
+                                <strong>{{ h.horas }}</strong>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% if t.horario_nota %}
+                        <p class="art-hours-note"><i class="fas fa-circle-info"></i><span>{{ t.horario_nota }}</span></p>
+                        {% endif %}
+                    </div>
+
+                    {% if relacionados %}
+                    <div class="art-side-card">
+                        <h3>Trámites relacionados</h3>
+                        <div class="art-rel">
+                            {% for r in relacionados %}
+                            <a href="{{ r.url }}"><i class="fas fa-{{ r.icon }}"></i>{{ r.n }}<span class="go"><i class="fas fa-chevron-right"></i></span></a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <div class="art-side-card art-sources">
+                        <h3>Fuentes oficiales</h3>
+                        {% for f in t.fuente %}
+                        <a href="{{ f.url }}" target="_blank" rel="noopener"><i class="fas fa-arrow-up-right-from-square"></i>{{ f.nombre }}</a>
+                        {% endfor %}
+                    </div>
+                </aside>
+            </div>
+
+            <div class="art-foot">
+                <span><i class="fas fa-shield-halved"></i> Información referencial actualizada · Gestión 2026</span>
+                <span><i class="fas fa-circle-check"></i> {{ t.modalidad }} · {{ t.tiempo }}</span>
+                <a class="p-tool" href="/"><i class="fas fa-arrow-left"></i> Volver al portal</a>
+            </div>
+        </article>
+    </main>
+
+    <footer class="p-footer">
+        <div class="p-footer-inner">
+            <div class="p-footer-brand">
+                <img src="{{ url_for('static', filename='img/logo-sacaba-2026.png') }}" alt="Escudo de Sacaba">
+                <div>
+                    <strong>Gobierno Autónomo Municipal de Sacaba</strong>
+                    <span>Orientación ciudadana digital · Gestión 2026</span>
+                </div>
+            </div>
+            <p class="p-footer-note">Información referencial elaborada a partir del portal oficial <a href="https://sacaba.gob.bo/tramites/" target="_blank" rel="noopener">sacaba.gob.bo</a>, SEGIP, Policía Boliviana y RUAT. Confirma montos y requisitos en ventanilla antes de iniciar tu trámite.</p>
+            <div class="p-footer-links">
+                <a href="https://sacaba.gob.bo/" target="_blank" rel="noopener">sacaba.gob.bo</a>
+                <a href="https://www.segip.gob.bo/" target="_blank" rel="noopener">SEGIP</a>
+                <a href="https://www.ruat.gob.bo/" target="_blank" rel="noopener">RUAT</a>
+                <a href="https://policiadnfr.gob.bo/" target="_blank" rel="noopener">DNFR</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        (function () {
+            var theme = localStorage.getItem('sacaba_theme') || 'light';
+            document.documentElement.setAttribute('data-theme', theme);
+            var btn = document.getElementById('btnTheme');
+            if (btn) {
+                btn.innerHTML = theme === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+                btn.addEventListener('click', function () {
+                    var next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+                    document.documentElement.setAttribute('data-theme', next);
+                    localStorage.setItem('sacaba_theme', next);
+                    btn.innerHTML = next === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+                });
+            }
+            var share = document.getElementById('btnShare');
+            if (share) {
+                share.addEventListener('click', function () {
+                    var url = window.location.href;
+                    if (navigator.clipboard) navigator.clipboard.writeText(url);
+                    share.querySelector('span').textContent = 'Enlace copiado';
+                    setTimeout(function () { share.querySelector('span').textContent = 'Copiar enlace'; }, 2200);
+                });
+            }
+        })();
+    </script>
+</body>
+</html>

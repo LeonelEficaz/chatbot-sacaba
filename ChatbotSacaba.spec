@@ -1,12 +1,16 @@
 # -*- mode: python ; coding: utf-8 -*-
 
+import os
+import speech_recognition
+
+_SR = os.path.dirname(speech_recognition.__file__)
 
 a = Analysis(
     ['app.py'],
     pathex=[],
     binaries=[],
-    datas=[('templates', 'templates'), ('static', 'static'), ('chatbot', 'chatbot'), ('css', 'css'), ('js', 'js'), ('data', 'data'), ('img', 'img'), ('.env', '.')],
-    hiddenimports=['openai', 'dotenv'],
+    datas=[('templates', 'templates'), ('static', 'static'), ('chatbot', 'chatbot'), ('css', 'css'), ('js', 'js'), ('data', 'data'), ('img', 'img'), ('.env', '.'), (os.path.join(_SR, 'flac-win32.exe'), 'speech_recognition')],
+    hiddenimports=['openai', 'dotenv', 'speech_recognition'],
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],

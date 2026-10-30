@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: sami-sacaba
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn wsgi:app --bind 0.0.0.0:$PORT --workers 1 --threads 8 --timeout 180
+    healthCheckPath: /
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.7
+      - key: SECRET_KEY
+        generateValue: true
+      - key: SACABA_FREE_AI
+        value: "1"
+      - key: SACABA_FREE_AI_URL
+        value: https://text.pollinations.ai/openai
+      - key: SACABA_FREE_AI_MODEL
+        value: openai-fast
+      - key: SACABA_FREE_AI_TIMEOUT
+        value: "40"
+      - key: SACABA_USERS_FILE
+        value: /tmp/sacaba/usuarios.json

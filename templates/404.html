@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Página no encontrada · Sacaba 2026</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/logo-sacaba-2026.png') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/portal-2026.css') }}?v=20261028">
+</head>
+<body class="portal-body">
+    <main class="p-standalone" style="text-align:center;padding-top:70px">
+        <img src="{{ url_for('static', filename='img/logo-sacaba-2026.png') }}" alt="Escudo de Sacaba" style="width:96px;height:96px;border-radius:50%;border:3px solid var(--gold);box-shadow:var(--shadow)">
+        <h1 style="font-family:var(--display);font-size:44px;margin:22px 0 8px;color:var(--g-900)">404</h1>
+        <h2 style="font-family:var(--display);font-size:22px;margin-bottom:10px">No encontramos esa página</h2>
+        <p style="color:var(--muted);font-size:14px;max-width:520px;margin:0 auto 24px">
+            El trámite o la dirección que buscas no existe o cambió de nombre. Pregúntale a Sami
+            o vuelve al portal para ver los 20 trámites disponibles.
+        </p>
+        <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+            <a class="p-btn p-btn-primary" href="/"><i class="fas fa-house"></i> Volver al portal</a>
+            <a class="p-btn p-btn-soft" href="/?pregunta=Quiero%20sacar%20mi%20carnet"><i class="fas fa-comments"></i> Preguntar a Sami</a>
+        </div>
+    </main>
+</body>
+</html>

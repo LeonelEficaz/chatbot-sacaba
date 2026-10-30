@@ -1,0 +1,103 @@
+{% extends 'admin_base.html' %}
+{% block title %}Trámites{% endblock %}
+{% block contenido %}
+<div class="titulo">
+    <div>
+        <h1>Trámites del portal</h1>
+        <p>Actualiza costos, requisitos y horarios. Los cambios se ven al instante en el portal y en Sami.</p>
+    </div>
+    <form method="get" action="{{ url_for('admin_tramites') }}" style="display:flex;gap:8px;align-items:center">
+        <input type="search" name="buscar" value="{{ buscar }}" placeholder="Buscar por nombre, categoría o sinónimo…" style="min-width:260px">
+        <button class="boton secundario" type="submit" style="width:auto;margin:0;padding:10px 14px"><i class="fas fa-magnifying-glass"></i></button>
+    </form>
+</div>
+
+<div class="rejilla">
+    <section class="panel">
+        <div class="panel-cab">
+            <div>
+                <h2>{{ tramites|length }} ficha{{ '' if tramites|length == 1 else 's' }}</h2>
+                <p>{% if buscar %}Resultados para «{{ buscar }}»{% else %}Orden del portal ciudadano{% endif %}</p>
+            </div>
+        </div>
+        <div class="panel-cuerpo" style="padding:0 8px 8px">
+            <table>
+                <thead>
+                    <tr><th>Trámite</th><th>Costo</th><th>Tiempo</th><th></th></tr>
+                </thead>
+                <tbody>
+                {% for t in tramites %}
+                    <tr {% if ficha and ficha.id == t.id %}style="background:#f0fdf4"{% endif %}>
+                        <td>
+                            <strong>{{ t.n }}</strong>
+                            <br><span style="color:var(--gris);font-size:11.5px">{{ t.cat }}</span>
+                        </td>
+                        <td style="font-size:12.5px">{{ t.costo }}</td>
+                        <td style="font-size:12.5px">{{ t.tiempo }}</td>
+                        <td style="text-align:right;white-space:nowrap">
+                            <a class="enlace-tenue" href="{{ url_for('admin_tramites', editar=t.id, buscar=buscar) }}">Editar</a>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr><td colspan="4" style="text-align:center;color:var(--gris);padding:26px">No encontramos trámites con ese texto.</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <aside class="panel">
+        <div class="panel-cab">
+            <div>
+                <h2>{% if ficha %}Editar ficha{% else %}Elige un trámite{% endif %}</h2>
+                <p>{% if ficha %}{{ ficha.n }}{% else %}Selecciona «Editar» en la lista{% endif %}</p>
+            </div>
+        </div>
+        <div class="panel-cuerpo">
+        {% if ficha %}
+            <form method="post" action="{{ url_for('admin_tramite_guardar', ident=ficha.id) }}">
+                <input type="hidden" name="csrf" value="{{ csrf_token() }}">
+
+                <label for="costo">Costo</label>
+                <input id="costo" name="costo" type="text" value="{{ cambios.get('costo', '') }}" placeholder="Oficial: {{ ficha.costo }}">
+
+                <label for="tiempo">Tiempo de atención</label>
+                <input id="tiempo" name="tiempo" type="text" value="{{ cambios.get('tiempo', '') }}" placeholder="Oficial: {{ ficha.tiempo }}">
+
+                <label for="modalidad">Modalidad</label>
+                <input id="modalidad" name="modalidad" type="text" value="{{ cambios.get('modalidad', '') }}" placeholder="Oficial: {{ ficha.modalidad }}">
+
+                <label for="resumen">Resumen</label>
+                <textarea id="resumen" name="resumen" placeholder="Oficial: {{ ficha.resumen }}">{{ cambios.get('resumen', '') }}</textarea>
+
+                <label for="requisitos">Requisitos (uno por línea)</label>
+                <textarea id="requisitos" name="requisitos" placeholder="Oficiales: {{ ficha.requisitos[:4]|join(' / ') }}">{{ cambios.get('requisitos', [])|join('\n') }}</textarea>
+
+                <label for="oficina_nombre">Oficina</label>
+                <input id="oficina_nombre" name="oficina_nombre" type="text" value="{{ cambios.get('oficina_nombre', '') }}" placeholder="Oficial: {{ ficha.oficina.nombre if ficha.oficina else '' }}">
+
+                <label for="oficina_direccion">Dirección de la oficina</label>
+                <input id="oficina_direccion" name="oficina_direccion" type="text" value="{{ cambios.get('oficina_direccion', '') }}" placeholder="Oficial: {{ ficha.oficina.direccion if ficha.oficina else '' }}">
+
+                <label for="horario_dias">Días de atención</label>
+                <input id="horario_dias" name="horario_dias" type="text" value="{{ cambios.get('horario_dias', '') }}" placeholder="Oficial: {{ ficha.horarios[0].dias if ficha.horarios else '' }}">
+
+                <label for="horario_horas">Horario</label>
+                <input id="horario_horas" name="horario_horas" type="text" value="{{ cambios.get('horario_horas', '') }}" placeholder="Oficial: {{ ficha.horarios[0].horas if ficha.horarios else '' }}">
+
+                <p class="ayuda">Deja un campo vacío para mantener el dato oficial. Los cambios guardados se marcan como «actualizado».</p>
+                <button class="boton" type="submit"><i class="fas fa-floppy-disk"></i> Guardar cambios</button>
+                {% if cambios %}
+                <button class="boton secundario" type="submit" name="restablecer" value="1"><i class="fas fa-rotate-left"></i> Restaurar datos oficiales</button>
+                {% endif %}
+            </form>
+        {% else %}
+            <p class="ayuda" style="margin-top:0">Elige una ficha de la lista para editar su costo, tiempo, requisitos, oficina u horario.</p>
+            <p class="ayuda">Los cambios quedan guardados en el servidor y se aplican de inmediato en el artículo del portal y en las respuestas de Sami.</p>
+        {% endif %}
+        </div>
+    </aside>
+</div>
+
+<p class="pie"><a href="{{ url_for('admin_panel') }}"><i class="fas fa-arrow-left"></i> Volver al panel</a></p>
+{% endblock %}

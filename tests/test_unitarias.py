@@ -125,6 +125,18 @@ class TestDetectLanguage(unittest.TestCase):
         self.assertEqual(detect_language(None), "es")
         self.assertEqual(detect_language(12345), "es")
 
+    def test_pu42_dictado_aproximado_en_quechua(self):
+        # El reconocedor de voz no escribe el quechua exacto; los sufijos
+        # (-yta, -manta, -kuna) deben bastar para detectarlo.
+        self.assertEqual(detect_language("carnetita horjoyta munani"), "qu")
+        self.assertEqual(detect_language("documentota ruwayta munani"), "qu")
+        self.assertEqual(detect_language("wasimanta jamuni"), "qu")
+
+    def test_pu43_espanol_no_se_confunde_con_quechua(self):
+        self.assertEqual(detect_language("quiero sacar mi carnet de identidad"), "es")
+        self.assertEqual(detect_language("una manta para el frio"), "es")
+        self.assertEqual(detect_language("pago de impuestos municipales"), "es")
+
 
 class TestBuilders(unittest.TestCase):
     """Unidades: build_card, build_tramite_list, build_multas_string"""
@@ -232,19 +244,22 @@ class TestGetAiResp(unittest.TestCase):
         self.assertIn("Sacaba", resp)
 
     def test_pu43_ia_devuelve_texto(self):
-        with mock.patch.object(engine, "_client") as client:
+        with mock.patch.object(engine, "_openai_dead", False), \
+                mock.patch.object(engine, "_client") as client:
             client.chat.completions.create.return_value = _fake_chat("Hola, en que te ayudo?")
             resp = engine.get_ai_resp("hola", "es")
         self.assertEqual(resp, "Hola, en que te ayudo?")
 
     def test_pu44_ia_responde_vacio_usa_respuesta_local(self):
-        with mock.patch.object(engine, "_client") as client:
+        with mock.patch.object(engine, "_openai_dead", False), \
+                mock.patch.object(engine, "_client") as client:
             client.chat.completions.create.return_value = _fake_chat("   ")
             resp = engine.get_ai_resp("hola", "es")
         self.assertIn("Sacaba", resp)
 
     def test_pu45_ia_error_usa_respuesta_local(self):
-        with mock.patch.object(engine, "_client") as client:
+        with mock.patch.object(engine, "_openai_dead", False), \
+                mock.patch.object(engine, "_client") as client:
             client.chat.completions.create.side_effect = Exception("timeout")
             resp = engine.get_ai_resp("hola", "es")
         self.assertIn("Sacaba", resp)
@@ -639,6 +654,67 @@ class TestGeminiFunctions(unittest.TestCase):
         from chatbot.engine import GEMINI_API_KEY
         # Puede estar vacía si no está configurada
         self.assertIsInstance(GEMINI_API_KEY, str)
+
+
+# =====================================================================
+# PRUEBAS: ADAPTACION FONETICA DEL QUECHUA PARA LA VOZ
+# =====================================================================
+
+class TestAdaptarQuechua(unittest.TestCase):
+    """Unidad: tts.adaptar_quechua()"""
+
+    def setUp(self):
+        from chatbot.tts import adaptar_quechua
+        self.adaptar = adaptar_quechua
+
+    def test_pu76_uvular_a_k(self):
+        self.assertIn('kullki', self.adaptar('qullqi'))
+
+    def test_pu77_aspirada_a_j(self):
+        self.assertEqual('jámuy', self.adaptar('hamuy'))
+
+    def test_pu78_w_a_hu(self):
+        self.assertEqual('huasi', self.adaptar('wasi'))
+
+    def test_pu79_glotalizada_sin_apostrofo(self):
+        self.assertEqual('púnchay', self.adaptar("p'unchay"))
+
+    def test_pu80_sh_a_s(self):
+        self.assertEqual('suk', self.adaptar('shuk'))
+
+    def test_pu81_acento_penultima(self):
+        self.assertEqual('yacháchik', self.adaptar('yachachik'))
+
+    def test_pu82_no_acentua_prestamos(self):
+        self.assertEqual('Carnet de identidad', self.adaptar('Carnet de identidad'))
+
+    def test_pu83_conserva_mayuscula_ch(self):
+        self.assertEqual('Chaupi', self.adaptar('Chawpi'))
+
+    def test_pu84_texto_vacio(self):
+        self.assertEqual('', self.adaptar(''))
+
+    def test_pu85_w_final_suena_u(self):
+        self.assertEqual('punchau', self.adaptar('punchaw'))
+
+    def test_pu86_quechua_no_es_kuechua(self):
+        self.assertEqual('kechua', self.adaptar('quechua'))
+
+    def test_pu87_prestamo_con_h_muda(self):
+        self.assertEqual('orario', self.adaptar('horario'))
+
+    def test_pu88_diccionario_qu_uvular_aspirada(self):
+        self.assertEqual('jápak', self.adaptar('qhapaq'))
+
+    def test_pu89_acento_solo_en_palabra_quechua(self):
+        self.assertEqual('Sami kani', self.adaptar('Sami kani'))
+
+    def test_pu90_voz_quechua_mas_lenta(self):
+        import inspect
+        from chatbot import tts
+        fuente = inspect.getsource(tts.sintetizar)
+        self.assertIn("'-24%'", fuente)
+        self.assertIn("'+0%'", fuente)
 
 
 if __name__ == "__main__":
