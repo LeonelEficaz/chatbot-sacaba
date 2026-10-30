@@ -742,6 +742,8 @@ var UI = {
         mic_ocupado: "Otro programa est\u00e1 usando el micr\u00f3fono. Ci\u00e9rralo y vuelve a intentar.",
         mic_red: "El servicio de voz del navegador no respondi\u00f3. Revisa tu conexi\u00f3n a internet e int\u00e9ntalo otra vez.",
         mic_espera: "Pidiendo permiso para el micr\u00f3fono...",
+        idioma_ack: "\u00a1Listo! Desde ahora te hablo en **espa\u00f1ol**. \u00bfEn qu\u00e9 te ayudo?",
+        idioma_corto: "Ahora te hablo en espa\u00f1ol.",
         tramite_opts: []
     },
     qu: {
@@ -775,6 +777,8 @@ var UI = {
         mic_ocupado: "Huk programa micr\u00f3fonota apaykachashan. Chayta wisq'ay hinaspa kutiy.",
         mic_red: "Navegadorpa rimayninqa manan kutichinchu. Internetniykita qhaway hinaspa kutiy.",
         mic_espera: "Micr\u00f3fonoq permisonta mashkhaspa...",
+        idioma_ack: "\u00a1Ar\u00ed! Kunanmanta **quechua**pi rimasaq. \u00bfImawan yanapaykayman?",
+        idioma_corto: "Kunanmanta quechuapi rimasaq.",
         tramite_opts: []
     }
 };
@@ -1087,9 +1091,128 @@ function looksQuechua(text) {
     return false;
 }
 
-function switchLang(lang, quiet) {
+/* ===== INTERPRETACION DEL QUECHUA DICTADO ===== */
+function sinAcentos(t) {
+    return String(t == null ? '' : t).toLowerCase()
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+}
+
+var QU_FIX = {
+    kechua: 'quechua', quichua: 'quechua', kichua: 'quechua', qhechua: 'quechua',
+    qhechwa: 'quechua', yuspagara: 'yusulpayki', allinllachu: 'allillanchu',
+    multacuna: 'multakuna', multakunas: 'multakuna',
+    tramitecuna: 'tramitekuna', tramitekunata: 'tramitekuna'
+};
+var QU_STOP = {
+    la: 1, el: 1, los: 1, las: 1, un: 1, una: 1, unos: 1, unas: 1, de: 1, del: 1,
+    al: 1, que: 1, mi: 1, mis: 1, su: 1, sus: 1, tu: 1, tus: 1, en: 1, y: 1, o: 1,
+    a: 1, para: 1, por: 1, con: 1, sin: 1, es: 1, son: 1, como: 1, lo: 1, se: 1,
+    me: 1, te: 1, nos: 1
+};
+var QU_PRESTAMOS = {
+    multa: 1, multas: 1, tramite: 1, tramites: 1, carnet: 1, licencia: 1,
+    licencias: 1, requisito: 1, requisitos: 1, documento: 1, documentos: 1,
+    pago: 1, pagos: 1, banco: 1, oficina: 1, constancia: 1, permiso: 1,
+    certificado: 1, vehiculo: 1, auto: 1, carro: 1, casa: 1, terreno: 1,
+    predio: 1, impuesto: 1, servicio: 1, horario: 1, caja: 1, municipal: 1,
+    sacaba: 1, segip: 1, geres: 1
+};
+var QU_SUFIJOS_SUELTOS = {
+    cuna: 'kuna', kuna: 'kuna', yta: 'yta', ta: 'ta', manta: 'manta',
+    pi: 'pi', paq: 'paq', wan: 'wan', chik: 'chik', qa: 'qa'
+};
+var QU_FRASES = {
+    'multa cuna': 'multakuna', 'multas cuna': 'multakuna',
+    'multa kuna': 'multakuna', 'multa cunas': 'multakuna',
+    'trami te': 'tramite', 'trami te kuna': 'tramitekuna',
+    'tramite cuna': 'tramitekuna', 'tramite kuna': 'tramitekuna',
+    'carnet yta': 'carnetyta', 'carnet ta': 'carnetta',
+    'licencia ta': 'licenciata', 'licencia yta': 'licenciayta',
+    'paga yta': 'pagayta', 'paga na': 'pagana',
+    'ruwa y': 'ruway', 'ruwa yta': 'ruwayta', 'ruwa na': 'ruwana',
+    'horqoy ta': 'horqoyta', 'hurqoy ta': 'hurqoyta',
+    'ima yna': 'imayna', 'imay nata': 'imaynata', 'ima ynata': 'imaynata',
+    'may pi': 'maypi', 'may pitaq': 'maypitaq', 'may pi taq': 'maypitaq',
+    'hay ka': 'hayka', 'hay ka taq': 'haykataq',
+    'kull qi': 'kullqi', 'qul qi': 'qullqi', 'qul lqi': 'qullqi',
+    'culle qui': 'qullqi',
+    'allin lla': 'allinlla', 'allin llanchu': 'allillanchu',
+    'allin llan chu': 'allillanchu', 'imay nallan': 'imaynallan',
+    'ima y nallan': 'imaynallan', 'ima ynan': 'imaynallan',
+    'tupanan chiskama': 'tupananchiskama', 'tupanan chikama': 'tupananchikama',
+    'yanapa way': 'yanapaway', 'yanapa ykuy': 'yanapaykuy',
+    'yanapa wanki': 'yanapawanki', 'ni way': 'niway', 'ni wa y': 'niway',
+    'uyari y': 'uyariy', 'waqay cha y': 'waqaychay',
+    'was i': 'wasi', 'wasi ta': 'wasita', 'wasi manta': 'wasimanta',
+    'runa simi': 'runasimi', 'runa simita': 'runasimita',
+    'ima ta': 'imata', 'ima taq': 'imataq', 'ima nataq': 'imanataq'
+};
+var QU_FRASES_ORDEN = Object.keys(QU_FRASES).sort(function (a, b) { return b.length - a.length; });
+
+function interpretarQuechua(texto) {
+    var t = String(texto == null ? '' : texto).replace(/\s+/g, ' ').trim();
+    if (!t) return t;
+    t = t.replace(/[A-Za-z\u00c1\u00c9\u00cd\u00d3\u00da\u00d1\u00e1\u00e9\u00ed\u00f3\u00fa\u00f1]+/g, function (w) {
+        return QU_FIX[sinAcentos(w)] || w;
+    });
+    for (var i = 0; i < QU_FRASES_ORDEN.length; i++) {
+        var mal = QU_FRASES_ORDEN[i];
+        var re = new RegExp('(^|[^a-z\\u00e1\\u00e9\\u00ed\\u00f3\\u00fa\\u00f1])' +
+            mal.split(' ').join('\\s+') + '(?![a-z\\u00e1\\u00e9\\u00ed\\u00f3\\u00fa\\u00f1])', 'gi');
+        t = t.replace(re, function (m, pre) { return pre + QU_FRASES[mal]; });
+    }
+    var partes = t.split(' ');
+    var salida = [];
+    for (var j = 0; j < partes.length; j++) {
+        var p = partes[j];
+        var suf = QU_SUFIJOS_SUELTOS[sinAcentos(p)];
+        if (suf && salida.length) {
+            var prev = sinAcentos(salida[salida.length - 1]).replace(/[.,;:!?]+$/, '');
+            if (!QU_STOP[prev] && prev.length >= 3 && QU_PRESTAMOS[prev]) {
+                salida[salida.length - 1] = salida[salida.length - 1] + (suf === 'kuna' ? 'kuna' : p);
+                continue;
+            }
+        }
+        salida.push(p);
+    }
+    return salida.join(' ');
+}
+
+/* ===== COMANDOS DE IDIOMA ===== */
+var LANG_QU_RE = /\b(?:habla|hablar|h\u00e1blame|hablame|responde|resp\u00f3ndeme|contesta|c\u00e1mbiate|cambia|ponte|parla|rimay|rimaykuy|rimaykuway|rimariy|rimasunchik)\b[^.!?\n]{0,40}\b(?:quechua|quichua|qhichwa|runasimi|kichwa|kechua)\b|\b(?:en|al|hacia)\s+(?:quechua|quichua|qhichwa|runasimi|kichwa|kechua)\b|\b(?:quechuapi|quechuata|runasimipi)\b/i;
+var LANG_ES_RE = /\b(?:habla|hablar|h\u00e1blame|hablame|responde|resp\u00f3ndeme|contesta|c\u00e1mbiate|cambia|ponte|parla)\b[^.!?\n]{0,40}\b(?:espa\u00f1ol|espanol|castellano)\b|\b(?:en|al)\s+(?:espa\u00f1ol|espanol|castellano)\b/i;
+var NO_CMD_RE = /\b(?:como se dice|como digo|traduce|traducir|traducci\u00f3n|traduccion|significa)\b/i;
+
+function detectarComandoIdioma(texto) {
+    var t = String(texto == null ? '' : texto).trim();
+    if (!t) return null;
+    var low = sinAcentos(t);
+    if (low.split(/\s+/).length > 8 || NO_CMD_RE.test(t)) return null;
+    var pals = low.match(/[a-z]+/g) || [];
+    if (pals.length <= 3) {
+        for (var i = 0; i < pals.length; i++) {
+            if (/^(quechua|quichua|qhichwa|runasimi|kichwa|kechua)$/.test(pals[i])) return 'qu';
+            if (/^(espanol|castellano)$/.test(pals[i])) return 'es';
+        }
+    }
+    if (LANG_QU_RE.test(t)) return 'qu';
+    if (LANG_ES_RE.test(t)) return 'es';
+    return null;
+}
+
+function avisarIdioma(lang) {
+    if (UI[lang] && UI[lang].idioma_corto) speakText(UI[lang].idioma_corto, lang, true);
+}
+
+function switchLang(lang, quiet, ack) {
     if (lang !== 'es' && lang !== 'qu') return;
-    if (S.lang === lang) return;
+    if (S.lang === lang) {
+        if (ack) { stopSpeaking(); avisarIdioma(lang); }
+        return;
+    }
+    // El cambio de idioma corta la voz en curso de inmediato: no se espera a
+    // que termine la frase en el idioma anterior.
+    stopSpeaking();
     applyLanguageUI(lang);
     if (quiet) {
         if (window.SacabaApplyPageLanguage) window.SacabaApplyPageLanguage(lang, { quiet: true });
@@ -1097,6 +1220,7 @@ function switchLang(lang, quiet) {
         renderConversation(lang);
         if (window.SacabaSetLang) window.SacabaSetLang(lang);
     }
+    if (ack) avisarIdioma(lang);
 }
 
 function historyForAI() {
@@ -1244,6 +1368,8 @@ function startRecording() {
 function enviarTexto(msg) {
     var inp = document.getElementById('cw-in');
     if (inp) inp.value = '';
+    // El dictado separa el quechua ("multa cuna"): se muestra ya interpretado.
+    msg = interpretarQuechua(msg);
     var opts = document.getElementById('cw-opts');
     if (opts) { opts.innerHTML = ''; opts.classList.remove('is-open'); }
     if (isMuteCommand(msg)) {
@@ -1684,6 +1810,14 @@ function manejarManosLibres(texto) {
         addMsg(UI[S.lang].stop_ack, 'bot', { silent: true });
         return;
     }
+    // El cambio de idioma se atiende aunque Sami este hablando y sin exigir
+    // la palabra "Sami": es un comando directo.
+    var cmdLang = detectarComandoIdioma(t);
+    if (cmdLang) {
+        switchLang(cmdLang, true, false);
+        addMsg(UI[cmdLang].idioma_ack, 'bot');
+        return;
+    }
     if (S.speaking || S.busy) return;
 
     var low = t.toLowerCase();
@@ -1693,16 +1827,6 @@ function manejarManosLibres(texto) {
     var cola = t.slice(m.index + m[1].length).replace(/^[\s,.:;¡!¿?\-]+/, '').trim();
     if (!cola) {
         addMsg(UI[S.lang].wake_ack, 'bot', { silent: true });
-        return;
-    }
-    if (/^(habla|responde|contesta)\s+en\s+quechua/.test(cola.toLowerCase()) || /quechuapi rimay/.test(cola.toLowerCase())) {
-        switchLang('qu');
-        addMsg('Ar\u00ed, quechuapi rimasaq. \ud83d\ude0a', 'bot');
-        return;
-    }
-    if (/^(habla|responde|contesta)\s+en\s+espa/.test(cola.toLowerCase())) {
-        switchLang('es');
-        addMsg('\u00a1Claro! Sigo en espa\u00f1ol.', 'bot');
         return;
     }
     var opts = document.getElementById('cw-opts');
@@ -1858,6 +1982,19 @@ function sendToAI(text, meta) {
         addMsg(UI[S.lang].stop_ack, 'bot', { silent: true });
         return;
     }
+    // "habla quechua" / "en español": cambia la pagina y la voz al instante,
+    // sin consultar a la IA (antes respondia que no sabia).
+    var cmdLang = detectarComandoIdioma(text);
+    if (cmdLang) {
+        switchLang(cmdLang, true, false);
+        addMsg(UI[cmdLang].idioma_ack, 'bot');
+        S.log.push({ type: 'user', text: text });
+        S.log.push({ type: 'bot', query: text, resp: UI[cmdLang].idioma_ack, respLang: cmdLang });
+        playSound('message');
+        S.busy = false;
+        setTimeout(showConsultaBtn, 450);
+        return;
+    }
     var porVoz = !!(meta && meta.porVoz);
     var vozQuechua = porVoz && looksQuechua(text);
     if (S.lang === 'es' && vozQuechua) switchLang('qu', true);
@@ -1882,6 +2019,9 @@ function sendToAI(text, meta) {
     .then(function(r) { return r.json(); })
     .then(function(data) {
         hideTyping();
+        if (data && data.lang_command && (data.language === 'es' || data.language === 'qu')) {
+            switchLang(data.language, true, false);
+        }
         var det = data && (data.detected === 'qu' || data.detected === 'es') ? data.detected : null;
         if (vozQuechua) det = 'qu';
         // Por voz se sigue el idioma detectado en los dos sentidos; al escribir
@@ -2098,7 +2238,7 @@ function speakBrowser(texto, lang, seq) {
             if (cortado() || i >= trozos.length) { resolve(); return; }
             var trozo = trozos[i++];
             var u = new SpeechSynthesisUtterance(qu ? adaptarQuechua(trozo) : trozo);
-            u.rate = qu ? 0.78 : 1;
+            u.rate = qu ? 0.88 : 1.03;
             u.pitch = qu ? 1 : 1.04;
             u.volume = 1;
             var v = pickEspVoice(qu);
@@ -2599,8 +2739,8 @@ function init(options) {
         btn.onclick = function() {
             var lang = this.dataset.lang;
             if (S.lang === lang) return;
-            if (typeof window.SacabaSetLang === 'function') window.SacabaSetLang(lang);
-            else switchLang(lang);
+            // ack=true: corta la voz actual y confirma en el nuevo idioma.
+            switchLang(lang, false, true);
         };
     });
 
@@ -2653,11 +2793,17 @@ window.sacabaSetVoice = function(on) { S.voice = !!on; if (!S.voice) stopSpeakin
 window.sacabaSetLang = function(lang) {
     if (lang !== 'es' && lang !== 'qu') return;
     if (S.lang !== lang) {
+        var hablaba = S.speaking || S.vozOcupada;
+        // La pagina cambio de idioma: la voz anterior se corta en el acto.
+        stopSpeaking();
         applyLanguageUI(lang);
         renderConversation(lang);
+        if (hablaba) avisarIdioma(lang);
     }
 };
 window.SacabaDetectarIdioma = looksQuechua;
+window.SacabaInterpretarQuechua = interpretarQuechua;
+window.SacabaDetectarComandoIdioma = detectarComandoIdioma;
 window.sacabaResetChat = function() {
     stopSpeaking();
     S.log = [];

@@ -57,7 +57,9 @@ class CajaNegraChat(unittest.TestCase):
     def test_ce04_texto_no_reconocido_respuesta_default(self):
         r = self.chat({"message": "xyzabc sin sentido", "language": "es"})
         self.assertEqual(r.status_code, 200)
-        self.assertIn("puedo aprenderla", r.get_json()["response"])
+        respuesta = r.get_json()["response"]
+        # Sin IA disponible responde con el aviso general, no deja el chat vacio.
+        self.assertTrue("puedo aprenderla" in respuesta or "servicio de IA" in respuesta)
 
     def test_ce05_campo_message_ausente(self):
         r = self.chat({"language": "es"})

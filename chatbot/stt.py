@@ -41,4 +41,12 @@ def transcribir(audio_bytes, language='es'):
   reconocedor.dynamic_energy_threshold = True
   with sr.AudioFile(io.BytesIO(audio_bytes)) as fuente:
     audio = reconocedor.record(fuente)
-  return reconocedor.recognize_google(audio, language=idioma).strip()
+  texto = reconocedor.recognize_google(audio, language=idioma).strip()
+
+  # El dictado escribe el quechua a la castellana y separa sufijos
+  # ("multa cuna"): se reconstruye antes de devolverlo al chat.
+  from chatbot.engine import detect_language, interpret_quechua
+  interpretado = interpret_quechua(texto)
+  if language != 'es' or detect_language(interpretado) == 'qu':
+    return interpretado
+  return texto

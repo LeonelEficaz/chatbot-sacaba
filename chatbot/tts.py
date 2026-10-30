@@ -166,7 +166,9 @@ def sintetizar(texto, voz=VOZ_PREDETERMINADA, lang='es'):
         limpio = adaptar_quechua(limpio)
         if not limpio:
             return None
-    rate = '-24%' if lang == 'qu' else '+0%'
+    # Voz mas agil: el quechua mantiene una cadencia pausada pero ya no tan
+    # lenta, y el espanol suena un poco mas rapido.
+    rate = '-14%' if lang == 'qu' else '+5%'
     clave = hashlib.sha256((voz + '|' + rate + '|' + limpio).encode('utf-8')).hexdigest()[:24]
     CACHE_DIR.mkdir(parents=True, exist_ok=True)
     destino = CACHE_DIR / (clave + '.mp3')

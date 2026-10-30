@@ -19,9 +19,11 @@ from chatbot.engine import (
     build_multas_string,
     build_tramite_list,
     detect_intent,
+    detect_lang_command,
     detect_language,
     detect_tramite,
     get_resp,
+    interpret_quechua,
     normalize,
 )
 
@@ -713,8 +715,44 @@ class TestAdaptarQuechua(unittest.TestCase):
         import inspect
         from chatbot import tts
         fuente = inspect.getsource(tts.sintetizar)
-        self.assertIn("'-24%'", fuente)
-        self.assertIn("'+0%'", fuente)
+        # El quechua sigue mas pausado que el espanol, pero mas agil que antes.
+        self.assertIn("'-14%'", fuente)
+        self.assertIn("'+5%'", fuente)
+
+
+class TestIdiomaYDictadoQuechua(unittest.TestCase):
+    """Unidad: comandos de idioma e interpretacion del quechua dictado."""
+
+    def test_pu91_comando_habla_quechua(self):
+        self.assertEqual(detect_lang_command("habla quechua"), "qu")
+        self.assertEqual(detect_lang_command("Sami, habla en quechua"), "qu")
+        self.assertEqual(detect_lang_command("rimay quechua"), "qu")
+        self.assertEqual(detect_lang_command("responde en runasimi"), "qu")
+
+    def test_pu92_comando_habla_espanol(self):
+        self.assertEqual(detect_lang_command("habla en español"), "es")
+        self.assertEqual(detect_lang_command("responde en castellano"), "es")
+
+    def test_pu93_preguntas_no_son_comandos(self):
+        self.assertIsNone(detect_lang_command("¿qué es el quechua?"))
+        self.assertIsNone(detect_lang_command("¿cómo se dice carnet en quechua?"))
+        self.assertIsNone(detect_lang_command("quiero sacar mi carnet"))
+
+    def test_pu94_interpreta_dictado_separado(self):
+        self.assertEqual(interpret_quechua("multa cuna"), "multakuna")
+        self.assertEqual(interpret_quechua("tramite cuna"), "tramitekuna")
+        self.assertEqual(interpret_quechua("carnet yta"), "carnetyta")
+        self.assertEqual(interpret_quechua("may pi multakuna"), "maypi multakuna")
+        self.assertEqual(interpret_quechua("kechua"), "quechua")
+
+    def test_pu95_no_altera_espanol(self):
+        self.assertEqual(interpret_quechua("una manta para el frío"), "una manta para el frío")
+        self.assertEqual(interpret_quechua("pago de impuestos"), "pago de impuestos")
+        self.assertEqual(interpret_quechua("paga y retira tu carnet"), "paga y retira tu carnet")
+
+    def test_pu96_detecta_quechua_dictado_separado(self):
+        self.assertEqual(detect_language("multa cuna"), "qu")
+        self.assertEqual(detect_language("tramite cuna"), "qu")
 
 
 if __name__ == "__main__":

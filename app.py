@@ -19,6 +19,7 @@ from chatbot import stt as stt_servidor
 # Importar funciones del motor del chatbot
 from chatbot.engine import (
     LANGUAGES, detect_language, get_ai_resp, is_ai_available, ai_provider,
+    detect_lang_command, interpret_quechua, lang_ack,
     translate_page, transcribe_audio, search_tramites, get_search_suggestions,
     get_office_location, search_offices, get_all_offices, get_directions,
     get_nearby_places, generate_map_embed, geocode_address, reverse_geocode,
@@ -84,9 +85,25 @@ def chat():
         return jsonify({'error': 'El campo "message" debe ser texto.'}), 400
 
     language = data.get('language', DEFAULT_LANGUAGE)
-    if not isinstance(language, str) or language not in LANGUAGES:
-        language = detect_language(message)
+    pedido = language if isinstance(language, str) and language in LANGUAGES else None
+
+    message = interpret_quechua(message.strip()) if message.strip() else message
+    comando_idioma = detect_lang_command(message)
+    if comando_idioma:
+        language = comando_idioma
+        detected = comando_idioma
+        response = lang_ack(comando_idioma)
+        return jsonify({
+            'response': response,
+            'options': [],
+            'language': language,
+            'detected': detected,
+            'lang_command': True,
+            'tramite': None,
+        })
+
     detected = detect_language(message)
+    language = pedido or detected
 
     history = data.get('history')
     if not isinstance(history, list):
@@ -100,6 +117,7 @@ def chat():
         'options': [],
         'language': language,
         'detected': detected,
+        'interpreted': message,
         'tramite': tramites_data.detect(message),
     })
 

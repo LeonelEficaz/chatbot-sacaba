@@ -212,6 +212,31 @@ class TestVozInteractiva(BasePortal):
             content_type="application/json")
         self.assertEqual(r.get_json()["detected"], "qu")
 
+    def test_chat_cambia_a_quechua_por_comando(self):
+        r = self.client.post("/chat", data=json.dumps(
+            {"message": "habla quechua", "language": "es"}),
+            content_type="application/json")
+        data = r.get_json()
+        self.assertTrue(data["lang_command"])
+        self.assertEqual(data["language"], "qu")
+        self.assertIn("quechua", data["response"].lower())
+
+    def test_chat_cambia_a_espanol_por_comando(self):
+        r = self.client.post("/chat", data=json.dumps(
+            {"message": "habla en español", "language": "qu"}),
+            content_type="application/json")
+        data = r.get_json()
+        self.assertTrue(data["lang_command"])
+        self.assertEqual(data["language"], "es")
+
+    def test_chat_interpreta_el_quechua_dictado(self):
+        r = self.client.post("/chat", data=json.dumps(
+            {"message": "multa cuna", "language": "auto"}),
+            content_type="application/json")
+        data = r.get_json()
+        self.assertEqual(data["interpreted"], "multakuna")
+        self.assertEqual(data["detected"], "qu")
+
 
 class TestTts(BasePortal):
     def test_estado(self):
