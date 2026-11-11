@@ -206,6 +206,17 @@ class TestVozInteractiva(BasePortal):
         self.assertIn("QU_SUFIJOS", js)
         self.assertIn("SacabaDetectarIdioma", js)
 
+    def test_la_llamada_no_escribe_lo_que_habla(self):
+        """En modo conversacion el dictado no se muestra como mensaje escrito."""
+        js = self.client.get("/static/chatbot/chatbot-widget.js").get_data(as_text=True)
+        self.assertIn("function iniciarConversacion()", js)
+        self.assertIn("function turnoDeVoz()", js)
+        self.assertIn("estadoOrbe('pensando', msg)", js)
+        self.assertIn("S.log.push({ type: 'user', text: msg })", js)
+        self.assertIn("sendToAI(msg, { porVoz: true, enVoz: !!enVoz });", js)
+        css = self.client.get("/static/chatbot/chatbot-widget.css").get_data(as_text=True)
+        self.assertIn(".cw-voz-orbe", css)
+
     def test_chat_detecta_quechua_dictado(self):
         r = self.client.post("/chat", data=json.dumps(
             {"message": "carnetita horjoyta munani", "language": "auto"}),
@@ -256,6 +267,54 @@ class TestTts(BasePortal):
         r = self.client.post("/api/tts", data=json.dumps({"text": "a" * 1501}),
                              content_type="application/json")
         self.assertEqual(r.status_code, 400)
+
+
+class TestIdentidadVisual(BasePortal):
+    """El traje visual de Sacaba: papel crema, verde municipal y dorado."""
+
+    HEREDADOS = ["#e8a9b0", "rgba(232,169,176", "#EAD9BC", "#FBF6E9",
+                 "#B6BE9F", "#070f1c", "#14b8a6", "#2dd4bf"]
+
+    def test_el_widget_lleva_la_paleta_sacaba(self):
+        css = self.client.get("/static/chatbot/chatbot-widget.css").get_data(as_text=True)
+        self.assertIn("--cw-paper: #F5F0E2", css)
+        self.assertIn("--cw-gold: #C29A3B", css)
+        for viejo in self.HEREDADOS:
+            with self.subTest(color=viejo):
+                self.assertNotIn(viejo, css)
+
+    def test_la_burbuja_del_bot_no_usa_degradado_de_borde(self):
+        """border-image anula el radio: la ficha crema debe llevar filete liso."""
+        css = self.client.get("/static/chatbot/chatbot-widget.css").get_data(as_text=True)
+        self.assertNotIn("border-image: linear-gradient", css)
+
+    def test_el_chat_embebido_es_papel_y_no_papel_blanco(self):
+        css = self.client.get("/static/css/portal-2026.css").get_data(as_text=True)
+        ventana = css[css.index("#chatbot-widget.is-embedded .cw-window {"):]
+        ventana = ventana[:ventana.index("}")]
+        self.assertIn("var(--paper)", ventana)
+        self.assertNotIn("background: #fff", ventana)
+
+    def test_cerrar_la_bienvenida_prepara_el_micro(self):
+        """Cerrar con la X tambien arma la escucha: nadie debe buscar el micro."""
+        js = self.client.get("/static/js/main.js").get_data(as_text=True)
+        terminar = js[js.index("function terminar()"):]
+        terminar = terminar[:terminar.index("function comenzar()")]
+        self.assertIn("SacabaSkipPresentation", terminar)
+        self.assertIn("SacabaPrepararMicro", terminar)
+
+    def test_el_adaptador_del_navegador_imita_al_servidor(self):
+        """El respaldo sin red pronuncia igual que la voz neuronal del equipo."""
+        from chatbot import tts
+        js = self.client.get("/static/chatbot/chatbot-widget.js").get_data(as_text=True)
+        acentuar = js[js.index("function acentuarPalabraQu"):]
+        acentuar = acentuar[:acentuar.index("function adaptarQuechua")]
+        self.assertIn("palabra === palabra.toUpperCase()", acentuar)
+        self.assertIn("'al', 'ar', 'er', 'ir'", acentuar)
+        # Las dos guardas tienen que seguir valiendo en el servidor.
+        self.assertEqual(tts.adaptar_quechua("trabajar"), "trabajar")
+        self.assertEqual(tts.adaptar_quechua("BS"), "BS")
+        self.assertEqual(tts.adaptar_quechua("allillanchik"), "allillánchik")
 
 
 if __name__ == "__main__":

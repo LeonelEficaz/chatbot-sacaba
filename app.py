@@ -3,6 +3,7 @@ import base64
 import os
 from pathlib import Path
 import threading
+import time
 import webbrowser
 
 from dotenv import load_dotenv
@@ -15,17 +16,20 @@ from chatbot.auth import (
 from chatbot import tramites as tramites_data
 from chatbot.tts import estado as tts_estado, sintetizar as tts_sintetizar
 from chatbot import stt as stt_servidor
+from chatbot import bitacora
 
 # Importar funciones del motor del chatbot
 from chatbot.engine import (
-    LANGUAGES, detect_language, get_ai_resp, is_ai_available, ai_provider,
+    LANGUAGES, detect_language, get_ai_resp, get_resp, ultima_capa,
+    is_ai_available, ai_provider,
     detect_lang_command, interpret_quechua, lang_ack,
     translate_page, transcribe_audio, search_tramites, get_search_suggestions,
     get_office_location, search_offices, get_all_offices, get_directions,
     get_nearby_places, generate_map_embed, geocode_address, reverse_geocode,
     search_nearby_osm, NOMINATIM_URL,
     translate_word, search_quechua_dictionary, get_quechua_phrases, learn_quechua_word,
-    QUECHUA_LOCAL_DB,
+    QUECHUA_LOCAL_DB, glosario_aprendido, brecha_de_conocimiento,
+    voz_responder, estado_voz, estado_proveedores,
     gemini_chat, gemini_translate, gemini_quechua_tutor, gemini_analyze_tramite,
     is_gemini_available, get_gemini_status, GEMINI_MODEL
 )
@@ -84,6 +88,7 @@ def chat():
     if not isinstance(message, str):
         return jsonify({'error': 'El campo "message" debe ser texto.'}), 400
 
+    inicio = time.monotonic()
     language = data.get('language', DEFAULT_LANGUAGE)
     pedido = language if isinstance(language, str) and language in LANGUAGES else None
 
@@ -93,6 +98,9 @@ def chat():
         language = comando_idioma
         detected = comando_idioma
         response = lang_ack(comando_idioma)
+        bitacora.registrar('consulta', via='texto', idioma=comando_idioma,
+                           capa='comando', entendio=True,
+                           latencia_ms=int((time.monotonic() - inicio) * 1000))
         return jsonify({
             'response': response,
             'options': [],
@@ -103,7 +111,10 @@ def chat():
         })
 
     detected = detect_language(message)
-    language = pedido or detected
+    # El quechua manda: nadie cambia el boton del idioma cuando habla, asi que
+    # una frase en quechua merece respuesta en quechua aunque la interfaz siga
+    # en espanol. En español se respeta el idioma que marco el ciudadano.
+    language = "qu" if detected == "qu" else (pedido or detected)
 
     history = data.get('history')
     if not isinstance(history, list):
@@ -111,6 +122,16 @@ def chat():
     use_ai = data.get('useAI', True) is not False
 
     response = get_ai_resp(message.strip(), language, history=history, allow_ai=use_ai)
+    # Solo se cuenta la consulta real: useAI=false es el repaint del historial
+    # al cambiar de idioma, no una pregunta del ciudadano.
+    if use_ai:
+        capa = ultima_capa()
+        bitacora.registrar(
+            'consulta', via='texto', idioma=language, capa=capa,
+            proveedor=ai_provider() if capa in ('openai', 'gemini', 'free') else None,
+            entendio=bool(response),
+            latencia_ms=int((time.monotonic() - inicio) * 1000),
+            largo=len(message.strip()))
 
     return jsonify({
         'response': response,
@@ -200,7 +221,10 @@ def tts():
         lang = 'es'
     voz = data.get('voice', '')
 
+    inicio = time.monotonic()
     ruta = tts_sintetizar(texto, voz=voz, lang=lang)
+    bitacora.registrar('sintesis', idioma=lang, entendio=bool(ruta), largo=len(texto),
+                       latencia_ms=int((time.monotonic() - inicio) * 1000))
     if not ruta:
         return jsonify({'error': 'La voz neuronal no está disponible.', 'fallback': 'browser'}), 503
 
@@ -232,6 +256,7 @@ def stt():
     except Exception:
         return jsonify({'error': 'El audio no esta codificado en base64.'}), 400
 
+    inicio = time.monotonic()
     try:
         texto = stt_servidor.transcribir(audio_bytes, language)
     except ValueError:
@@ -239,9 +264,80 @@ def stt():
     except Exception:
         return jsonify({'error': 'No se pudo transcribir el audio.'}), 503
 
+    bitacora.registrar('dictado', idioma=language, entendio=bool(texto), largo=len(texto or ''),
+                       latencia_ms=int((time.monotonic() - inicio) * 1000))
     if not texto:
         return jsonify({'text': '', 'error': 'No se entendio el audio.'}), 200
-    return jsonify({'text': texto, 'language': language})
+    return jsonify({'text': texto, 'language': language,
+                    'detected': detect_language(texto)})
+
+
+@app.route('/api/voice', methods=['POST'])
+def voice():
+    """Escucha el audio del microfono en el modelo de IA.
+
+    El audio va directo al modelo, sin reconocedor intermedio: por eso
+    entiende quechua, que no esta entre los idiomas de Whisper ni del dictado
+    del navegador. Devuelve lo dicho, la respuesta y su traduccion obligatoria."""
+    data = request.get_json(silent=True)
+    if not isinstance(data, dict):
+        return jsonify({'error': 'Cuerpo JSON invalido.'}), 400
+    audio_b64 = data.get('audio')
+    if not isinstance(audio_b64, str) or not audio_b64:
+        return jsonify({'error': 'Falta el campo "audio".'}), 400
+
+    inicio = time.monotonic()
+    language = data.get('language', 'es')
+    if language not in LANGUAGES:
+        language = 'es'
+    mime = data.get('mime') if isinstance(data.get('mime'), str) else 'audio/webm'
+
+    try:
+        audio_bytes = base64.b64decode(audio_b64)
+    except Exception:
+        return jsonify({'error': 'El audio no esta codificado en base64.'}), 400
+
+    history = data.get('history') if isinstance(data.get('history'), list) else None
+
+    try:
+        resultado = voz_responder(audio_bytes, mime=mime, lang=language, history=history)
+    except ValueError as exc:
+        return jsonify({'error': str(exc)}), 400
+    except Exception as exc:
+        return jsonify({'error': 'No se pudo procesar el audio.', 'detalle': str(exc)[:120]}), 503
+
+    if not resultado or not (resultado.get('texto') or '').strip():
+        bitacora.registrar('consulta', via='voz', idioma=language, capa='audio',
+                           entendio=False,
+                           latencia_ms=int((time.monotonic() - inicio) * 1000))
+        return jsonify({'error': 'No se entendio el audio.', 'fallback': 'browser'}), 200
+
+    texto = resultado['texto'].strip()
+    dicho = (resultado.get('dicho') or '').strip()
+    bitacora.registrar('consulta', via='voz', idioma=language, capa='audio',
+                       proveedor=resultado.get('proveedor'), entendio=True,
+                       latencia_ms=int((time.monotonic() - inicio) * 1000), largo=len(dicho))
+    return jsonify({
+        'text': texto,
+        'dicho': dicho,
+        'original': dicho,
+        'espanol': resultado.get('espanol'),
+        'language': language,
+        'detected': detect_language(dicho) if dicho else None,
+        'provider': resultado.get('proveedor'),
+    })
+
+
+@app.route('/api/voice/status')
+def voice_status():
+    """Si el modelo de voz esta vivo, para que el microfono sepa como trabajar."""
+    estado = estado_voz()
+    estado['dictado_respaldo'] = bool(stt_servidor.DISPONIBLE)
+    estado['disponible'] = bool(estado.get('modelo_de_audio')) or estado['dictado_respaldo']
+    # Sin modelo de audio el camino rapido es el dictado del navegador: el
+    # texto pasa por la normalizacion fonetica del motor, que si entiende quechua.
+    estado['via'] = 'audio' if estado.get('modelo_de_audio') else 'texto'
+    return jsonify(estado)
 
 
 @app.route('/audio-to-text', methods=['POST'])
@@ -279,7 +375,8 @@ def language():
 
 @app.route('/api/ai-status')
 def ai_status():
-    return jsonify({'ai': is_ai_available(), 'provider': ai_provider()})
+    return jsonify({'ai': is_ai_available(), 'provider': ai_provider(),
+                    'proveedores': estado_proveedores()})
 
 
 @app.route('/api/translate', methods=['POST'])
@@ -660,9 +757,11 @@ def dictionary_learn():
         return jsonify({'error': 'Se requieren campos "spanish" y "quechua".'}), 400
 
     result = learn_quechua_word(es_word, qu_word, example)
+    bitacora.registrar('glosario', idioma='qu', entendio=True, largo=len(es_word))
     return jsonify({
         'status': 'success',
         'word': result,
+        'aprendidas_total': len(glosario_aprendido()),
         'message': f'Palabra "{es_word}" aprendida como "{qu_word}".',
     })
 
@@ -672,6 +771,7 @@ def dictionary_stats():
     """Retorna estadísticas del diccionario local."""
     return jsonify({
         'total_words': len(QUECHUA_LOCAL_DB),
+        'aprendidas_por_el_publico': len(glosario_aprendido()),
         'languages': ['es', 'qu'],
         'source': 'Base de datos local + Glosbe API',
         'categories': {
@@ -1046,6 +1146,44 @@ def admin_cuenta():
                 flash('Contraseña actualizada. Úsela la próxima vez que ingrese.', 'success')
                 return redirect(url_for('admin_cuenta'), code=303)
     return render_template('admin_cuenta.html', error=error)
+
+
+# =====================================================================
+# MONITOREO
+# =====================================================================
+
+@app.route('/health')
+def health():
+    """Estado para el monitoreo externo. Responde 503 solo cuando el motor
+    local ya no puede garantizar la atención: si cae un proveedor de IA el
+    ciudadano sigue siendo atendido, y eso no es una caída del servicio."""
+    estado = estado_proveedores()
+    vivo = sum(1 for dato in estado.values()
+               if isinstance(dato, dict) and dato.get('vivo'))
+    return jsonify({
+        'estado': 'ok',
+        'minutos_activo': round(bitacora.minutos_activo(), 1),
+        'proveedor_activo': ai_provider(),
+        'proveedores_vivos': vivo,
+        'atencion_garantizada': bool(estado.get('local', {}).get('vivo')),
+        'consultas_24h': bitacora.resumen(1)['consultas'],
+        'brecha_de_conocimiento': len(brecha_de_conocimiento()),
+    }), 200
+
+
+@app.route('/api/metricas')
+def metricas():
+    """Agregados de la bitácora: los números que alimentan los reportes de
+    seguimiento. Devuelve conteos nomás, nunca textos ni identidades."""
+    dias = request.args.get('dias', '7')
+    try:
+        dias = max(0, min(int(dias), 365))
+    except ValueError:
+        dias = 7
+    datos = bitacora.resumen(dias)
+    datos['proveedores'] = estado_proveedores()
+    datos['glosario_aprendido'] = len(glosario_aprendido())
+    return jsonify(datos), 200, {'Cache-Control': 'no-store'}
 
 
 if __name__ == '__main__':

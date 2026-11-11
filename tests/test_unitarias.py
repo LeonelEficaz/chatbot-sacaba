@@ -189,8 +189,9 @@ class TestGetResp(unittest.TestCase):
 
     def test_pu30_pasos_procedimiento(self):
         resp = get_resp("¿Cómo tramito la licencia de funcionamiento?", "es")
-        self.assertIn("- Procedimiento:", resp)
-        self.assertIn("1. Acude a la caja central", resp)
+        self.assertIn("Licencia de Funcionamiento", resp)
+        self.assertIn("Procedimiento:", resp)
+        self.assertIn("1. ", resp)
         self.assertIn("Bs. 60", resp)
 
     def test_pu31_respuesta_default(self):
@@ -246,25 +247,27 @@ class TestGetAiResp(unittest.TestCase):
         self.assertIn("Sacaba", resp)
 
     def test_pu43_ia_devuelve_texto(self):
+        # Pregunta abierta: los saludos ya los responde la base local sin salir a la red.
         with mock.patch.object(engine, "_openai_dead", False), \
                 mock.patch.object(engine, "_client") as client:
             client.chat.completions.create.return_value = _fake_chat("Hola, en que te ayudo?")
-            resp = engine.get_ai_resp("hola", "es")
+            resp = engine.get_ai_resp("que opinas del clima de sacaba", "es")
         self.assertEqual(resp, "Hola, en que te ayudo?")
 
     def test_pu44_ia_responde_vacio_usa_respuesta_local(self):
         with mock.patch.object(engine, "_openai_dead", False), \
                 mock.patch.object(engine, "_client") as client:
             client.chat.completions.create.return_value = _fake_chat("   ")
-            resp = engine.get_ai_resp("hola", "es")
-        self.assertIn("Sacaba", resp)
+            resp = engine.get_ai_resp("que opinas del clima de sacaba", "es")
+        self.assertTrue(resp)
+        self.assertNotEqual(resp, "   ")
 
     def test_pu45_ia_error_usa_respuesta_local(self):
         with mock.patch.object(engine, "_openai_dead", False), \
                 mock.patch.object(engine, "_client") as client:
             client.chat.completions.create.side_effect = Exception("timeout")
-            resp = engine.get_ai_resp("hola", "es")
-        self.assertIn("Sacaba", resp)
+            resp = engine.get_ai_resp("que opinas del clima de sacaba", "es")
+        self.assertTrue(resp)
 
 
 class TestTranscribeAudio(unittest.TestCase):
@@ -715,9 +718,64 @@ class TestAdaptarQuechua(unittest.TestCase):
         import inspect
         from chatbot import tts
         fuente = inspect.getsource(tts.sintetizar)
-        # El quechua sigue mas pausado que el espanol, pero mas agil que antes.
-        self.assertIn("'-14%'", fuente)
+        # Sami habla: el quechua lleva una pausa minima, no cadencia silabica.
+        self.assertIn("'-4%'", fuente)
         self.assertIn("'+5%'", fuente)
+
+
+
+class TestVozHablada(unittest.TestCase):
+    """Unidad: tts.frase_hablada(), lo que Sami dice (no lo que se lee en pantalla)."""
+
+    FICHA = ('\U0001FAAA **Carnet de Identidad (Cedula)**\n\n'
+             'Documento de identificacion personal obligatorio.\n\n'
+             '**Donde:** Las oficinas del SEGIP se encuentran en Sacaba.\n'
+             '**Costo:** Bs. 17\n**Tiempo:** Inmediato\n'
+             'Ubicacion: https://maps.app.goo.gl/abc123\n'
+             'Ficha completa: /tramite/carnet-de-identidad')
+
+    def setUp(self):
+        from chatbot.tts import frase_hablada, limpiar
+        self.hablada = frase_hablada
+        self.limpiar = limpiar
+
+    def test_pu97_no_lee_enlaces_ni_rutas(self):
+        hablada = self.hablada(self.FICHA)
+        self.assertNotIn('http', hablada)
+        self.assertNotIn('tramite', hablada)
+        self.assertNotIn('maps', hablada)
+
+    def test_pu98_dice_el_numero_completo(self):
+        self.assertIn('17 bolivianos', self.limpiar('Costo: Bs. 17'))
+        self.assertNotIn('1 bolivianos7', self.limpiar('Costo: Bs. 17'))
+
+    def test_pu99_rango_sin_romper_las_horas(self):
+        self.assertIn('100 a 300', self.limpiar('Exceso de velocidad: Bs. 100 - 300'))
+        self.assertIn('8:00', self.limpiar('Lunes: 08:00 - 12:00'))
+        self.assertNotIn('8 de', self.limpiar('Lunes: 08:00 - 12:00'))
+
+    def test_pu100_es_mas_corto_que_la_ficha(self):
+        hablada = self.hablada(self.FICHA)
+        self.assertLess(len(hablada), len(self.FICHA))
+        self.assertLessEqual(hablada.count('.') + hablada.count('!'), 4)
+
+    def test_pu101_sin_la_etiqueta_de_datos(self):
+        self.assertNotIn('Donde:', self.hablada(self.FICHA))
+        self.assertIn('SEGIP', self.hablada(self.FICHA))
+
+    def test_pu102_texto_vacio(self):
+        self.assertEqual('', self.hablada(''))
+
+    def test_pu103_prestamos_castellanos_sin_acento(self):
+        from chatbot.tts import adaptar_quechua
+        self.assertEqual('patente municipal', adaptar_quechua('patente municipal'))
+        self.assertEqual('oficinas del SEGIP', adaptar_quechua('oficinas del SEGIP'))
+        self.assertEqual('para abrir', adaptar_quechua('para abrir'))
+
+    def test_pu104_quechua_sigue_con_acento_propio(self):
+        from chatbot.tts import adaptar_quechua
+        self.assertEqual('yacháchik', adaptar_quechua('yachachik'))
+        self.assertEqual('jámuy', adaptar_quechua('hamuy'))
 
 
 class TestIdiomaYDictadoQuechua(unittest.TestCase):

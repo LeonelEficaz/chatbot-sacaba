@@ -731,6 +731,12 @@ var UI = {
         no_entendi: "No pude escuchar bien. \u00bfMe lo repites, por favor?",
         manos_libres_on: "Modo manos libres activo. Di \u00abSami...\u00bb y te escucho.",
         manos_libres_off: "Modo manos libres desactivado.",
+        voz_off: "Conversaci\u00f3n terminada. Aqu\u00ed abajo queda lo que te respond\u00ed.",
+        voz_caida: "Se cort\u00f3 el internet para escuchar tu voz. Puedes seguir escribiendo.",
+        voz_silencio: "Te escuch\u00e9 poco. Cuando quieras, vuelve a tocar el bot\u00f3n de manos libres.",
+        voz_escuchando: "Escuchando...",
+        voz_grabando: "Un momento...",
+        voz_pensando: "Pensando...",
         wake_ack: "\u00bfS\u00ed? Te escucho.",
         stop_ack: "Listo, me quedo en silencio. \ud83d\ude0a",
         mic_denegado: "No tengo permiso para usar el micr\u00f3fono. Toca el candado de la barra de direcciones, permite el micr\u00f3fono y vuelve a intentar.",
@@ -765,6 +771,12 @@ var UI = {
         no_entendi: "Allinta uyarirqanichu. \u00bfKutin niway, ama hina kaspa?",
         manos_libres_on: "Manos libres kachkan. \u00abSami...\u00bb niy, uyarisqayki.",
         manos_libres_off: "Manos libres wa\u00f1uchisqa.",
+        voz_off: "Rimay tukukun. Kay uranpi qipan imaynatas kutichishasqayki.",
+        voz_caida: "Internet sayarurqan vozniyta uyawayta. Qillqayllawanmi sarwayta atinki.",
+        voz_silencio: "Pisillatam uyarqayki. Yumaptiki, manos libres botonta huk kutillata maqaway.",
+        voz_escuchando: "Uyarisqayki...",
+        voz_grabando: "Huk ratullla...",
+        voz_pensando: "Yuyayisqayki...",
         wake_ack: "\u00bfAr\u00ed? Uyarishayki.",
         stop_ack: "Ar\u00ed, ch'inlla\u00f1a kasqani. \ud83d\ude0a",
         mic_denegado: "Micr\u00f3fonoq permisonniyuq kani\u00f1achu. Barra de direccionespi candadota kichay, micr\u00f3fonota saqilliy, hinaspa kutiy.",
@@ -782,7 +794,7 @@ var UI = {
 };
 
 /* ===== STATE ===== */
-var S = { open: false, lang: 'es', busy: false, recording: false, recognition: null, hfPause: false, sttFallo: false, sttFinal: '', sttHeard: false, log: [], silent: false, silentFijo: false, embedded: false, voice: true, audio: null, speakSeq: 0, logoSrc: '/static/img/sami-gato.svg', handsFree: false, speaking: false, consultas: false, sttTimer: null, restartSTT: false, vozCola: [], vozActual: null, vozOcupada: false, vozGen: 0, presentado: false, presentando: false, bloqueado: false, autoListen: false, autoTurno: false, autoIntentos: 0, micListo: null, modoServidor: false, recLang: null, sttReintento: false };
+var S = { open: false, lang: 'es', busy: false, recording: false, recognition: null, hfPause: false, sttFallo: false, sttFinal: '', sttHeard: false, log: [], silent: false, silentFijo: false, embedded: false, voice: true, audio: null, speakSeq: 0, logoSrc: '/static/img/sami-gato.svg', handsFree: false, speaking: false, consultas: false, sttTimer: null, restartSTT: false, vozCola: [], vozActual: null, vozOcupada: false, vozGen: 0, presentado: false, presentando: false, bloqueado: false, autoListen: false, autoTurno: false, autoIntentos: 0, micListo: null, modoServidor: false, recLang: null, sttReintento: false, vozModelo: false, vozStt: false, vozNormaliza: false, conversacion: false, orbe: null, orbeSilencios: 0 };
 
 /* ===== AUDIO EFFECTS ===== */
 var AudioCtx = window.AudioContext || window.webkitAudioContext;
@@ -1068,10 +1080,69 @@ var QU_HINTS = ['imaynalla', 'imaynallan', 'allillan', 'allinlla', 'yusulpayki',
     'horqoy', 'horqoyta', 'ruway', 'ruwayta', 'ruwakun', 'ruwana', 'qhaway', 'willay',
     'apay', 'pusay', 'pagay', 'pagayta', 'yachay', 'llamkay', 'qhatu', 'wasita', 'yaku',
     'punchaw', 'p\'unchaw', 'simana', 'qillqay', 'kasqan', 'nitaq', 'utaq', 'paykuna',
-    'yupay', 'waqaychay', 'apamuy', 'qhapaq', 'tramitata', 'multata'];
+    'yupay', 'waqaychay', 'apamuy', 'qhapaq', 'tramitata', 'multata',
+    'kanki', 'sutiyki', 'yanapawayki', 'yachani', 'yachanki', 'rirqani',
+    'hamusqayki', 'allinllan', 'tupananchis', 'imaynanam', 'imanallan'];
 
 var QU_SUFIJOS = /(yta|manta|kuna|nchik|yman|puni|qta|yki|niy|chik|qti)$/;
 var QU_SIN_SUFIJO = { manta: 1, amamanta: 1 };
+
+/* Como se escribe "habla quechua" cuando el dictado lo oye en castellano:
+   parlanguichu, parlanchu, rimasunchik... Son las formas que la gente usa. */
+var QU_HABLADO = ['parlankichu', 'parlankiman', 'parlanki', 'parlashun', 'parlasun',
+    'rimasunchik', 'rimasun', 'rimaykuy', 'rimariy', 'rimaykuway', 'kechuatapuy',
+    'quechuatapuy', 'parlanchik', 'parlankichik', 'uyarinichu', 'yachihuan',
+    // Las mismas formas que compara el servidor: saludos, cortesias y preguntas.
+    'yusulpayki', 'allillanchu', 'imaynallan', 'tupananchiskama', 'yanapaway',
+    'yanapaykuy', 'yanapawanki', 'kanchu', 'tiyanchu', 'imayna', 'hayka',
+    'maypitaq', 'imataq', 'kunanqa', 'runasimi', 'kawsay', 'waqaychay',
+    'qullqi', 'tramitekuna', 'multakuna', 'parlaway', 'parlami', 'parluyki',
+    'rimanayki', 'rimanqi', 'munani'];
+
+/* Igual que canon_qu del servidor: una sola pasada, asi 'ch' no se rompe
+   al convertir la 'c'. Es lo que permite comparar "parlanguichu" con
+   "parlankichu" sin que el deletreo importe. */
+function canonQ(texto) {
+    var t = String(texto == null ? '' : texto).toLowerCase()
+        .replace(/[áàäâ]/g, 'a').replace(/[éèëê]/g, 'e').replace(/[íìïî]/g, 'i')
+        .replace(/[óòöô]/g, 'o').replace(/[úùüû]/g, 'u').replace(/[ñ]/g, 'n')
+        .replace(/[^a-z' ]/g, ' ').replace(/'/g, '');
+    return t.replace(/qu|gu|hu|ju|ch|sh|ll|c|g|j|q/g, function (m) {
+        return { qu: 'k', gu: 'k', hu: 'w', ju: 'k', ch: 'ch', sh: 's',
+                 ll: 'll', c: 'k', g: 'k', j: 'k', q: 'k' }[m];
+    });
+}
+
+var QU_HABLADO_CANON = (function () {
+    var s = [];
+    for (var i = 0; i < QU_HABLADO.length; i++) s.push(canonQ(QU_HABLADO[i]));
+    return s;
+})();
+
+function habladoQuechua(texto) {
+    var palabras = canonQ(texto).split(/[^a-z]+/);
+    for (var i = 0; i < palabras.length; i++) {
+        var p = palabras[i];
+        if (p.length < 5) continue;
+        for (var j = 0; j < QU_HABLADO_CANON.length; j++) {
+            var f = QU_HABLADO_CANON[j];
+            if (p === f) return true;
+            // El reconocedor come o cambia silabas: alcanza con que
+            // coincidan las cuatro primeras y el largo sea parecido.
+            if (Math.abs(p.length - f.length) <= 3 && p.indexOf(f.slice(0, 4)) === 0 &&
+                similarColas(p, f)) return true;
+        }
+    }
+    return false;
+}
+
+function similarColas(a, b) {
+    var n = Math.min(a.length, b.length);
+    if (n < 4) return a === b;
+    var iguales = 0;
+    for (var i = 0; i < n; i++) { if (a.charAt(n - 1 - i) === b.charAt(b.length - 1 - i)) iguales++; else break; }
+    return iguales >= Math.max(2, Math.round(n * 0.5));
+}
 
 function looksQuechua(text) {
     var t = String(text || '').toLowerCase();
@@ -1086,7 +1157,8 @@ function looksQuechua(text) {
         var p = palabras[j];
         if (p.length >= 6 && !QU_SIN_SUFIJO[p] && QU_SUFIJOS.test(p)) return true;
     }
-    return false;
+    // "parlanguichu", "kishua parlani": fonetica, no ortografia.
+    return habladoQuechua(t);
 }
 
 /* ===== INTERPRETACION DEL QUECHUA DICTADO ===== */
@@ -1099,7 +1171,20 @@ var QU_FIX = {
     kechua: 'quechua', quichua: 'quechua', kichua: 'quechua', qhechua: 'quechua',
     qhechwa: 'quechua', yuspagara: 'yusulpayki', allinllachu: 'allillanchu',
     multacuna: 'multakuna', multakunas: 'multakuna',
-    tramitecuna: 'tramitekuna', tramitekunata: 'tramitekuna'
+    tramitecuna: 'tramitekuna', tramitekunata: 'tramitekuna',
+    // Como escribe el dictado castellano lo que se dijo en quechua.
+    quehua: 'quechua', quecha: 'quechua', qechua: 'quechua',
+    kishua: 'quechua', keshua: 'quechua',
+    parlanguichu: 'parlankichu', parlankuchu: 'parlankichu', parlanchu: 'parlanchik',
+    parlanqui: 'parlanki', parlashon: 'parlashun', parlanguiman: 'parlankiman',
+    rimariyu: 'rimariy', rimason: 'rimasun', jullqui: 'qullqi',
+    noga: 'noqa', joga: 'noqa', nuqa: 'noqa', noha: 'noqa',
+    mumani: 'munani', numani: 'munani', munauni: 'munani',
+    parlamishun: 'parlanchik', parlanchis: 'parlanchik',
+    tupanachiscama: 'tupananchiskama',
+    imaynanam: 'imaynallan', imaynaman: 'imaynallan', imanallan: 'imaynallan',
+    sulpayki: 'yusulpayki', yusulpaki: 'yusulpayki',
+    allinllan: 'allillan', alillanchu: 'allillanchu'
 };
 var QU_STOP = {
     la: 1, el: 1, los: 1, las: 1, un: 1, una: 1, unos: 1, unas: 1, de: 1, del: 1,
@@ -1195,6 +1280,9 @@ function detectarComandoIdioma(texto) {
     }
     if (LANG_QU_RE.test(t)) return 'qu';
     if (LANG_ES_RE.test(t)) return 'es';
+    // "parlanguichu" a secas: el dictado lo escribe como suena y ninguna
+    // regla ortologica lo atrapa, asi que se compara por fonetica.
+    if (habladoQuechua(t)) return 'qu';
     return null;
 }
 
@@ -1338,8 +1426,14 @@ function startRecording() {
     stopSpeaking();
     if (S.recording) return stopRecording();
     var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SR) return avisoMic('mic_no_soportado');
+    if (!SR && !S.vozModelo) return avisoMic('mic_no_soportado');
     if (!hayMicSeguro()) return avisoMic('mic_inseguro');
+    if ((S.vozModelo || S.modoServidor) && navigator.mediaDevices && window.MediaRecorder) {
+        // Con un modelo de audio, o cuando el servicio de voz del navegador
+        // ya fallo, la grabadora hace todo el trabajo y el servidor decide.
+        grabarServidor(!S.autoListen);
+        return;
+    }
 
     if (S.handsFree) {
         S.hfPause = true;
@@ -1363,7 +1457,7 @@ function startRecording() {
     });
 }
 
-function enviarTexto(msg) {
+function enviarTexto(msg, enVoz) {
     var inp = document.getElementById('cw-in');
     if (inp) inp.value = '';
     // El dictado separa el quechua ("multa cuna"): se muestra ya interpretado.
@@ -1375,9 +1469,17 @@ function enviarTexto(msg) {
         addMsg(UI[S.lang].stop_ack, 'bot', { silent: true });
         return;
     }
-    addMsg(msg, 'user');
-    playSound('send');
-    sendToAI(msg, { porVoz: true });
+    if (enVoz) {
+        if (isStopCommand(msg)) { terminarConversacion(); return; }
+        S.orbeSilencios = 0;
+        S.log.push({ type: 'user', text: msg });
+        estadoOrbe('pensando', msg);
+    } else {
+        if (S.conversacion) terminarConversacion();
+        addMsg(msg, 'user');
+        playSound('send');
+    }
+    sendToAI(msg, { porVoz: true, enVoz: !!enVoz });
 }
 
 function startLiveSTT(SR) {
@@ -1386,7 +1488,9 @@ function startLiveSTT(SR) {
     S.sttFinal = '';
     S.sttHeard = false;
     S.restartSTT = false;
-    rec.lang = S.recLang || ((S.lang === 'qu') ? 'qu-BO' : 'es-BO');
+    // Ningun reconocedor del mundo tiene runasimi: se dicta en castellano y
+    // el servidor normaliza la fonetica quechua (parlanguichu -> parlankichu).
+    rec.lang = S.recLang || 'es-BO';
     rec.continuous = true;
     rec.interimResults = true;
     rec.maxAlternatives = 1;
@@ -1395,7 +1499,7 @@ function startLiveSTT(SR) {
         clearTimeout(S.sttTimer);
         S.sttTimer = setTimeout(function () {
             if (S.recording) stopRecording();
-        }, 2400);
+        }, 1500);
     }
 
     rec.onresult = function (event) {
@@ -1575,6 +1679,7 @@ function grabarServidor(manual) {
         GRAB.tope = setTimeout(detenerGrabacionServidor, manual ? 25000 : 15000);
         vigilarNivel();
     }).catch(function (clave) {
+        if (S.conversacion) terminarConversacion();
         avisoMic(typeof clave === 'string' ? clave : claveErrorMic((clave && clave.name) || ''));
     });
 }
@@ -1600,9 +1705,9 @@ function vigilarNivel() {
             var rms = Math.sqrt(suma / datos.length);
             var ahora = Date.now();
             if (rms > 0.012) { GRAB.hablo = true; GRAB.ultimoRuido = ahora; }
-            var silencio = GRAB.manual ? 2600 : 2200;
-            var espera = GRAB.manual ? 12000 : 9000;
-            var tope = GRAB.manual ? 25000 : 15000;
+            var silencio = GRAB.manual ? 1900 : 1500;
+            var espera = GRAB.manual ? 12000 : 8000;
+            var tope = GRAB.manual ? 25000 : 14000;
             if (GRAB.hablo && ahora - GRAB.ultimoRuido > silencio) return detenerGrabacionServidor();
             if (!GRAB.hablo && ahora - GRAB.inicio > espera) return detenerGrabacionServidor();
             if (ahora - GRAB.inicio > tope) return detenerGrabacionServidor();
@@ -1635,11 +1740,53 @@ function finalizarGrabacion() {
     var trozos = GRAB.trozos;
     GRAB.trozos = [];
     if (!hablo || !trozos.length) {
-        sinVozDetectada();
+        if (S.conversacion && !turnoSinVoz()) return;
+        if (!S.conversacion) sinVozDetectada();
         return;
     }
     var blob = new Blob(trozos, { type: trozos[0].type || 'audio/webm' });
-    showTyping();
+    if (S.conversacion) estadoOrbe('grabando'); else showTyping();
+    enviarAudioAlModelo(blob);
+}
+
+/* ===== AUDIO AL MODELO: la ruta que entiende quechua ===== */
+/* El audio se envia tal como se grabo. El modelo lo escucha, lo transcribe con
+   ortografia quechua y responde con los datos del municipio en una sola pasada,
+   asi que ya no depende de los reconocedores de voz, que no tienen runasimi. */
+function enviarAudioAlModelo(blob) {
+    if (!S.vozModelo) { dictadoServidor(blob); return; }
+    blobABase64(blob).then(function (base64) {
+        return fetch('/api/voice', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                audio: base64,
+                mime: blob.type || 'audio/webm',
+                language: S.lang,
+                history: historyForAI()
+            })
+        });
+    }).then(function (r) {
+        if (!r.ok) throw new Error('voice ' + r.status);
+        return r.json();
+    }).then(function (d) {
+        hideTyping();
+        var resp = ((d && d.text) || '').trim();
+        if (!resp) {
+            avisoMic('mic_red');
+            return;
+        }
+        S.autoTurno = !!S.autoListen || !!S.handsFree;
+        S.autoIntentos = 0;
+        respuestaDelModelo(((d && d.dicho) || '').trim(), resp, d);
+    }).catch(function () {
+        // Cayo el modelo de voz: el dictado de respaldo sigue atendiendo.
+        dictadoServidor(blob);
+    });
+}
+
+/* Respaldo viejo: WAV al dictado gratuito del servidor, que no reconoce quechua. */
+function dictadoServidor(blob) {
     convertirAWav(blob).then(function (base64) {
         return fetch('/api/stt', {
             method: 'POST',
@@ -1653,20 +1800,161 @@ function finalizarGrabacion() {
         hideTyping();
         var texto = ((d && d.text) || '').trim();
         if (!texto) {
+            if (S.conversacion) { turnoSinVoz(); return; }
             addMsg(UI[S.lang].no_entendi, 'bot', { silent: true });
             return;
         }
+        // El servidor ya normalizo el quechua dictado ("multa cuna" ->
+        // "multakuna") y dice en que idioma quedo: se cambia al instante.
+        var det = (d && (d.detected === 'qu' || d.detected === 'es')) ? d.detected : null;
+        if (det && det !== S.lang) switchLang(det, true);
         S.autoTurno = !!S.autoListen;
         S.autoIntentos = 0;
-        enviarTexto(texto);
+        enviarTexto(texto, S.conversacion);
     }).catch(function () {
         hideTyping();
+        if (S.conversacion) { terminarConversacion(UI[S.lang].voz_caida); return; }
         avisoMic('mic_red');
     });
 }
 
+function blobABase64(blob) {
+    return new Promise(function (listo, error) {
+        var lector = new FileReader();
+        lector.onloadend = function () {
+            var url = String(lector.result || '');
+            listo(url.slice(url.indexOf(',') + 1));
+        };
+        lector.onerror = error;
+        lector.readAsDataURL(blob);
+    });
+}
+
+/* La respuesta ya viene generada: se muestra y se lee, sin volver a preguntar. */
+function respuestaDelModelo(dicho, resp, d) {
+    if (dicho && S.conversacion) estadoOrbe('pensando', dicho);
+    else if (dicho) addMsg(dicho, 'user');
+    var detectado = (d && d.detected === 'qu') ? 'qu' : ((d && d.detected === 'es') ? 'es' : null);
+    if (detectado && detectado !== S.lang) switchLang(detectado, true);
+    addMsg(resp, 'bot');
+    S.log.push({ type: 'user', text: dicho || '(voz)' });
+    S.log.push({ type: 'bot', query: dicho, resp: resp, respLang: S.lang });
+    playSound('message');
+    S.busy = false;
+    setTimeout(showConsultaBtn, 450);
+    flushPendingLang();
+}
+
+/* Avisa si existe un modelo capaz de escuchar el audio del microfono. */
+function comprobarVozModelo() {
+    fetch('/api/voice/status').then(function (r) { return r.json(); }).then(function (d) {
+        // Solo un modelo de audio escucha quechua directamente; sin el,
+        // el dictado del navegador + normalizacion del motor hace el trabajo.
+        S.vozModelo = !!(d && d.audio_quechua);
+        S.vozStt = !!(d && d.dictado_respaldo);
+        S.vozNormaliza = !!(d && d.normalizacion_quechua);
+        if (S.vozModelo) S.modoServidor = true;
+    }).catch(function () { S.vozModelo = false; S.vozStt = false; });
+}
+
+/* ===== CONVERSACION POR VOZ: la burbujita que escucha, piensa y habla ===== */
+/* Lo que dijo el ciudadano no se escribe como mensaje: el orbe dice en que etapa
+   esta la llamada y, cuando Sami termina de hablar, se vuelve a escuchar solo. */
+function crearOrbe() {
+    quitarOrbe();
+    var msgs = document.getElementById('cw-msgs');
+    if (!msgs) return null;
+    var d = document.createElement('div');
+    d.className = 'cw-msg bot cw-voz-orbe is-escuchando';
+    d.innerHTML = '<div class="cw-msg-av"><img src="' + S.logoSrc + '" alt="Sami"></div>' +
+        '<div class="cw-msg-b"><span class="cw-orbe"><i></i><i></i><i></i></span>' +
+        '<span class="cw-orbe-texto"></span></div>';
+    msgs.appendChild(d);
+    msgs.scrollTop = msgs.scrollHeight;
+    S.orbe = d;
+    return d;
+}
+
+function estadoOrbe(estado, caption) {
+    var d = S.orbe || crearOrbe();
+    if (!d) return;
+    d.className = 'cw-msg bot cw-voz-orbe is-' + estado;
+    var texto = d.querySelector('.cw-orbe-texto');
+    if (texto) texto.textContent = (caption == null ? (UI[S.lang]['voz_' + estado] || '') : caption);
+    var msgs = document.getElementById('cw-msgs');
+    if (msgs) msgs.scrollTop = msgs.scrollHeight;
+}
+
+function quitarOrbe() {
+    if (S.orbe && S.orbe.parentNode) S.orbe.parentNode.removeChild(S.orbe);
+    S.orbe = null;
+}
+
+/* Un turno de la llamada: esperar a que Sami calle y volver a abrir el micro. */
+function turnoDeVoz() {
+    if (!S.conversacion) return;
+    if (!S.open || S.bloqueado || S.presentando) { setTimeout(turnoDeVoz, 1200); return; }
+    if (S.busy || S.speaking || S.vozOcupada || GRAB.activa || S.recognition) {
+        setTimeout(turnoDeVoz, 600);
+        return;
+    }
+    estadoOrbe('escuchando');
+    abrirMicro(!S.vozModelo);
+}
+
+/* La ruta mas corta segun lo que el equipo realmente pueda escuchar:
+   el dictado del navegador responde en el acto; grabar y subir el audio
+   solo paga su costo cuando hay un modelo que lo escuche o cuando el
+   navegador no tiene servicio de voz. */
+function abrirMicro(prefiereNavegador) {
+    var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    var navegadorVivo = !!(SR && !S.modoServidor);
+    if (prefiereNavegador && navegadorVivo) { startLiveSTT(SR); return; }
+    if (navigator.mediaDevices && window.MediaRecorder &&
+        (S.vozModelo || S.vozStt || !navegadorVivo)) {
+        grabarServidor(false);
+        return;
+    }
+    if (navegadorVivo) { startLiveSTT(SR); return; }
+    avisoMic('mic_no_soportado');
+}
+
+function iniciarConversacion() {
+    if (S.conversacion) return;
+    S.conversacion = true;
+    S.autoListen = false;
+    S.autoTurno = false;
+    S.orbeSilencios = 0;
+    playSound('open');
+    estadoOrbe('escuchando');
+    turnoDeVoz();
+}
+
+/* Suma un turno sin entender nada; con tres, la llamada se cierra sola. */
+function turnoSinVoz() {
+    S.orbeSilencios++;
+    if (S.orbeSilencios >= 3) { terminarConversacion(UI[S.lang].voz_silencio); return false; }
+    estadoOrbe('escuchando');
+    setTimeout(turnoDeVoz, 700);
+    return true;
+}
+
+function terminarConversacion(mensaje) {
+    if (!S.conversacion) return;
+    S.conversacion = false;
+    S.orbeSilencios = 0;
+    quitarOrbe();
+    if (GRAB.activa) detenerGrabacionServidor();
+    S.handsFree = false;
+    updateHandsFreeUI();
+    playSound('stop');
+    addMsg(mensaje || UI[S.lang].voz_off, 'bot', { silent: true });
+}
+
+
 /* No se detecto voz: en modo automatico reintenta un par de veces antes de avisar. */
 function sinVozDetectada() {
+    if (S.conversacion) { turnoSinVoz(); return; }
     if (S.autoListen && S.autoIntentos < 2) {
         S.autoIntentos++;
         S.autoTurno = false;
@@ -1739,10 +2027,12 @@ function toggleHandsFree() {
     S.autoTurno = false;
     updateHandsFreeUI();
     if (S.handsFree) {
+        if (S.vozModelo || S.vozStt) { iniciarConversacion(); return; }
         playSound('open');
         addMsg(UI[S.lang].manos_libres_on, 'bot', { silent: true });
         empezarManosLibres();
     } else {
+        if (S.conversacion) { terminarConversacion(); return; }
         playSound('stop');
         S.restartSTT = false;
         S.hfPause = false;
@@ -1891,15 +2181,9 @@ function iniciarEscuchaAuto() {
     if (!hayMicSeguro()) return;
     if (S.recording || S.recognition || GRAB.activa) return;
     if (S.busy || S.speaking || S.vozOcupada) { setTimeout(iniciarEscuchaAuto, 700); return; }
-    // El dictado del servidor escucha de verdad en cualquier navegador;
-    // el reconocimiento propio del navegador solo se usa si no hay grabadora.
-    if (navigator.mediaDevices && window.MediaRecorder) {
-        grabarServidor(false);
-        return;
-    }
-    var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SR) { avisoMic('mic_no_soportado'); return; }
-    startLiveSTT(SR);
+    // El dictado del navegador va directo al chat; grabar y subir audio
+    // solo se paga cuando existe un modelo que sepa escucharlo.
+    abrirMicro(!S.vozModelo);
 }
 
 function reanudarEscuchaAuto() {
@@ -1910,6 +2194,7 @@ function reanudarEscuchaAuto() {
 
 /* La cola de voz se vacio: si el turno vino del microfono, se vuelve a escuchar. */
 function alQuedarEnSilencio() {
+    if (S.conversacion) { setTimeout(turnoDeVoz, 350); return; }
     if (!S.autoListen || !S.autoTurno) return;
     setTimeout(reanudarEscuchaAuto, 600);
 }
@@ -1998,7 +2283,7 @@ function sendToAI(text, meta) {
     if (S.lang === 'es' && vozQuechua) switchLang('qu', true);
 
     S.busy = true;
-    showTyping();
+    if (!(meta && meta.enVoz)) showTyping();
     syncPanel(text, meta && meta.tramite);
 
     var historial = historyForAI();
@@ -2047,8 +2332,12 @@ function sendToAI(text, meta) {
     });
 }
 
-/* ===== VOZ (Edge TTS servidor + respaldo del navegador) ===== */
+/* ===== VOZ (natural del sistema + Edge TTS de respaldo) ===== */
+/* La primera opcion es la voz del propio equipo: suena humana y contesta al
+   instante porque no espera a la red. Las voces de servidor quedan para quien
+   las elija o para los navegadores sin voces naturales. */
 var VOCES_TTS = [
+    { id: 'natural', nombre: 'Natural' },
     { id: 'es-BO-SofiaNeural', nombre: 'Sofía' },
     { id: 'es-BO-MarceloNeural', nombre: 'Marcelo' }
 ];
@@ -2061,6 +2350,11 @@ function nombreVoz(id) {
     return VOCES_TTS[0].nombre;
 }
 
+/* Sin eleccion del ciudadano se empieza por la voz neuronal del servidor: las
+   voces clasicas del sistema suenan roboticas, y esa es la queja real. */
+var VOZ_NATURAL = 'natural';
+var VOZ_NEURONAL = 'es-BO-SofiaNeural';
+
 function vozGuardada() {
     try {
         var guardada = localStorage.getItem(VOZ_KEY);
@@ -2068,10 +2362,34 @@ function vozGuardada() {
             if (VOCES_TTS[i].id === guardada) return guardada;
         }
     } catch (e) {}
-    return VOCES_TTS[0].id;
+    return null;
 }
 
-S.vozTTS = vozGuardada();
+S.vozTTS = vozGuardada() || VOZ_NEURONAL;
+
+/* Cuando el navegador termina de cargar sus voces, si alguna suena humana se
+   prefiere esa: contesta al instante y sin gastar la red. */
+function refrescarVozPorDefecto() {
+    if (vozGuardada() || S.vozTTS === VOZ_NATURAL) return;
+    if (!vozSistemaNatural()) return;
+    S.vozTTS = VOZ_NATURAL;
+    var boton = document.getElementById('cw-voz');
+    if (boton) boton.textContent = 'Voz · ' + nombreVoz(S.vozTTS);
+}
+
+/* Voz del sistema que suena humana: las neuronales/online de Windows y Chrome. */
+function vozSistemaNatural() {
+    if (!window.speechSynthesis) return null;
+    var voces = window.speechSynthesis.getVoices() || [];
+    for (var i = 0; i < voces.length; i++) {
+        var l = (voces[i].lang || '').toLowerCase();
+        if (l.indexOf('es') !== 0) continue;
+        if (/natural|online|neural|premium|wavenet|aurora|enhanced/i.test(voces[i].name || '')) {
+            return voces[i];
+        }
+    }
+    return null;
+}
 
 function pickEspVoice(needQu) {
     if (!window.speechSynthesis) return null;
@@ -2203,8 +2521,12 @@ function acentuarPalabraQu(palabra) {
         if ('aeiou'.indexOf(minus[i]) >= 0 && (i === 0 || 'aeiou'.indexOf(minus[i - 1]) < 0)) inicios.push(i);
     }
     if (inicios.length < 2) return palabra;
+    if (palabra === palabra.toUpperCase() && palabra.length <= 6) return palabra;
     var fin = minus.charAt(minus.length - 1);
     if ('kqylrmpw\u0003'.indexOf(fin) < 0) return palabra;
+    // Sufijos del castellano: un infinitivo tampoco es quechua, por mucho que
+    // termine en consonante.
+    if (['al', 'ar', 'er', 'ir', 'oz', 'uz'].indexOf(minus.slice(-2)) >= 0) return palabra;
     var pos = inicios[inicios.length - 2];
     var acento = ACENTOS_QU[minus.charAt(pos)];
     if (!acento) return palabra;
@@ -2267,8 +2589,17 @@ function limpiarParaVoz(text) {
         .replace(/https?:\/\/\S+/g, ' ')
         .replace(/&nbsp;/g, ' ')
         .replace(/&amp;/g, 'y')
+        // 1b) La voz no lee el pie de ficha ni la ruta interna del enlace.
+        .replace(/^[\s>*-]*(?:ficha|ubicaci\u00f3n|ubicacion|enlace|link|mapa|m\u00e1s[ \s]+informaci\u00f3n|mas[ \s]+informacion)[^\n]*$/gim, '')
+        .replace(/(?:^|\s)\/\w+[\/][\w-]{2,}/g, ' ')
+        .replace(/^[\s>*-]*(?:donde|d\u00f3nde|c\u00f3mo|como|cu\u00e1ndo|cuando|costo|precio|tiempo|duraci\u00f3n|consejo|requisitos|documentos|horarios?|contacto|tel\u00e9fono|telefono|ubicaci\u00f3n|ubicacion|respuesta|quechua)\s*[:.]\s*/gim, '')
         // 2) Unidades y abreviaturas para leer con naturalidad.
+        .replace(/(\d{1,2}:\d{2})\s*[-\u2013]\s*(\d{1,2}:\d{2})/g, '$1 a $2')
+        .replace(/\bBs\.?\s*(\d[\d.,]*)\s*[-\u2013]\s*(\d[\d.,]*)/gi, '$1 a $2 bolivianos')
+        .replace(/(?<![\d:])(\d[\d.]{0,3})\s+[-\u2013]\s+(\d[\d.]{0,3})(?![\d:])/g, '$1 a $2')
         .replace(/\bBs\.?\s*(\d+(?:[.,]\d+)?)/gi, '$1 bolivianos')
+        .replace(/(\d),(\d{3})\b/g, '$1.$2')
+        .replace(/\b0(\d{1,2}:\d{2}\b)/g, '$1')
         .replace(/\bAv\.\s*/gi, 'avenida ')
         .replace(/\bSt\.\s*/gi, 'santo ')
         .replace(/\bN[°º]\s*/gi, 'número ')
@@ -2286,15 +2617,26 @@ function limpiarParaVoz(text) {
         // 5) Puntuacion: pausa despues de cada signo, sin romper decimales ni abreviaturas.
         .replace(/([,;:!?¿¡.])(?![ \s\d])/g, '$1 ')
         .replace(/\s+([,.!?;:])/g, '$1')
+        .replace(/[.;:]+\s*([.!?])/g, '$1')
+        .replace(/([.!?])\s*[.;:]+/g, '$1')
+        .replace(/\.{2,}/g, '.')
         .replace(/\s+/g, ' ')
         .replace(/^[.?\s]+/, '')
         .trim();
-    if (clean.length > 1400) {
-        clean = clean.substring(0, 1400);
-        var corte = Math.max(clean.lastIndexOf('.'), clean.lastIndexOf('!'), clean.lastIndexOf('?'));
-        clean = corte > 200 ? clean.substring(0, corte + 1) : clean;
+    // Sami habla, no lee la pantalla entera: como mucho tres frases cortas.
+    var frases = clean.match(/[^.!?]+[.!?]*/g) || [];
+    var corto = '';
+    for (var i = 0; i < frases.length && i < 3; i++) {
+        var frase = frases[i].trim();
+        if (frase.length < 3) continue;
+        if (corto) {
+            if (corto.length + 2 + frase.length > 260) break;
+            if (!/[.!?]$/.test(corto)) corto += '.';
+            corto += ' ';
+        }
+        corto += frase;
     }
-    return clean;
+    return (corto || clean).substring(0, 300).trim();
 }
 
 function pedirTTS(texto, lang) {
@@ -2401,6 +2743,20 @@ function hablarItem(item, gen, fin) {
     // Se piden todas las frases a la vez: la primera suena en ~1 s y las
     // demas ya estan listas mientras se reproduce la anterior.
     var trozos = trocearVoz(item.texto, 110);
+
+    // Voz natural del equipo: sin red y sin sintesis, asi que la respuesta
+    // suena en cuanto llega el texto.
+    if (S.vozTTS === 'natural' && vozSistemaNatural()) {
+        speakBrowser(item.texto, item.lang, seq).then(function () {
+            clearTimeout(limite);
+            fin();
+        }, function () {
+            clearTimeout(limite);
+            fin();
+        });
+        return;
+    }
+
     var pedidos = trozos.map(function (trozo) { return pedirTTS(trozo, item.lang); });
     function detenido() { return item.vencido || gen !== S.vozGen || seq !== S.speakSeq || !S.voice; }
 
@@ -2476,6 +2832,7 @@ function linkify(html) {
 }
 
 function addMsg(text, type, opts) {
+    if (type === 'bot' && S.orbe) quitarOrbe();
     if (type === 'user') stopSpeaking();
     var msgs = document.getElementById('cw-msgs');
     var d = document.createElement('div');
@@ -2690,7 +3047,7 @@ function init(options) {
             fab.classList.toggle('open', S.open);
             document.getElementById('cw-badge').style.display = 'none';
             playSound('open');
-            if (S.open) greet();
+            if (S.open) greet(); else if (S.conversacion) terminarConversacion();
         };
         setTimeout(function() { document.getElementById('cw-badge').style.display = 'flex'; }, 2000);
     }
@@ -2760,8 +3117,13 @@ function init(options) {
         }).catch(function() {});
     }
 
+    comprobarVozModelo();
+
     if (window.speechSynthesis) {
-        window.speechSynthesis.onvoiceschanged = function() { window.speechSynthesis.getVoices(); };
+        window.speechSynthesis.onvoiceschanged = function() {
+            window.speechSynthesis.getVoices();
+            refrescarVozPorDefecto();
+        };
     }
 }
 

@@ -64,8 +64,14 @@ def _acentuar_palabra(palabra):
     ]
     if len(inicios) < 2:
         return palabra
+    if palabra.isupper() and len(palabra) <= 6:
+        return palabra
     # Solo finales propios del quechua: evita acentuar prestamos como carnet.
     if minus[-1] not in 'kqylrmpw\x03':
+        return palabra
+    # Sufijos del castellano: un infinitivo o un adjetivo en -al tampoco es
+    # quechua, por mucho que termine en consonante.
+    if minus[-2:] in ('al', 'ar', 'er', 'ir', 'oz', 'uz'):
         return palabra
     pos = inicios[-2]
     letra = palabra[pos]
@@ -128,12 +134,31 @@ def adaptar_quechua(texto):
     return t.replace('\x03', 'hu')
 
 
+def _cifras(texto):
+    """Escribe las cifras como las diria una persona.
+
+    "Bs. 100 - 300" pasa a "100 a 300 bolivianos"; sin esto la voz se queda en
+    un "Bs." suelto y el punto de la abreviatura parte la frase por la mitad.
+    El lookbehind y el lookahead evitan romper las horas ("08:00 - 12:00").
+    """
+    # Las horas se dicen con "a": "08:00 – 12:00" -> "8:00 a 12:00".
+    t = re.sub(r'(\d{1,2}:\d{2})\s*[-\u2013]\s*(\d{1,2}:\d{2})', r'\1 a \2', texto)
+    # La moneda con rango va primero, si no "bolivianos" cae en medio del rango.
+    t = re.sub(r'\bBs\.?\s*(\d[\d.,]*)\s*[-\u2013]\s*(\d[\d.,]*)',
+               r'\1 a \2 bolivianos', t, flags=re.I)
+    t = re.sub(r'(?<![\d:])(\d[\d.]{0,3})\s*[-\u2013]\s*(\d[\d.]{0,3})(?![\d:])',
+               r'\1 a \2', t)
+    t = re.sub(r'\bBs\.?\s*(\d[\d.,]*)', r'\1 bolivianos', t, flags=re.I)
+    t = re.sub(r'(?<=\d),(\d{3})\b', r'.\1', t)
+    return re.sub(r'\b0(\d{1,2}:\d{2}\b)', r'\1', t)
+
+
 def limpiar(texto):
     limpio = str(texto or '')
     limpio = re.sub(r'\[([^\]]+)\]\([^)]*\)', r'\1', limpio)
     limpio = re.sub(r'https?://\S+', ' ', limpio)
     limpio = limpio.replace('**', '').replace('*', '').replace('`', '')
-    limpio = re.sub(r'\bBs\.?\s*(\d)', r'\1 bolivianos', limpio, flags=re.I)
+    limpio = _cifras(limpio)
     limpio = re.sub(r'^\s*[-•·]\s*', '', limpio, flags=re.M)
     limpio = re.sub(r'[\U0001F000-\U0001FAFF\u2600-\u27BF]', '', limpio)
     limpio = re.sub(r'\s+', ' ', limpio).strip()
@@ -141,6 +166,66 @@ def limpiar(texto):
         corte = limpio[:MAX_CARACTERES]
         limpio = corte[:corte.rfind('.') + 1] if '.' in corte else corte
     return limpio
+
+
+# Lo que Sami dice en voz alta es mas corto que la ficha que se ve en pantalla.
+MAX_FRASES = 3
+MAX_HABLADO = 260
+
+# Las etiquetas de datos ("**Costo:** Bs. 17") se leen sin la etiqueta.
+ETIQUETA = re.compile(
+    r'^(?:donde|d\u00f3nde|c[o\u00f3]mo|cu[a\u00e1]ndo|costo|precio|tiempo|duraci\u00f3n|'
+    r'consejo|requisitos|documentos|horario|horarios|contacto|tel\u00e9fono|'
+    r'ubicaci\u00f3n|ubicacion|respuesta|quechua|ficha)\s*[:.\u2013-]\s*', re.I)
+
+# Lineas que nunca se leen en voz alta: pie de ficha, enlaces, rutas internas.
+SIN_VOZ = re.compile(
+    r'^(?:ficha|ubicaci\u00f3n|ubicacion|enlace|link|mapa|'
+    r'm\u00e1s\s+informaci\u00f3n|mas\s+informacion)\b', re.I)
+ENLACE = re.compile(r'https?://\S+|(?<!\w)/[\w/-]{3,}')
+
+
+def frase_hablada(texto):
+    """Devuelve lo que Sami dice: dos o tres frases sueltas, sin enlaces.
+
+    La ficha completa sigue visible en pantalla; la voz no lee encabezados,
+    direcciones web ni la cola de datos porque eso suena a lector de pantalla
+    y no a alguien que contesta.
+    """
+    bruto = re.sub(r'\[([^\]]+)\]\([^)]*\)', r'\1', str(texto or ''))
+    bruto = re.sub(r'^\s*#{1,6}\s*', '', bruto, flags=re.M)
+    frases = []
+    for linea in bruto.split('\n'):
+        linea = linea.strip().strip('-\u2022\u00b7*').strip()
+        if not linea or SIN_VOZ.match(linea):
+            continue
+        linea = _cifras(ENLACE.sub(' ', linea))
+        linea = ETIQUETA.sub('', linea).replace('**', '').replace('*', '')
+        introduccion = linea.rstrip().endswith(':')
+        linea = re.sub(r'\s+', ' ', linea).strip(' :.\u2013-')
+        if len(linea) < 3:
+            continue
+        for frase in re.split(r'(?<=[.!?])\s+', linea):
+            frase = frase.strip(' \u2013-')
+            if len(frase) >= 3:
+                frases.append((frase, introduccion))
+    if not frases:
+        return limpiar(texto)
+    hablado = ''
+    previa_es_introduccion = False
+    for frase, introduccion in frases[:MAX_FRASES]:
+        if hablado and len(hablado) + 2 + len(frase) > MAX_HABLADO:
+            break
+        if hablado:
+            if hablado[-1] not in '.!?':
+                # Una linea que anuncia datos ("Los horarios son:") sigue
+                # hablando; un punto ahi suena a corte y no a frase nueva.
+                hablado += ', ' if previa_es_introduccion else '. '
+            elif not hablado.endswith(' '):
+                hablado += ' '
+        hablado += frase
+        previa_es_introduccion = introduccion
+    return limpiar(hablado)
 
 
 async def _generar(texto, voz, rate):
@@ -156,7 +241,7 @@ def sintetizar(texto, voz=VOZ_PREDETERMINADA, lang='es'):
     """Devuelve la ruta del MP3 generado, o None si no se pudo sintetizar."""
     if not DISPONIBLE:
         return None
-    limpio = limpiar(texto)
+    limpio = frase_hablada(texto)
     if not limpio:
         return None
     if voz not in VOCES:
@@ -166,9 +251,9 @@ def sintetizar(texto, voz=VOZ_PREDETERMINADA, lang='es'):
         limpio = adaptar_quechua(limpio)
         if not limpio:
             return None
-    # Voz mas agil: el quechua mantiene una cadencia pausada pero ya no tan
-    # lenta, y el espanol suena un poco mas rapido.
-    rate = '-14%' if lang == 'qu' else '+5%'
+    # Sami habla, no deletrea: el quechua solo lleva una ligera pausa para que
+    # se distingan las silabas adaptadas, nada de cadencia silabica.
+    rate = '-4%' if lang == 'qu' else '+5%'
     clave = hashlib.sha256((voz + '|' + rate + '|' + limpio).encode('utf-8')).hexdigest()[:24]
     CACHE_DIR.mkdir(parents=True, exist_ok=True)
     destino = CACHE_DIR / (clave + '.mp3')
@@ -197,5 +282,5 @@ def estado():
         'motor': 'edge-tts (Microsoft Edge)',
         'voces': [{'id': k, **v} for k, v in VOCES.items()],
         'predeterminada': VOZ_PREDETERMINADA,
-        'nota': 'Voz neuronal boliviana gratuita. El quechua se adapta a la fonética castellana (q→k, h→j, w→u/hu) y se lee más lento; el navegador usa una voz nativa qu si existe.',
+        'nota': 'Voz neuronal boliviana gratuita. El quechua se adapta a la fonética castellana (q→k, h→j, w→u/hu) y la voz lee dos o tres frases mientras la ficha completa se ve en pantalla; el navegador usa una voz nativa qu si existe.',
     }

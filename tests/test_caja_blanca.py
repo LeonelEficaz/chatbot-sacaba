@@ -225,5 +225,34 @@ class CajaBlancaOpenBrowser(unittest.TestCase):
         abrir.assert_called_once_with("http://127.0.0.1:5000")
 
 
+class CajaBlancaLocalSinIA(unittest.TestCase):
+    """Funciones: _local_answer() / build_ficha_string() en quechua.
+    Garantizan que el chat responda sin proveedores y sin avisar de una caida."""
+
+    def setUp(self):
+        self._wiki = engine._wikipedia_answer
+        engine._wikipedia_answer = lambda msg, lang: None
+
+    def tearDown(self):
+        engine._wikipedia_answer = self._wiki
+
+    def test_cb43_respuesta_local_nunca_avisa_caida(self):
+        resp = engine.get_ai_resp("xyzabc sin sentido", "es", allow_ai=False)
+        self.assertTrue(resp.strip())
+        self.assertNotIn("servicio de IA", resp)
+        self.assertIn("Sacaba", resp)
+
+    def test_cb44_ficha_en_quechua(self):
+        resp = engine.build_ficha_string("licencia_funcionamiento", "qu")
+        self.assertIn("Hunt'asqa ficha", resp)
+        self.assertIn("Qullqi", resp)
+
+    def test_cb45_continuidad_con_historial(self):
+        historial = [{"role": "user", "content": "quiero mi carnet"},
+                     {"role": "assistant", "content": "ok"}]
+        resp = engine.get_ai_resp("cuanto cuesta", "es", history=historial, allow_ai=False)
+        self.assertIn("Bs. 17", resp)
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

@@ -58,8 +58,11 @@ class CajaNegraChat(unittest.TestCase):
         r = self.chat({"message": "xyzabc sin sentido", "language": "es"})
         self.assertEqual(r.status_code, 200)
         respuesta = r.get_json()["response"]
-        # Sin IA disponible responde con el aviso general, no deja el chat vacio.
-        self.assertTrue("puedo aprenderla" in respuesta or "servicio de IA" in respuesta)
+        # Sin proveedores de IA el chat siempre responde con los datos del
+        # municipio; nunca deja el chat vacio ni avisa de una caida del servicio.
+        self.assertTrue(respuesta.strip())
+        self.assertNotIn("servicio de IA no", respuesta)
+        self.assertIn("Sacaba", respuesta)
 
     def test_ce05_campo_message_ausente(self):
         r = self.chat({"language": "es"})

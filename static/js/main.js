@@ -656,6 +656,9 @@
         var closeBtn = document.getElementById('welcomeClose');
         function terminar() {
             if (!overlay.classList.contains('is-hidden')) close();
+            // Este clic tambien vale para pedir el micro: Sami escucha sin que
+            // el ciudadano tenga que buscar el boton del micromono.
+            if (typeof window.SacabaPrepararMicro === 'function') window.SacabaPrepararMicro();
             if (typeof window.SacabaSkipPresentation === 'function') window.SacabaSkipPresentation();
         }
         function comenzar() {

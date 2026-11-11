@@ -5,6 +5,8 @@ Integra ChatGPT (API de OpenAI) para respuestas inteligentes en espanol y quechu
 """
 
 # Importaciones necesarias
+import base64
+import difflib
 import json
 import os
 import re
@@ -16,6 +18,8 @@ from pathlib import Path
 from dotenv import load_dotenv
 import openai
 import requests
+
+from chatbot import google_idioma
 
 # Idiomas soportados: español (es) y quechua (qu)
 LANGUAGES = ("es", "qu")
@@ -35,16 +39,6 @@ LANGUAGES = ("es", "qu")
 NOMINATIM_URL = "https://nominatim.openstreetmap.org"
 OSM_TILES_URL = "https://tile.openstreetmap.org"
 
-# API de diccionario español-quechua - Glosbe (gratuita)
-GLOSBLE_API_KEY = os.getenv('GLOSBLE_API_KEY', '')
-GLOSBLE_API_URL = "https://glosbe.com/gapi"
-
-# API de IA gratuita - Google Gemini (como ChatGPT pero gratis)
-GEMINI_API_KEY = os.getenv('GEMINI_API_KEY', '')
-GEMINI_MODEL = os.getenv('GEMINI_MODEL', 'gemini-1.5-flash')
-GEMINI_AVAILABLE = bool(GEMINI_API_KEY and GEMINI_API_KEY != 'TU_API_KEY_AQUI')
-
-
 def _load_env_file():
     candidates = []
     bundle = getattr(sys, "_MEIPASS", None)
@@ -61,31 +55,70 @@ def _load_env_file():
 
 _load_env_file()
 
+def _clave_real(valor):
+    """Dice si el valor parece una API key de verdad y no un hueco del .env.
+
+    Una clave placeholder hacia creer a la app que Gemini estaba disponible,
+    y cada consulta perdio segundos esperando una respuesta que nunca llega."""
+    v = str(valor or '').strip()
+    if len(v) < 20:
+        return False
+    bajo = v.lower()
+    huecos = ('tu_api_key', 'your_api_key', 'api_key_aqui', 'pegar',
+              'reemplaza', 'xxxxxxxx', 'xxxxx')
+    return not any(h in bajo for h in huecos)
+
+
+
+# API de diccionario español-quechua - Glosbe (gratuita)
+GLOSBLE_API_KEY = os.getenv('GLOSBLE_API_KEY', '')
+GLOSBLE_API_URL = "https://glosbe.com/gapi"
+
+# API de IA gratuita - Google Gemini (como ChatGPT pero gratis)
+GEMINI_API_KEY = os.getenv('GEMINI_API_KEY', '')
+GEMINI_MODEL = os.getenv('GEMINI_MODEL', 'gemini-1.5-flash')
+GEMINI_AVAILABLE = _clave_real(GEMINI_API_KEY)
+# Los modelos antiguos dejan de existir: si el configurado ya no responde se
+# prueban estos en orden y se recuerda el que funciono.
+GEMINI_MODELOS = [GEMINI_MODEL, "gemini-2.5-flash", "gemini-2.0-flash",
+                  "gemini-flash-latest"]
+_gemini_modelo_ok = None
+
+
 CHAT_MODEL = os.getenv('OPENAI_MODEL', 'gpt-4o-mini')
 AUDIO_MODEL = os.getenv('OPENAI_AUDIO_MODEL', 'whisper-1')
 
 _api_key = os.getenv('OPENAI_API_KEY', '')
-if _api_key and _api_key != 'TU_API_KEY_AQUI':
-    _client = openai.OpenAI(api_key=_api_key)
-    _ai_available = True
-else:
-    _client = None
-    _ai_available = False
+_client = None
+_ai_available = False
+if _clave_real(_api_key):
+    # Un proxy mal formado o un SDK roto no pueden tumbar el chat: si el
+    # cliente no se construye, la app sigue con Gemini y la base local.
+    try:
+        # max_retries=0: una cuenta sin creditos responde 429 al instante y el
+        # reintento del SDK costaba hasta 20 segundos por consulta.
+        _client = openai.OpenAI(api_key=_api_key, max_retries=0, timeout=8.0)
+        _ai_available = True
+    except Exception:
+        _client = None
+        _ai_available = False
 
 # Se apaga si la cuenta de OpenAI queda sin creditos, para no esperar en cada consulta.
 _openai_dead = False
+_openai_dead_until = 0.0
 
 # IA gratuita de respaldo: endpoint compatible con la API de chat, sin clave.
 # Se puede desactivar con SACABA_FREE_AI=0 en el .env.
 FREE_AI_URL = os.getenv('SACABA_FREE_AI_URL', 'https://text.pollinations.ai/openai')
 FREE_AI_MODEL = os.getenv('SACABA_FREE_AI_MODEL', 'openai-fast')
-FREE_AI_TIMEOUT = int(os.getenv('SACABA_FREE_AI_TIMEOUT', '25'))
+FREE_AI_TIMEOUT = int(os.getenv('SACABA_FREE_AI_TIMEOUT', '8'))
 _FREE_AI_COOLDOWN = 30  # el servicio gratuito permite 1 respuesta cada 30 s por IP
 _free_ai_enabled = os.getenv('SACABA_FREE_AI', '1').strip().lower() not in ('0', 'false', 'no', 'off')
 _ai_disabled = os.getenv('SACABA_DISABLE_AI', '').strip().lower() not in ('', '0', 'false', 'no', 'off')
 _free_ai_cooldown_until = 0.0
 _ai_cache = {}
 _AI_CACHE_TTL = 900
+_WIKI_CACHE = {}
 
 # --- Traductor IA gratuito de quechua (Hugging Face - NLLB-200) ----
 # Actua como "especialista en quechua" junto a ChatGPT:
@@ -1157,14 +1190,14 @@ _LABELS = {
         "horario": "Horario", "consejo": "Consejo", "ubicacion": "Ubicacion",
         "requisitos": "Requisitos", "procedimiento": "Procedimiento",
         "tramites": "Tramites Disponibles:", "pregunta": "Que tramite te interesa?",
-        "multas": "Informacion de Multas:",
+        "multas": "Informacion de Multas:", "ficha": "Ficha completa",
     },
     "qu": {
         "donde": "Maypi", "costo": "Qullqi", "tiempo": "Pacha", "tiempo_estimado": "Pacha",
         "horario": "Yanapay pacha", "consejo": "Yuyaychay", "ubicacion": "Maypi kasqan",
         "requisitos": "Requisitokuna", "procedimiento": "Ruwanakuna",
         "tramites": "Tramitekuna:", "pregunta": "Ima trámite munanki?",
-        "multas": "Multakuna Yachay",
+        "multas": "Multakuna Yachay", "ficha": "Hunt'asqa ficha",
     },
 }
 
@@ -1202,7 +1235,8 @@ INTENT_PATTERNS = [
     ("greeting", r"^(hola|buenos|buenas|saludos|hey|imaynallan|napa|alli|kamisaki|que tal)\b"),
     ("farewell", r"^(gracias|adios|chau|hasta|yusulpakuy|tupananchiskama|hamusaq)\b"),
     ("smalltalk", r"\b(como estas|como te sientes|como te encuentras|como te va|como estas tu|como van las cosas|allillanchu|allinllachu)\b"),
-    ("identity", r"\b(quien eres|quien sos|que eres|como te llamas|para que sirves|para que eres|que puedes hacer|kanki ima|iman kanki)\b"),
+    ("identity", r"\b(quien eres|quien sos|que eres|como te llamas|para que sirves|para que eres|que puedes hacer|"
+                 r"kanki ima|iman kanki|ima sutiyki|iman sutiyki|ima sutiyoq|maymanta kanki|imata ruwayta atinki)\b"),
     ("donde", r"\b(donde|ubicacion|direccion|mapa|luhuynin|maypitaq|maypi)\b"),
     ("cuanto", r"\b(cuanto|cuesta|costo|precio|chaki|pagan|hayka|hayk'ataq|haykataq|qullqi)\b"),
     ("que_necesito", r"\b(que necesito|requisitos|documentos|papeles|que llevo|que debo|imakunata|requisitokuna|imakunatataq)\b"),
@@ -1243,13 +1277,99 @@ QUECHUA_TOKENS = (
     "punchaw", "simana", "kasqan", "kanchu", "tiyanchu", "nitaq", "utaq",
     "paykuna", "yupay", "waqaychay", "apamuy", "qhapaq", "tramitayta",
     "tramitata", "multayta", "carnetyta",
+    # Saludos y particulas que el dictado deja sueltos al inicio de la frase.
+    "imaynalla", "allinlla", "allillan", "yusulpayki", "maypi", "imata",
+    "imayna", "imaynata", "haykataq", "chayqa", "multata", "nan", "upallay",
+    # Pronombres y verbos tal como los dicta el oido castellano.
+    "ima", "muna", "munani", "kanki", "kani", "suti", "sutiyki", "riqsay",
+    "yanapawayki", "yachani", "yachanki", "rirqani", "hamusqayki",
 )
 
 # El dictado escribe una grafia aproximada; los sufijos quechuas delatan el
-# idioma aunque la palabra exacta no este en la lista de arriba.
+# idioma aunque la palabra exacta no este en la lista de arriba. Las formas
+# "ngui", "nqui" y "shun" son como el reconocedor castellano escribe -nki,
+# -nchi y -sun.
 QUECHUA_SUFIJOS = ("yta", "manta", "kuna", "nchik", "yman", "puni", "qta",
-                   "yki", "niy", "chik", "qti")
+                   "yki", "niy", "chik", "qti", "wan", "paq", "chu", "ngui",
+                   "nqui", "shun", "sun")
 QUECHUA_SIN_SUFIJO = {"manta", "amamanta"}
+
+# La normalizacion fonetica vive en el motor, no en un servicio externo: por
+# eso el quechua dictado se entiende aunque no haya ninguna clave de IA.
+NORMALIZACION_QUECHUA = True
+
+# ---------------------------------------------------------------------
+# QUECHUA DICTADO: comparacion fonetica
+# ---------------------------------------------------------------------
+# El reconocedor del navegador y del servidor solo conocen castellano, de modo
+# que "parlankichu" llega escrito "parlanguichu" y "qullqi" como "jullqui".
+# canon_qu reduce cualquier grafia a una forma fonetica unica; comparandola con
+# QUECHUA_HABLADO el quechua se reconoce aunque nadie lo haya escrito.
+_CANON_QU_PATRON = re.compile("qu|gu|hu|ju|ch|sh|ll|c|g|j|q|n")
+_CANON_QU_MAPA = {"qu": "k", "gu": "k", "hu": "w", "ju": "k", "ch": "ch",
+                  "sh": "s", "ll": "ll", "c": "k", "g": "k", "j": "k",
+                  "q": "k", "n": "n"}
+
+QUECHUA_HABLADO = (
+    "parlankichu", "parlankiman", "parlanki", "parlashun", "parlaway",
+    "parlami", "parluyki", "parlaqtiyki", "parlasqayki", "parlanayki",
+    "rimasunchik", "rimanayki", "rimakuy", "rimariy", "rimanqi", "rimaykuy",
+    "yusulpayki", "yuspakiki", "allillanchu", "imaynallan", "tupananchiskama",
+    "yanapaway", "yanapaykuy", "yanapawanki", "kanchu", "tiyanchu",
+    "imayna", "hayka", "maypitaq", "imataq", "kunanqa",
+    "runasimi", "kawsay", "waqaychay", "qullqi", "tramitekuna", "multakuna",
+)
+
+
+def canon_qu(texto):
+    """Reduce la grafia castellana del dictado a una forma fonetica unica."""
+    t = normalize(texto).replace("'", "").replace("-", "")
+    return _CANON_QU_PATRON.sub(lambda m: _CANON_QU_MAPA[m.group(0)], t)
+
+
+_CANON_HABLADO = [canon_qu(w) for w in QUECHUA_HABLADO]
+
+# El glosario del chatbot tambien sirve para reconocer el idioma: sus palabras
+# quechuas, reducidas a la forma fonetica, atrapan grafias que nadie escribio.
+_CANON_DICCIONARIO = None
+
+
+def _canon_del_diccionario():
+    global _CANON_DICCIONARIO
+    if _CANON_DICCIONARIO is None:
+        formas = []
+        for espanol, entrada in QUECHUA_LOCAL_DB.items():
+            qu = entrada.get("qu", "") if isinstance(entrada, dict) else ""
+            # Un prestamo del espanol ("Certificado", "Oficina") no demuestra
+            # nada: solo las palabras realmente quechuas sirven como prueba.
+            if canon_qu(espanol) == canon_qu(qu):
+                continue
+            for palabra in re.findall(r"[a-z\u00e1-\u00fa\u00f1]+", normalize(qu)):
+                if len(palabra) >= 5:
+                    formas.append(canon_qu(palabra.replace("\u00f1", "n")))
+        _CANON_DICCIONARIO = tuple(dict.fromkeys(f for f in formas if f))
+    return _CANON_DICCIONARIO
+
+
+def _cerca(palabra, formas, corte=0.86):
+    """True si `palabra` suena a alguna de las formas canonicas dadas."""
+    for forma in formas:
+        if difflib.SequenceMatcher(None, palabra, forma).ratio() >= corte:
+            return True
+    return False
+
+
+def hablado_quechua(texto):
+    """True si alguna palabra suena a quechua aunque este mal escrita."""
+    if not isinstance(texto, str):
+        return False
+    for palabra in re.findall(r"[a-z\u00e1-\u00fa]+", canon_qu(texto)):
+        if len(palabra) >= 5 and _cerca(palabra, _CANON_HABLADO):
+            return True
+        if len(palabra) >= 6 and _cerca(palabra, _canon_del_diccionario(), 0.90):
+            return True
+    return False
+
 
 # ---------------------------------------------------------------------
 # COMANDOS DE IDIOMA ("habla quechua", "responde en castellano"...)
@@ -1277,6 +1397,16 @@ _NO_ES_COMANDO = re.compile(
 _LANG_QU_PALABRAS = ("quechua", "quichua", "qhichwa", "qhechwa", "runasimi",
                      "kichwa", "kechua")
 _LANG_ES_PALABRAS = ("espanol", "castellano")
+# Formas foneticas canonicas: cubren lo que el dictado escribe ("quehua",
+# "kishua", "llamasimi") sin repetir la lista letra por letra.
+_LANG_QU_CANON = {canon_qu(p) for p in _LANG_QU_PALABRAS} | {
+    "kechua", "kichwa", "kikwa", "runasimi", "llamasimi", "qeswa", "keswa"}
+_LANG_ES_CANON = {canon_qu(p) for p in _LANG_ES_PALABRAS}
+# Pedidos de hablar en quechua tal como los devuelve el reconocedor castellano.
+_QU_HABLAR = ("parlankichu", "parlankiman", "parlanki", "parlashun", "parlaway",
+              "parlami", "parluyki", "parlasqayki", "parlanayki", "rimasunchik",
+              "rimanayki", "rimakuy", "rimariy", "rimanqi", "rimaykuy")
+_CANON_HABLAR = [canon_qu(w) for w in _QU_HABLAR]
 
 LANG_ACK = {
     "es": "\u00a1Listo! Desde ahora te hablo en **espa\u00f1ol**. \u00bfEn qu\u00e9 te ayudo?",
@@ -1287,12 +1417,17 @@ LANG_ACK_CORTO = {
     "qu": "Kunanmanta quechuapi rimasaq.",
 }
 GENERAL_FALLBACK = {
-    "es": ("Ahora mismo mi servicio de IA no responde, pero sigo contigo: puedo ayudarte "
-           "con **tr\u00e1mites, licencias, catastro, veh\u00edculos y multas** de Sacaba, y en "
-           "cuanto vuelva la conexi\u00f3n respondo cualquier otra pregunta. \u00bfQu\u00e9 necesitas?"),
-    "qu": ("Kunanqa IA yanapayniy manan kutichinchu, ichaqa qampaq kachkani: **tr\u00e1mitekuna, "
-           "licenciakuna, catastro, carrokuna nitaq multakuna**manta yanapayta atiymi. "
-           "\u00bfImata munanki?"),
+    "es": ("Con gusto te ayudo con eso. Mis datos más completos son los del municipio de "
+           "Sacaba: trámites, costos, requisitos, oficinas, horarios, licencias, catastro, "
+           "vehículos y multas.\n\nEscríbeme el nombre del trámite o el tema que te interesa "
+           "y te respondo con el costo, lo que necesitas y dónde se hace. También puedes "
+           "llamar al 4-4701677 o escribir a info@sacaba.gob.bo.\n\n¿Con qué te ayudo?"),
+    "qu": ("Kusikuywan yanapaykiman. Aswan hunt'asqa datosniyqa Sacaba municipiomanta: "
+           "trámites, qullqi, requisitokuna, oficinas, yanapay pacha, licenciakuna, "
+           "catastro, carrokuna nitaq multakuna.\n\nTrámitepa sutinta utaq ima yachay "
+           "munasqaykitapas qillqamuway; qullqinta, imata munasqaykita, maypichus "
+           "ruwakusqantapas willasqayki. 4-4701677 yupayman waqyayta utaq "
+           "info@sacaba.gob.bo qillqayta atinkitaqmi.\n\n¿Imawan yanapaykayman?"),
 }
 
 
@@ -1305,16 +1440,21 @@ def detect_lang_command(text):
         return None
     if _NO_ES_COMANDO.search(t):
         return None
+    k = canon_qu(text)
     palabras = re.findall(r"[a-z]+", t)
+    si = [canon_qu(p) for p in palabras]
     if len(palabras) <= 3:
-        if any(p in _LANG_QU_PALABRAS for p in palabras):
+        if any(p in _LANG_QU_CANON for p in si):
             return "qu"
-        if any(p in _LANG_ES_PALABRAS for p in palabras):
+        if any(p in _LANG_ES_CANON for p in si):
             return "es"
-    if _LANG_QU_RE.search(t):
+    if _LANG_QU_RE.search(t) or _LANG_QU_RE.search(k):
         return "qu"
-    if _LANG_ES_RE.search(t):
+    if _LANG_ES_RE.search(t) or _LANG_ES_RE.search(k):
         return "es"
+    # "¿hablas quechua?" dictado: parlankichu, rimasunchik...
+    if any(_cerca(p, _CANON_HABLAR) for p in si if len(p) >= 5):
+        return "qu"
     return None
 
 
@@ -1367,9 +1507,24 @@ _QU_FRASES = {
 _QU_FIX = {
     "kechua": "quechua", "quichua": "quechua", "kichua": "quechua",
     "qhechua": "quechua", "qhechwa": "quechua",
+    # como escribe el dictado castellano las palabras sueltas mas frecuentes
+    "quehua": "quechua", "quecha": "quechua", "qechua": "quechua",
+    "kishua": "quechua", "keshua": "quechua",
+    "parlanguichu": "parlankichu", "parlankuchu": "parlankichu",
+    "parlanqui": "parlanki", "parlashon": "parlashun", "parlanguiman": "parlankiman",
+    "rimariyu": "rimariy", "rimason": "rimasun", "jullqui": "qullqi",
     "yuspagara": "yusulpayki", "allinllachu": "allillanchu",
     "multacuna": "multakuna", "multakunas": "multakuna",
     "tramitecuna": "tramitekuna", "tramitekunata": "tramitekuna",
+    # El oido castellano escribe "yo quiero" como "noga mumani": se ajusta a la
+    # grafia que el motor reconoce.
+    "noga": "noqa", "joga": "noqa", "nuqa": "noqa", "noha": "noqa",
+    "mumani": "munani", "numani": "munani", "munauni": "munani",
+    "parlamishun": "parlanchik", "parlanchis": "parlanchik",
+    "tupanachiscama": "tupananchiskama",
+    "imaynanam": "imaynallan", "imaynaman": "imaynallan", "imanallan": "imaynallan",
+    "sulpayki": "yusulpayki", "yusulpaki": "yusulpayki",
+    "allinllan": "allillan", "alillanchu": "allillanchu",
 }
 
 
@@ -1424,7 +1579,9 @@ def detect_language(text):
         if len(palabra) >= 6 and palabra not in QUECHUA_SIN_SUFIJO:
             if palabra.endswith(QUECHUA_SUFIJOS):
                 return "qu"
-    return "es"
+    # Nada coincidio de forma exacta: el dictado escribe el quechua con
+    # grafias castellanas, asi que se compara de oido.
+    return "qu" if hablado_quechua(text) else "es"
 
 
 def detect_tramite(text):
@@ -1575,6 +1732,11 @@ def lookup_learned(msg, lang="es"):
     return best
 
 
+def brecha_de_conocimiento():
+    """Consultas que el motor no entendio, con su contador de repeticiones."""
+    return list(_load_unknown())
+
+
 def record_unknown(msg, lang="es"):
     """Registra una consulta que el bot no supo responder, para aprenderse luego."""
     text = str(msg).strip()
@@ -1684,7 +1846,7 @@ def _ficha_actualizada(ident):
         return False
 
 
-def build_ficha_string(ident, lang="es"):
+def build_ficha_string(ident, lang="es", intent=None):
     """Respuesta local con los datos oficiales de una ficha del portal."""
     try:
         from chatbot import tramites as _tramites
@@ -1694,26 +1856,40 @@ def build_ficha_string(ident, lang="es"):
     if not ficha:
         return None
     lb = _LABELS.get(lang, _LABELS["es"])
-    lineas = ["**" + ficha["n"] + "**", ficha.get("resumen", ""), ""]
-    if ficha.get("costo"):
-        lineas.append(lb["costo"] + ": " + ficha["costo"])
-    if ficha.get("tiempo"):
-        lineas.append(lb["tiempo"] + ": " + ficha["tiempo"])
-    requisitos = (ficha.get("requisitos") or [])[:4]
+    qu = ficha.get("qu") or {}
+    # En quechua se muestra el contenido traducido de la ficha (nombre,
+    # resumen, costo, requisitos, oficina y horarios), no el texto espanol.
+    datos = qu if (lang == "qu" and qu.get("resumen")) else ficha
+    lineas = ["**" + str(datos.get("n") or ficha["n"]) + "**",
+              str(datos.get("resumen") or ficha.get("resumen", "")), ""]
+    costo = datos.get("costo") or ficha.get("costo")
+    if costo:
+        lineas.append(lb["costo"] + ": " + str(costo))
+    tiempo = datos.get("tiempo") or ficha.get("tiempo")
+    if tiempo:
+        lineas.append(lb["tiempo"] + ": " + str(tiempo))
+    requisitos = (datos.get("requisitos") or ficha.get("requisitos") or [])[:4]
     if requisitos:
         lineas.append(lb["requisitos"] + ":")
         for i, req in enumerate(requisitos, 1):
-            lineas.append(str(i) + ". " + req)
-    oficina = ficha.get("oficina") or {}
+            lineas.append(str(i) + ". " + str(req))
+    oficina = datos.get("oficina") or ficha.get("oficina") or {}
     if oficina.get("nombre"):
-        donde = oficina["nombre"]
+        donde = str(oficina["nombre"])
         if oficina.get("direccion"):
-            donde += " - " + oficina["direccion"]
+            donde += " - " + str(oficina["direccion"])
         lineas.append(lb["donde"] + ": " + donde)
-    horarios = ficha.get("horarios") or []
+    horarios = datos.get("horarios") or ficha.get("horarios") or []
     if horarios:
-        lineas.append(lb["horario"] + ": " + horarios[0]["dias"] + " " + horarios[0]["horas"])
-    lineas.append("Ficha completa: " + ficha["url"])
+        lineas.append(lb["horario"] + ": " + str(horarios[0]["dias"]) + " " + str(horarios[0]["horas"]))
+    if intent == "como":
+        pasos = datos.get("pasos") or ficha.get("pasos") or []
+        if pasos:
+            lineas.append("")
+            lineas.append(lb["procedimiento"] + ":")
+            for i, paso in enumerate(pasos[:4], 1):
+                lineas.append(str(i) + ". " + str(paso.get("t", "")) + ": " + str(paso.get("d", "")))
+    lineas.append(lb.get("ficha", "Ficha completa") + ": " + ficha["url"])
     return "\n".join(lineas)
 
 
@@ -1850,55 +2026,422 @@ def _free_ai_complete(messages):
     global _free_ai_cooldown_until
     if not _free_ai_enabled or time.time() < _free_ai_cooldown_until:
         return None
-    try:
-        r = requests.post(
-            FREE_AI_URL,
-            json={
-                "model": FREE_AI_MODEL,
-                "messages": messages,
-                "temperature": 0.6,
-                "max_tokens": 600,
-                "referrer": "sacaba.gob.bo",
-            },
-            timeout=FREE_AI_TIMEOUT,
-        )
-        if r.status_code in (402, 429):
-            _free_ai_cooldown_until = time.time() + _FREE_AI_COOLDOWN
-            return None
-        if r.status_code >= 500:
-            _free_ai_cooldown_until = time.time() + 10
-            return None
-        if r.status_code != 200:
-            return None
-        data = r.json()
-        choices = data.get("choices") or []
-        if not choices:
-            return None
-        return ((choices[0].get("message") or {}).get("content") or "").strip() or None
-    except Exception:
+    modelos = [FREE_AI_MODEL] if FREE_AI_MODEL == "openai" else [FREE_AI_MODEL, "openai"]
+    for modelo in modelos:
+        try:
+            r = requests.post(
+                FREE_AI_URL,
+                json={
+                    "model": modelo,
+                    "messages": messages,
+                    "temperature": 0.6,
+                    "max_tokens": 600,
+                    "referrer": "sacaba.gob.bo",
+                },
+                timeout=FREE_AI_TIMEOUT,
+            )
+            if r.status_code in (402, 429):
+                # El servicio sin clave limita por IP: se espera lo que indique
+                # el mensaje para no gastar la cuota en intentos inutiles.
+                espera = _FREE_AI_COOLDOWN
+                m = re.search(r"retry after (\d+)", r.text or "", re.IGNORECASE)
+                if m:
+                    espera = max(5, min(int(m.group(1)) + 2, 90))
+                _free_ai_cooldown_until = time.time() + espera
+                return None
+            if r.status_code >= 500:
+                _free_ai_cooldown_until = time.time() + 10
+                return None
+            if r.status_code != 200:
+                continue
+            data = r.json()
+            choices = data.get("choices") or []
+            if not choices:
+                continue
+            texto = ((choices[0].get("message") or {}).get("content") or "").strip()
+            if texto:
+                return texto
+        except Exception:
+            continue
+    return None
+
+
+def _gemini_enviar(payload, timeout=25):
+    """Envia el payload a Gemini probando los modelos en orden.
+
+    Se llama por REST para no depender de `google-generativeai` (una
+    dependencia mas que puede faltar en el hosting) y se prueban varios
+    modelos porque los nombres antiguos se retiran con el tiempo. Devuelve el
+    texto generado o None, y recuerda el modelo que funciono."""
+    global _gemini_modelo_ok
+    if not GEMINI_AVAILABLE:
         return None
+    modelos = list(GEMINI_MODELOS)
+    if _gemini_modelo_ok:
+        # El modelo recordado va primero, pero si deja de responder se siguen
+        # probando los demas en vez de quedarse sin Gemini.
+        modelos = [_gemini_modelo_ok] + [m for m in modelos if m != _gemini_modelo_ok]
+    for modelo in modelos:
+        try:
+            r = requests.post(
+                "https://generativelanguage.googleapis.com/v1beta/models/"
+                + modelo + ":generateContent",
+                params={"key": GEMINI_API_KEY},
+                json=payload,
+                timeout=timeout,
+            )
+            if r.status_code != 200:
+                continue
+            data = r.json()
+            candidatos = data.get("candidates") or []
+            if not candidatos:
+                continue
+            partes = ((candidatos[0].get("content") or {}).get("parts") or [])
+            texto = "".join(p.get("text", "") for p in partes).strip()
+            if texto:
+                _gemini_modelo_ok = modelo
+                return texto
+        except Exception:
+            continue
+    return None
 
 
 def _gemini_complete(messages):
     """Misma conversacion enviada a Google Gemini cuando OpenAI no responde."""
     if not GEMINI_AVAILABLE:
         return None
-    try:
-        import google.generativeai as genai
-        genai.configure(api_key=GEMINI_API_KEY)
-        modelo = genai.GenerativeModel(GEMINI_MODEL)
-        partes = []
-        for m in messages:
-            if m["role"] == "system":
-                partes.append(m["content"])
-            elif m["role"] == "assistant":
-                partes.append("Sami: " + m["content"])
-            else:
-                partes.append("Ciudadano: " + m["content"])
-        r = modelo.generate_content("\n\n".join(partes))
-        return (getattr(r, "text", "") or "").strip() or None
-    except Exception:
+    sistema = "\n\n".join(m["content"] for m in messages if m["role"] == "system")
+    contenidos = []
+    for m in messages:
+        if m["role"] == "system":
+            continue
+        rol = "model" if m["role"] == "assistant" else "user"
+        contenidos.append({"role": rol, "parts": [{"text": m["content"]}]})
+    payload = {
+        "contents": contenidos,
+        "generationConfig": {"temperature": 0.55, "maxOutputTokens": 900},
+    }
+    if sistema:
+        payload["systemInstruction"] = {"parts": [{"text": sistema}]}
+    return _gemini_enviar(payload)
+
+
+
+# =====================================================================
+# VOZ: el audio del microfono se escucha EN EL MODELO, no en un reconocedor
+# =====================================================================
+# Los reconocedores de voz tradicionales no tienen quechua: Whisper admite 99
+# idiomas y `qu` no esta entre ellos, y la Web Speech API tampoco lo soporta.
+# Por eso el audio ya no se transcribe contra uno de esos motores para
+# "reinterpretar" despues: se envia tal cual al modelo multimodal, que lo
+# escucha, entiende runasimi y responde con los datos del municipio.
+MIME_AUDIO = ('audio/webm', 'audio/ogg', 'audio/mp4', 'audio/mpeg', 'audio/wav')
+MAX_AUDIO_BYTES = 3 * 1024 * 1024  # unos 3 minutos de opus; el pedido admite 20 MB
+
+_ORDEN_AUDIO_BASE = (
+    "El ciudadano hablo por el microfono. El audio puede estar en quechua "
+    "boliviano (runasimi de Cochabamba), en espanol, o mezclar los dos.\n"
+    "Contesta SOLO con estos bloques, sin markdown y sin agregar nada:\n"
+    "TRANSCRIPCION: <lo que dijo, tal como se escucha. Si hablo en quechua, "
+    "escribelo con ortografia quechua: q, j, k, w, apostrofo en las "
+    "glotalizadas (p'unchay) y los sufijos PEGADOS a la palabra "
+    "(multakuna, ruwanayki, carnetyki), nunca separados.>\n"
+    "RESPUESTA: <la respuesta al ciudadano en ESPANOL claro y calido, 2 a 5 "
+    "frases, con los datos municipales de la base de conocimiento.>"
+)
+
+# El quechua se pide como bloque aparte y obligatorio: la traduccion es un paso
+# controlado (no la respuesta suelta del modelo) y el espanol queda de referencia.
+_ORDEN_AUDIO_QU = (
+    "\nQUECHUA: <traduce RESPUESTA al quechua boliviano de Cochabamba, toda la "
+    "frase. Sufijos pegados (-kuna, -pi, -ta, -manta, -paq, -wan, -qa, -chu, "
+    "-yki) y los prestamos del espanol que la gente usa a diario (carnet, "
+    "tramite, multa, oficina, horario) dentro de la frase quechua. No dejes "
+    "ninguna frase en espanol.>"
+)
+
+
+def _separar_etiquetas(texto):
+    """Parte la salida en los bloques TRANSCRIPCION / RESPUESTA / QUECHUA.
+
+    Devuelve (dicho, espanol, quechua); quechua es None si no venia en la
+    respuesta, y entonces la traduccion se pide al traductor aparte."""
+    t = str(texto or '').strip()
+    marcas = []
+    for etiqueta, indice in (('TRANSCRIPCION', 0), ('RESPUESTA', 1), ('QUECHUA', 2)):
+        m = re.search(r'\b' + etiqueta + r'\s*[:\-]\s*', t, re.IGNORECASE)
+        if m:
+            marcas.append((m.start(), m.end(), indice))
+    if not marcas:
+        return '', t, None
+    marcas.sort()
+    trozos = [None, None, None]
+    for posicion, (inicio, fin, indice) in enumerate(marcas):
+        tope = marcas[posicion + 1][0] if posicion + 1 < len(marcas) else len(t)
+        trozos[indice] = t[fin:tope].strip()
+    return trozos[0] or '', trozos[1] or '', trozos[2]
+
+
+_TRADUCTOR_QU = (
+    "Eres traductor profesional de espanol a QUECHUA BOLIVIANO (runasimi de "
+    "Cochabamba) para un sitio municipal. Reglas:\n"
+    "- Traduce TODA la respuesta; no dejes frases sueltas en espanol.\n"
+    "- Pega los sufijos a la palabra: -kuna (plural), -pi/-ta/-manta (lugar), "
+    "-paq (destino), -wan (compania), -qa (tema), -chu (pregunta), "
+    "-yki/-ki (tuyo).\n"
+    "- Conserva como prestamos los terminos que la gente usa a diario en "
+    "espanol (carnet, licencia, tramite, oficina, multa, horario, requisito, "
+    "ventanilla) y declinalos en quechua: carnetyki, multapaq.\n"
+    "- Numeros, montos y telefonos se escriben como en espanol (25 Bs, "
+    "4-4701677).\n"
+    "- Devuelve UNICAMENTE la traduccion: sin markdown, sin comillas, sin "
+    "explicaciones ni notas del traductor.\n"
+)
+
+
+def traducir_a_quechua(texto):
+    """Paso es->qu obligatorio: la IA razona en espanol y aqui se traduce.
+
+    El orden es Gemini (si hay clave), el traductor publico de Google
+    Translate -gratis y con quechua- y NLLB-200 al final. Ninguna es
+    obligatoria: si las tres fallan, la respuesta queda en espanol."""
+    limpio = str(texto or '').strip()
+    if not limpio:
         return None
+    payload = {
+        "contents": [{"role": "user", "parts": [{"text": limpio}]}],
+        "systemInstruction": {"parts": [{"text": _TRADUCTOR_QU}]},
+        "generationConfig": {"temperature": 0.2, "maxOutputTokens": 900},
+    }
+    salida = _gemini_enviar(payload, timeout=20)
+    if salida:
+        salida = re.sub(r'^```[a-z]*\s*|```\s*$', '', salida.strip()).strip().strip('"').strip()
+        if salida:
+            return salida
+    desde_google = google_idioma.traducir(limpio, 'es', 'qu')
+    if desde_google:
+        return desde_google
+    return _hf_nllb_translate(limpio, src=NLLB_ES, tgt=NLLB_QU, timeout=12)
+
+
+def _qu_a_espanol(texto):
+    """Entiende lo que el ciudadano dijo en quechua.
+
+    El traductor publico de Google no pide clave y responde en segundos; NLLB
+    queda como respaldo porque necesita token de Hugging Face."""
+    limpio = str(texto or '').strip()
+    if not limpio:
+        return ""
+    desde_google = google_idioma.traducir(limpio, 'qu', 'es')
+    if desde_google and desde_google.strip():
+        return desde_google.strip()
+    return _hf_nllb_translate(limpio, src=NLLB_QU, tgt=NLLB_ES, timeout=10)
+
+
+def voz_responder(audio_bytes, mime='audio/webm', lang='es', history=None):
+    """Escucha el audio del microfono y arma la respuesta con los datos de Sacaba.
+
+    Devuelve {'texto', 'dicho', 'espanol', 'proveedor'} o None si ningun
+    proveedor pudo. Si el ciudadano hablo quechua, la respuesta pasa por la
+    traduccion obligatoria es->qu y el texto en espanol se devuelve aparte para
+    mostrarlo cuando la traduccion no convenza."""
+    if not audio_bytes:
+        raise ValueError('Audio vacio.')
+    if len(audio_bytes) > MAX_AUDIO_BYTES:
+        raise ValueError('El audio supera el maximo permitido.')
+    mime_ok = str(mime or 'audio/webm').split(';')[0]
+    if mime_ok not in MIME_AUDIO:
+        mime_ok = 'audio/webm'
+
+    orden = _ORDEN_AUDIO_BASE + (_ORDEN_AUDIO_QU if lang == 'qu' else '')
+    sistema = _SAMI_PERSONA + "\n" + orden + "\n\n" + _build_knowledge_context()
+    contenidos = []
+    for turno in _history_messages(history):
+        rol = "model" if turno["role"] == "assistant" else "user"
+        contenidos.append({"role": rol, "parts": [{"text": turno["content"]}]})
+    contenidos.append({"role": "user", "parts": [
+        {"inlineData": {"mimeType": mime_ok, "data": base64.b64encode(audio_bytes).decode()}},
+        {"text": "Escucha el audio y responde con los dos bloques pedidos."},
+    ]})
+    payload = {
+        "contents": contenidos,
+        "systemInstruction": {"parts": [{"text": sistema}]},
+        "generationConfig": {"temperature": 0.5, "maxOutputTokens": 900},
+    }
+    crudo = _gemini_enviar(payload, timeout=40)
+    if crudo:
+        dicho, respuesta, quechua = _separar_etiquetas(crudo)
+        if respuesta:
+            texto = respuesta
+            if lang == 'qu':
+                # Paso obligatorio: se usa el bloque QUECHUA del modelo y, si no
+                # trajo o venia en espanol, se traduce con el traductor aparte.
+                texto = quechua if (quechua and detect_language(quechua) == 'qu') else None
+                texto = texto or traducir_a_quechua(respuesta) or respuesta
+            return {'texto': texto, 'dicho': dicho, 'espanol': respuesta,
+                    'proveedor': _gemini_modelo_ok or 'gemini'}
+
+    # Sin Gemini se vuelve al camino viejo (reconocedor + chat) para que el
+    # microfono siga funcionando aunque el modelo de voz este caido.
+    texto_stt = ''
+    motores = [_stt_desde_audio]
+    if _sondeo('openai', _probar_openai)[0]:
+        # Whisper escucha mejor que el dictado gratuito, pero solo si la cuenta
+        # tiene creditos: sin ellos cada intento cuesta segundos y nada.
+        motores.insert(0, transcribe_audio)
+    for motor in motores:
+        try:
+            texto_stt = (motor(audio_bytes, lang) or '').strip()
+            if texto_stt:
+                break
+        except Exception:
+            continue
+    if not texto_stt:
+        return None
+    return {'texto': get_ai_resp(texto_stt, lang, history), 'dicho': texto_stt,
+            'espanol': None, 'proveedor': 'stt'}
+
+
+def _stt_desde_audio(audio_bytes, lang):
+    """Dictado de respaldo en el servidor (Google gratuito), si esta instalado."""
+    from chatbot import stt as _stt_mod
+    if not _stt_mod.DISPONIBLE:
+        raise RuntimeError('sin speech_recognition')
+    return _stt_mod.transcribir(audio_bytes, lang)
+
+
+def estado_voz():
+    """Que puede hacer hoy la ruta de voz, para que el widget lo diga al cliente.
+
+    Consulta el sondeo de cada cuenta en lugar de la sola presencia de la clave:
+    una clave sin creditos no sirve para transcribir nada."""
+    openai_vivo, _motivo = _sondeo('openai', _probar_openai)
+    if GEMINI_AVAILABLE:
+        proveedor = 'gemini'
+    elif openai_vivo:
+        proveedor = 'whisper'
+    else:
+        proveedor = 'stt'
+    audio_directo = bool(GEMINI_AVAILABLE)
+    return {
+        'modelo_de_audio': audio_directo,
+        'proveedor': proveedor,
+        # El quechua se entiende de dos maneras: el modelo escucha el audio
+        # (solo con Gemini) o el dictado en grafia castellana pasa por la
+        # normalizacion fonetica. La segunda funciona siempre, sin claves.
+        'audio_quechua': audio_directo,
+        'entiende_quechua': audio_directo or NORMALIZACION_QUECHUA,
+        'normalizacion_quechua': NORMALIZACION_QUECHUA,
+        'nota': ('El audio se escucha en el modelo: entiende quechua sin reconocedor.'
+                 if audio_directo else
+                 'Sin modelo de voz: el quechua se entiende normalizando el dictado.'),
+    }
+
+
+# =====================================================================
+# ESTADO REAL DE LOS PROVEEDORES
+# =====================================================================
+# La app declaraba cuatro proveedores "disponibles" cuando ninguno
+# respondia: la cuenta de OpenAI estaba sin creditos y las claves de
+# Gemini y Hugging Face eran huecos del .env. Aqui se consulta cada uno
+# de verdad, con cache, para que el widget y el panel digan la verdad.
+_SALUD_TTL = 180
+_sondeos = {}
+
+
+def _sondeo(nombre, prueba):
+    """Devuelve (vivo, motivo) y recuerda el ultimo sondeo un rato."""
+    global _sondeos
+    guardado = _sondeos.get(nombre)
+    ahora = time.time()
+    if guardado and ahora - guardado[2] < _SALUD_TTL:
+        return guardado[0], guardado[1]
+    try:
+        vivo, motivo = prueba()
+    except Exception as exc:
+        vivo, motivo = False, str(exc)[:90]
+    _sondeos[nombre] = (vivo, motivo, ahora)
+    return vivo, motivo
+
+
+def _probar_openai():
+    global _openai_dead, _openai_dead_until
+    if not _ai_available or _client is None:
+        return False, 'sin clave configurada'
+    if _openai_dead:
+        return False, 'cuenta sin creditos'
+    try:
+        _client.chat.completions.create(
+            model=CHAT_MODEL,
+            messages=[{'role': 'user', 'content': 'di OK'}],
+            max_tokens=2,
+        )
+        return True, 'activo'
+    except Exception as exc:
+        error = str(exc).lower()
+        if any(c in error for c in ('insufficient_quota', 'credit_balance',
+                                    'exceeded quota', 'no credits')):
+            _openai_dead = True
+            _openai_dead_until = time.time() + 600
+            return False, 'cuenta sin creditos'
+        if 'invalid_api_key' in error or '401' in error:
+            return False, 'clave invalida'
+        return False, 'sin respuesta'
+
+
+def _probar_gemini():
+    if not GEMINI_AVAILABLE:
+        return False, ('clave placeholder en el .env' if GEMINI_API_KEY
+                       else 'sin clave configurada')
+    payload = {
+        'contents': [{'role': 'user', 'parts': [{'text': 'di OK'}]}],
+        'generationConfig': {'maxOutputTokens': 5},
+    }
+    texto = _gemini_enviar(payload, timeout=15)
+    return (True, 'activo') if texto else (False, 'la clave no responde')
+
+
+def _probar_hf():
+    if not _clave_real(HF_API_TOKEN):
+        return False, ('token placeholder en el .env' if HF_API_TOKEN
+                       else 'sin token configurado')
+    if _HF_AVAILABLE is False:
+        return False, 'la API de traduccion no responde'
+    return True, 'activo'
+
+
+def _probar_google():
+    """Prueba el traductor publico de Translate (gratis, sin clave de API)."""
+    if google_idioma.disponible():
+        return True, 'gratis, sin clave'
+    return False, 'Translate no responde; se usa NLLB'
+
+
+def estado_proveedores():
+    """Que IA responde hoy, con el motivo cuando no.
+
+    Solo se sondea lo que de verdad hace falta: Hugging Face y el chat
+    gratuito se reportan por configuracion, porque probarlos cuesta una
+    espera larga o una cuota que se agota por IP."""
+    openai_vivo, openai_motivo = _sondeo('openai', _probar_openai)
+    gemini_vivo, gemini_motivo = _sondeo('gemini', _probar_gemini)
+    hf_vivo, hf_motivo = _sondeo('hf', _probar_hf)
+    google_vivo, google_motivo = _sondeo('google', _probar_google)
+    return {
+        'openai': {'clave': _clave_real(_api_key), 'vivo': openai_vivo,
+                   'motivo': openai_motivo, 'modelo': CHAT_MODEL},
+        'gemini': {'clave': bool(GEMINI_API_KEY), 'vivo': gemini_vivo,
+                   'motivo': gemini_motivo, 'modelo': _gemini_modelo_ok or GEMINI_MODEL},
+        'hf': {'clave': _clave_real(HF_API_TOKEN), 'vivo': hf_vivo, 'motivo': hf_motivo},
+        'traductor': {'vivo': google_vivo, 'gratis': True, 'quechua': google_vivo,
+                      'motivo': google_motivo},
+        'free': {'activa': bool(_free_ai_enabled),
+                 'vivo': bool(_free_ai_enabled) and time.time() >= _free_ai_cooldown_until,
+                 'motivo': 'en cooldown' if (_free_ai_enabled and time.time() < _free_ai_cooldown_until)
+                 else ('activa' if _free_ai_enabled else 'desactivada por SACABA_FREE_AI=0')},
+        'voz': estado_voz(),
+        'local': {'vivo': True, 'motivo': 'siempre responde sin internet'},
+    }
 
 
 def ai_provider():
@@ -1928,9 +2471,41 @@ def _history_messages(history):
     return mensajes
 
 
+_ultima_capa = "local"
+
+
+def ultima_capa():
+    """Capa del motor que contesto la ultima consulta: ficha, cache, openai,
+    gemini, free o local. La bitacora la registra porque es el KPI que dice
+    cuanto depende el servicio de los servicios pagos."""
+    return _ultima_capa
+
+
+# Charla que la base local ya resuelve bien: presentarse, saludar, dar el menu
+# o el horario. Enviarla a la IA suma segundos sin mejorar la respuesta.
+_KB_SUFICIENTE = {
+    "greeting", "farewell", "smalltalk", "identity", "menu_tramites",
+    "consejo", "contacto", "horarios", "guia_telefonica", "subalcaldias",
+}
+
+
+def _charla_local(msg, lang):
+    """Respuesta oficial inmediata cuando la pregunta es de las ya escritas."""
+    if detect_intent(msg) not in _KB_SUFICIENTE:
+        return None
+    respuesta = get_resp(msg, lang)
+    if respuesta and respuesta != UI[lang]["default"]:
+        return respuesta
+    return None
+
+
 def get_ai_resp(msg, lang="es", history=None, allow_ai=True):
+    global _ultima_capa
+    _ultima_capa = "local"
     if not allow_ai or _ai_disabled:
-        return get_resp(msg, lang)
+        # Sin IA (p. ej. al re-renderizar la conversacion al cambiar de idioma)
+        # se responde al instante con los datos locales, sin salir a la red.
+        return _local_answer(msg, lang, history, use_wiki=False)
 
     # El dictado puede separar el quechua ("multa cuna"): se interpreta antes
     # de buscar el tramite o de enviarlo a la IA.
@@ -1941,30 +2516,43 @@ def get_ai_resp(msg, lang="es", history=None, allow_ai=True):
     # Un tramite concreto ya tiene ficha oficial: responder al instante evita
     # 4-6 s de espera de la IA (y el riesgo de inventar costos u horarios).
     if _ficha_para(msg):
+        _ultima_capa = "ficha"
         return get_resp(msg, lang)
+
+    # Saluditos, horarios y menus ya estan escritas: contestar aqui quita los
+    # segundos que tarda cualquier proveedor externo.
+    charla = _charla_local(msg, lang)
+    if charla:
+        _ultima_capa = "kb"
+        return charla
 
     cache_key = None
     if not history:
         cache_key = (lang, " ".join(msg.lower().split())[:300])
         guardada = _ai_cache.get(cache_key)
         if guardada and time.time() - guardada[0] < _AI_CACHE_TTL:
+            _ultima_capa = "cache"
             return guardada[1]
 
     prompt = msg
     if lang == "qu":
-        traducido = _hf_nllb_translate(msg, src=NLLB_QU, tgt=NLLB_ES, timeout=10)
+        # El mensaje quechua se traduce al espanol para que la IA entienda la
+        # consulta exacta; el original se conserva debajo del bloque.
+        traducido = _qu_a_espanol(msg)
         if traducido:
-            prompt = "[QUE] " + traducido + " | [QU] " + msg
-        prompt = "[RESPONDE EN QUECHUA BOLIVIANO]\n" + prompt
+            prompt = "[ES] " + traducido + " | [QU] " + msg
 
     lang_instruction = (
         "IDIOMA: el ciudadano escribe en ESPANOL. Responde en espanol claro y calido."
         if lang == "es"
-        else "IDIOMA OBLIGATORIO: responde TODA la respuesta en QUECHUA boliviano "
-             "(runasimi de Cochabamba), no en espanol. Usa el quechua claro y cotidiano "
-             "de la gente y los prestamos que se usan a diario (carnet, licencia, "
-             "tramite, oficina, multa) cuando sean mas claros. Si no conoces una palabra, "
-             "usa el prestamo del espanol dentro de la frase quechua."
+        else "IDIOMA: el ciudadano hablo en QUECHUA. Responde con DOS bloques, sin "
+             "markdown y sin agregar nada mas:\n"
+             "RESPUESTA: <la respuesta en ESPANOL claro y calido, 2 a 5 frases>\n"
+             "QUECHUA: <esa misma respuesta, traducida al quechua boliviano de "
+             "Cochabamba: es la que lee el ciudadano. Pega los sufijos (-kuna, -pi, "
+             "-ta, -manta, -paq, -wan, -qa, -chu, -yki), usa los prestamos del "
+             "espanol que la gente maneja a diario (carnet, tramite, multa, oficina, "
+             "horario) dentro de la frase quechua y no dejes ninguna frase en espanol>"
     )
     sistema = _SAMI_PERSONA + "\n" + lang_instruction + "\n\n" + _build_knowledge_context()
     messages = [{"role": "system", "content": sistema}]
@@ -1972,7 +2560,12 @@ def get_ai_resp(msg, lang="es", history=None, allow_ai=True):
     messages.append({"role": "user", "content": prompt})
 
     text = None
-    global _openai_dead
+    global _openai_dead, _openai_dead_until
+    if _openai_dead and _openai_dead_until and time.time() > _openai_dead_until:
+        # Se vuelve a probar la cuenta cada tanto: si le cargan creditos o
+        # cambian la clave, la IA vuelve sin reiniciar el servidor.
+        _openai_dead = False
+        _openai_dead_until = 0.0
     if _ai_available and _client is not None and not _openai_dead:
         try:
             response = _client.chat.completions.create(
@@ -1982,28 +2575,38 @@ def get_ai_resp(msg, lang="es", history=None, allow_ai=True):
                 max_tokens=900,
             )
             text = (response.choices[0].message.content or "").strip() or None
+            if text:
+                _ultima_capa = "openai"
         except Exception as exc:
             error = str(exc).lower()
             if any(clave in error for clave in ("insufficient_quota", "credit", "invalid_api_key", "401")):
                 _openai_dead = True
+                _openai_dead_until = time.time() + 600
             text = None
 
     if not text:
         text = _gemini_complete(messages)
+        if text:
+            _ultima_capa = "gemini"
     if not text:
         text = _free_ai_complete(messages)
+        if text:
+            _ultima_capa = "free"
     if not text:
-        local = get_resp(msg, lang)
-        if local and local != UI[lang]["default"]:
-            return local
-        return GENERAL_FALLBACK.get(lang, GENERAL_FALLBACK["es"])
+        return _local_answer(msg, lang, history)
 
-    if lang == "qu" and detect_language(text) != "qu":
-        # La IA ya fue instruida para responder en quechua; solo si devolvio
-        # espanol se intenta traducir (con tiempo corto para no demorar la voz).
-        pulido = _hf_nllb_translate(text, src=NLLB_ES, tgt=NLLB_QU, timeout=12)
-        if pulido:
-            text = pulido.strip()
+    if lang == "qu":
+        # Paso obligatorio es->qu: se usa el bloque QUECHUA del modelo y, si falto
+        # o vino en espanol, se traduce aparte antes de mostrar nada.
+        _, en_espanol, en_quechua = _separar_etiquetas(text)
+        if en_espanol and not (en_quechua and detect_language(en_quechua) == "qu"):
+            en_quechua = traducir_a_quechua(en_espanol)
+        if en_quechua and detect_language(en_quechua) == "qu":
+            text = en_quechua
+        elif en_espanol:
+            # Sin traduccion posible (los dos traductores caidos) se muestra el
+            # espanol: mejor eso que devolver el bloque sin desarmar.
+            text = en_espanol
 
     if cache_key is not None:
         if len(_ai_cache) > 120:
@@ -2151,14 +2754,22 @@ def get_resp(msg, lang="es"):
     if tramite == "vehiculos" and ficha_id:
         # "Mi carro/moto" es demasiado general: si el mensaje apunta a una ficha
         # concreta (vender, inscribir, revisión), esa ficha responde mejor.
-        ficha = build_ficha_string(ficha_id, lang)
+        ficha = build_ficha_string(ficha_id, lang, intent)
         if ficha:
             return ficha
 
     if ficha_id and _ficha_actualizada(ficha_id):
         # Si un funcionario actualizó la ficha, sus datos mandan sobre el texto
         # genérico del motor para que el chat y el portal digan lo mismo.
-        ficha = build_ficha_string(ficha_id, lang)
+        ficha = build_ficha_string(ficha_id, lang, intent)
+        if ficha:
+            return ficha
+
+    if ficha_id and tramite and ficha_id != tramite:
+        # La busqueda por ficha entiende frases completas ("licencia de
+        # funcionamiento"); el motor antiguo a veces se queda con una palabra
+        # suelta ("documento" -> carnet) y responde del tramite equivocado.
+        ficha = build_ficha_string(ficha_id, lang, intent)
         if ficha:
             return ficha
 
@@ -2167,10 +2778,11 @@ def get_resp(msg, lang="es"):
         lb = _LABELS.get(lang, _LABELS["es"])
 
         def con_ficha(texto):
-            if ficha_id and "Ficha completa:" not in texto:
+            etiqueta = lb.get("ficha", "Ficha completa")
+            if ficha_id and etiqueta + ":" not in texto:
                 url = _ficha_url(ficha_id)
                 if url:
-                    texto += "\nFicha completa: " + url
+                    texto += "\n" + etiqueta + ": " + url
             return texto
 
         if intent == "donde":
@@ -2217,7 +2829,7 @@ def get_resp(msg, lang="es"):
 
     # Ficha oficial del portal cuando el mensaje la menciona con otras palabras
     if ficha_id:
-        ficha = build_ficha_string(ficha_id, lang)
+        ficha = build_ficha_string(ficha_id, lang, intent)
         if ficha:
             return ficha
 
@@ -2228,6 +2840,300 @@ def get_resp(msg, lang="es"):
 
     record_unknown(msg, lang)
     return UI[lang]["default"]
+
+
+# =====================================================================
+# RESPUESTA LOCAL BILINGUE (cuando ningun proveedor de IA responde)
+# =====================================================================
+_LOCAL_STOPWORDS = {
+    "para", "como", "cual", "cuales", "donde", "cuando", "cuanto", "cuanta",
+    "cuantos", "cuantas", "porque", "quiero", "necesito", "puedo", "puede",
+    "podrias", "hacer", "saber", "decir", "sobre", "hola", "sami", "gracias",
+    "favor", "tengo", "esta", "este", "esto", "esos", "esas", "mucho", "muy",
+    "seria", "fuese", "dime", "dame", "ayuda", "ayudame", "informacion",
+    "quien", "quienes", "fue", "fueron", "era", "eran", "hace", "hacen",
+    "tiene", "tienen", "significa", "explicame", "cuentame", "sabes", "conoces",
+    "sentido", "cosa", "cosas", "algo", "nada", "tema", "asunto",
+    "kay", "ima", "imata", "imataq", "imanataq", "imatataq", "imapitaq",
+    "maypi", "maypitaq", "hayka", "haykataq", "munani", "atini", "yanapaway",
+    "willay", "niway", "tapuy", "manta", "hina", "kunan", "kusikuy",
+    "nisqaqa", "nisqa", "kaptinqa", "atinki", "atinkichu", "kanchu", "tiyanchu",
+}
+
+
+def _local_tokens(text):
+    return [w for w in re.findall(r"[a-z0-9]+", normalize(str(text)))
+            if len(w) >= 4 and w not in _LOCAL_STOPWORDS]
+
+
+def _local_ficha_ranking(msg):
+    """Ordena las fichas por parecido real con la consulta (espanol o quechua)."""
+    try:
+        from chatbot import tramites as _tramites
+        fichas = _tramites.listado()
+    except Exception:
+        return []
+    consulta = _local_tokens(msg)
+    if not consulta:
+        return []
+    textos = []
+    for ficha in fichas:
+        qu = ficha.get("qu") or {}
+        # Solo el nombre, la categoria, el resumen y las palabras clave: los
+        # requisitos y pasos comparten palabras y confundirian la busqueda.
+        partes = [ficha.get("n", ""), ficha.get("cat", ""), ficha.get("resumen", "")]
+        partes += list(ficha.get("keywords") or [])
+        partes += [str(qu.get("n", "")), str(qu.get("resumen", ""))]
+        textos.append(" " + normalize(" ".join(partes)) + " ")
+    total = len(textos)
+    tope = max(2, total // 5)
+    ranking = []
+    for ficha, texto in zip(fichas, textos):
+        score = 0
+        for token in consulta:
+            if " " + token not in texto:
+                continue
+            # Las palabras que aparecen en casi todas las fichas ("oficina",
+            # "horario", "municipal") no identifican ningun tramite.
+            if sum(1 for otro in textos if " " + token in otro) > tope:
+                continue
+            score += 4 if len(token) >= 7 else 3
+        nombre = [w for w in re.findall(r"[a-z0-9]{4,}", normalize(ficha.get("n", "")))
+                  if w not in _LOCAL_STOPWORDS]
+        if nombre and all(w in consulta for w in nombre):
+            score += 6
+        if score >= 4:
+            ranking.append((score, ficha))
+    ranking.sort(key=lambda par: -par[0])
+    return ranking
+
+
+def _local_dictionary_answer(msg, lang):
+    """Traduce una palabra con el diccionario local (sin salir a internet)."""
+    texto = str(msg).strip()
+    t = normalize(texto)
+    if not re.search(r"\b(que significa|que quiere decir|como se dice|se dice|"
+                     r"traduce|traducir|significado|en quechua|quechua|qhichwa)\b", t):
+        return None
+    palabra = None
+    for patron in (r"como se dice\s+(.+?)\s+en\s+(?:quechua|qhichwa)",
+                   r"que significa\s+(.+)", r"que quiere decir\s+(.+)",
+                   r"traduce\s+(.+)", r"traducir\s+(.+)",
+                   r"(.+?)\s+en\s+(?:quechua|qhichwa)"):
+        m = re.search(patron, t)
+        if m:
+            palabra = m.group(1).strip(" ?!.,;:\"'")
+            break
+    if not palabra:
+        return None
+    palabra = re.sub(r"^(el|la|los|las|un|una|palabra|termino)\s+", "", palabra).strip()
+    if not palabra:
+        return None
+    clave = palabra.replace("¿", "").replace("?", "").strip()
+    dato = QUECHUA_LOCAL_DB.get(clave) or QUECHUA_LOCAL_DB.get(clave.lower())
+    if dato is None:
+        for es, valor in QUECHUA_LOCAL_DB.items():
+            if normalize(es) == normalize(clave):
+                dato = valor
+                break
+    if dato:
+        if lang == "qu":
+            return ("«" + clave + "» quechuapi **" + dato["qu"] + "** nin. Eh: "
+                    + dato.get("example", ""))
+        return ("«" + clave + "» en quechua se dice **" + dato["qu"] + "**. Ejemplo: "
+                + dato.get("example", ""))
+    for es, valor in QUECHUA_LOCAL_DB.items():
+        if normalize(valor["qu"]) == normalize(clave):
+            if lang == "qu":
+                return ("**" + valor["qu"] + "** nisqaqa «" + es + "» nin. Eh: "
+                        + valor.get("example", ""))
+            return ("**" + valor["qu"] + "** significa «" + es + "». Ejemplo: "
+                    + valor.get("example", ""))
+    return None
+
+
+def _wiki_buscar(base, consulta, cabeceras):
+    try:
+        r = requests.get(
+            base + "/w/api.php",
+            params={"action": "query", "list": "search", "srsearch": consulta,
+                    "format": "json", "srlimit": 1, "utf8": 1},
+            headers=cabeceras, timeout=6)
+        if r.status_code != 200:
+            return "", ""
+        resultados = ((r.json().get("query") or {}).get("search") or [])
+        if not resultados:
+            return "", ""
+        item = resultados[0]
+        extracto = re.sub(r"<[^>]+>", " ", item.get("snippet") or "")
+        return (item.get("title") or "", extracto)
+    except Exception:
+        return "", ""
+
+
+def _titulo_relacionado(titulo, tokens):
+    palabras = re.findall(r"[a-z0-9]+", normalize(titulo))
+    for token in tokens:
+        for palabra in palabras:
+            if token in palabra or palabra in token:
+                return True
+            if difflib.SequenceMatcher(None, token, palabra).ratio() >= 0.6:
+                return True
+    return False
+
+
+def _pista_definitoria(pista, tokens):
+    """Acepta un resultado solo si el avance define el tema, no si lo menciona
+    de pasada (una busqueda sin sentido puede caer en un articulo cualquiera)."""
+    t = normalize(pista)
+    if not re.search(r"\b(es un|es una|es el|es la|se refiere|consiste|significa|"
+                     r"kastilla simipi|nisqaqa|nisqa|kayqa)\b", t):
+        return False
+    for token in tokens:
+        if re.search(r"(?<![a-z])" + re.escape(token) + r"(?![a-z])", t):
+            return True
+    return False
+
+
+def _wikipedia_answer(msg, lang):
+    """Resumen de Wikipedia para preguntas generales cuando falla toda la IA.
+
+    Usa la Wikipedia en el mismo idioma del ciudadano (es o qu), sin clave y
+    con atribucion, para no dejar una pregunta general sin respuesta."""
+    consulta = " ".join(_local_tokens(msg))
+    if len(consulta) < 3:
+        return None
+    clave = (lang, consulta)
+    guardada = _WIKI_CACHE.get(clave)
+    if guardada and time.time() - guardada[0] < 3600:
+        return guardada[1]
+    cabeceras = {"User-Agent": "SamiSacaba/1.0 (info@sacaba.gob.bo)"}
+    base = "https://qu.wikipedia.org" if lang == "qu" else "https://es.wikipedia.org"
+    tokens = consulta.split()
+    # Los nombres propios ("Bolivia", "Francia") identifican mejor el tema que
+    # una palabra comun como "capital", que tiene su propio articulo generico.
+    originales = re.findall(r"[A-Za-z\u00c0-\u017f]+", str(msg))
+    nombres = {normalize(w) for w in originales if w[:1].isupper()} & set(tokens)
+    titulo, avance = _wiki_buscar(base, consulta, cabeceras)
+    valido = bool(titulo) and (_titulo_relacionado(titulo, tokens)
+                               or _pista_definitoria(avance, tokens))
+    if valido and nombres and not any(n in normalize(titulo) for n in nombres):
+        valido = False
+    # En quechua la busqueda con varias palabras acierta poco ("Francia
+    # capital" no encuentra el articulo): si el titulo no tiene relacion con
+    # la consulta se prueba palabra por palabra, los nombres propios primero.
+    if not valido:
+        candidatos = sorted(tokens, key=lambda t: (t not in nombres, -len(t)))[:2]
+        titulo = ""
+        for token in candidatos:
+            hallado, pista = _wiki_buscar(base, token, cabeceras)
+            if hallado and (_titulo_relacionado(hallado, [token])
+                            or _pista_definitoria(pista, [token])):
+                titulo = hallado
+                break
+    if not titulo:
+        return None
+    try:
+        detalle = requests.get(
+            base + "/api/rest_v1/page/summary/"
+            + requests.utils.quote(titulo.replace(" ", "_"), safe=""),
+            headers=cabeceras, timeout=6)
+        if detalle.status_code != 200:
+            return None
+        extracto = (detalle.json().get("extract") or "").strip()
+        if len(extracto) < (40 if lang == "qu" else 60):
+            return None
+        extracto = re.sub(r"\s+", " ", extracto)[:700]
+        if lang == "qu":
+            respuesta = ("**" + titulo + "**: " + extracto
+                         + "\n\nPukyu: Wikipidiya. Aswan tapukuykuna kaptinqa, qillqamuway.")
+        else:
+            respuesta = ("**" + titulo + "**: " + extracto
+                         + "\n\nFuente: Wikipedia en espanol. Si quieres, tambien "
+                           "te ayudo con un tramite de Sacaba.")
+        _WIKI_CACHE[clave] = (time.time(), respuesta)
+        if len(_WIKI_CACHE) > 80:
+            _WIKI_CACHE.clear()
+        return respuesta
+    except Exception:
+        return None
+
+
+def _local_general_answer(msg, lang, use_wiki=True):
+    """Respuesta util armada solo con los datos del municipio.
+
+    Nunca avisa de una caida de la IA: si no hay una ficha exacta, responde con
+    calidez, orienta y ofrece los canales de atencion en espanol o quechua."""
+    ranking = _local_ficha_ranking(msg)
+    if ranking:
+        ficha = ranking[0][1]
+        detalle = build_ficha_string(ficha["id"], lang)
+        if detalle:
+            qu = ficha.get("qu") or {}
+            if lang == "qu":
+                intro = ("Kusikuywan yanapaykiman. Kaymi **"
+                         + str(qu.get("n") or ficha["n"]) + "**manta yachasqay:")
+                cierre = "\n\nAswan tapukuykuna kaptinqa, qillqamuway."
+            else:
+                intro = "Con gusto, esto es lo que tengo de **" + ficha["n"] + "**:"
+                cierre = "\n\nSi quieres el detalle de otro tramite, dime cual y te lo explico."
+            return intro + "\n\n" + detalle + cierre
+
+    t = normalize(msg)
+    if re.search(r"\b(ayuda|ayudame|que haces|que sabes|como funciona|"
+                 r"no se que hacer|yanapaway|imatataq ruwanki|"
+                 r"imata ruwayta atini|imata ruwayta atinki)\b", t):
+        return UI[lang].get("identity", UI["es"]["identity"])
+    if use_wiki:
+        wiki = _wikipedia_answer(msg, lang)
+        if wiki:
+            return wiki
+    return GENERAL_FALLBACK.get(lang, GENERAL_FALLBACK["es"])
+
+
+def _garantizar_quechua(texto):
+    """Quien habla quechua debe leer quechua: si algo salio en espanol, se traduce.
+
+    Usa el traductor publico de Google (gratis, ~0.3 s); si falla, deja el
+    espanol antes que devolver nada vacio."""
+    if not texto or detect_language(texto) == "qu":
+        return texto
+    return traducir_a_quechua(texto) or texto
+
+
+def _local_answer(msg, lang="es", history=None, use_wiki=True):
+    """Ruta sin proveedores: datos oficiales primero y respuesta calida despues."""
+    if lang not in LANGUAGES:
+        lang = "es"
+    respuesta = _local_answer_bruto(msg, lang, history, use_wiki)
+    # La consulta de diccionario ya trae la palabra quechua: traducirla otra vez
+    # la desarmaria.
+    if lang == "qu" and not _local_dictionary_answer(msg, lang):
+        respuesta = _garantizar_quechua(respuesta)
+    return respuesta
+
+
+def _local_answer_bruto(msg, lang, history, use_wiki):
+    # "Como se dice agua en quechua" es una consulta de diccionario, no de
+    # tramites: se responde antes de que el motor la asocie a una ficha.
+    dic = _local_dictionary_answer(msg, lang)
+    if dic:
+        return dic
+    texto = get_resp(msg, lang)
+    if texto and texto != UI[lang]["default"]:
+        return texto
+    # Continuidad: "cuanto cuesta" despues de "quiero mi carnet".
+    if isinstance(history, list):
+        for turno in reversed(history):
+            if not isinstance(turno, dict) or turno.get("role") != "user":
+                continue
+            previo = turno.get("content")
+            if isinstance(previo, str) and _ficha_para(previo):
+                combinado = get_resp(previo + " " + str(msg), lang)
+                if combinado and combinado != UI[lang]["default"]:
+                    return combinado
+                break
+    return _local_general_answer(msg, lang, use_wiki)
 
 
 # =====================================================================
@@ -2986,6 +3892,42 @@ QUECHUA_LOCAL_DB = {
     "mal": {"qu": "Mana allin", "example": "Mana allinmi."},
 }
 
+# Las palabras que ensena el publico vivian solo en memoria: al reiniciar el
+# servidor se perdian y el municipio no podia revisarlas. Se guardan aparte
+# para no mezclarlas con el glosario revisado por los funcionarios.
+GLOSARIO_FILE = _data_dir() / "glosario_aprendido.json"
+_GLOSARIO_APRENDIDO = {}
+
+
+def _cargar_glosario_aprendido():
+    try:
+        datos = json.loads(GLOSARIO_FILE.read_text(encoding="utf-8"))
+    except Exception:
+        return
+    if isinstance(datos, dict):
+        for clave, valor in datos.items():
+            if isinstance(valor, dict) and valor.get("qu"):
+                _GLOSARIO_APRENDIDO[clave] = valor
+                QUECHUA_LOCAL_DB[clave] = valor
+
+
+def _guardar_glosario_aprendido():
+    try:
+        GLOSARIO_FILE.parent.mkdir(parents=True, exist_ok=True)
+        GLOSARIO_FILE.write_text(
+            json.dumps(_GLOSARIO_APRENDIDO, ensure_ascii=False, indent=2),
+            encoding="utf-8")
+    except Exception:
+        pass
+
+
+_cargar_glosario_aprendido()
+
+
+def glosario_aprendido():
+    """Palabras quechuas ensenadas por los ciudadanos, pendientes de revision."""
+    return dict(_GLOSARIO_APRENDIDO)
+
 
 def translate_word(word, source_lang="es", target_lang="qu"):
     """Traduce una palabra usando Glosbe Dictionary API.
@@ -3169,6 +4111,8 @@ def learn_quechua_word(es_word, qu_word, example=""):
         "qu": qu_word.strip(),
         "example": example if example else f"{es_word} = {qu_word}",
     }
+    _GLOSARIO_APRENDIDO[es_lower] = QUECHUA_LOCAL_DB[es_lower]
+    _guardar_glosario_aprendido()
     return {
         "word": es_lower,
         "translation": qu_word,
