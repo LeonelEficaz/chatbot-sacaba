@@ -10,8 +10,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/portal-2026.css') }}?v=20261111a">
-    <link rel="stylesheet" href="{{ url_for('static', filename='chatbot/chatbot-widget.css') }}?v=20261111a">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/portal-2026.css') }}?v=20261111b">
+    <link rel="stylesheet" href="{{ url_for('static', filename='chatbot/chatbot-widget.css') }}?v=20261111b">
 </head>
 <body class="portal-body">
 
@@ -80,6 +80,22 @@
                     </g>
                 </g>
             </symbol>
+
+            <!-- Rama de tipa decorativa, del modelo visual municipal -->
+            <symbol id="sacaba-rama" viewBox="0 0 220 130">
+                <path d="M6 124C42 108 84 82 122 50 150 26 182 14 214 12" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round"/>
+                <g fill="currentColor">
+                    <ellipse cx="44" cy="98" rx="19" ry="7.5" transform="rotate(-34 44 98)"/>
+                    <ellipse cx="34" cy="112" rx="16" ry="6.5" transform="rotate(24 34 112)"/>
+                    <ellipse cx="78" cy="76" rx="19" ry="7.5" transform="rotate(-30 78 76)"/>
+                    <ellipse cx="66" cy="92" rx="16" ry="6.5" transform="rotate(28 66 92)"/>
+                    <ellipse cx="112" cy="52" rx="19" ry="7.5" transform="rotate(-28 112 52)"/>
+                    <ellipse cx="100" cy="70" rx="16" ry="6.5" transform="rotate(30 100 70)"/>
+                    <ellipse cx="148" cy="34" rx="18" ry="7" transform="rotate(-24 148 34)"/>
+                    <ellipse cx="138" cy="52" rx="15" ry="6" transform="rotate(32 138 52)"/>
+                    <ellipse cx="184" cy="22" rx="16" ry="6.5" transform="rotate(-18 184 22)"/>
+                </g>
+            </symbol>
         </defs>
     </svg>
 
@@ -99,13 +115,6 @@
                 </span>
             </a>
 
-            <nav class="p-nav" aria-label="Navegación principal">
-                <button class="p-nav-link active" data-nav="inicio"><i class="fas fa-house"></i> Inicio</button>
-                <button class="p-nav-link" data-nav="tramites"><i class="fas fa-folder-open"></i> Trámites</button>
-                <button class="p-nav-link" data-nav="multas"><i class="fas fa-triangle-exclamation"></i> Multas</button>
-                <button class="p-nav-link" data-nav="institucion"><i class="fas fa-landmark"></i> Institución</button>
-            </nav>
-
             <div class="p-actions">
                 <button class="p-icon-btn" id="btnVoice" aria-label="Activar o desactivar la voz de Sami" aria-pressed="true" title="Voz de Sami"><i class="fas fa-volume-high"></i></button>
                 <button class="p-icon-btn" id="btnTheme" aria-label="Cambiar tema" title="Cambiar tema"><i class="fas fa-moon"></i></button>
@@ -113,6 +122,15 @@
                 <a class="p-login" href="{{ url_for('login') }}"><i class="fas fa-user-lock"></i><span>Funcionarios</span></a>
             </div>
         </div>
+
+        <nav class="p-nav" aria-label="Navegación principal">
+            <div class="p-nav-inner">
+                <button class="p-nav-link active" data-nav="inicio"><i class="fas fa-house"></i> Inicio</button>
+                <button class="p-nav-link" data-nav="tramites"><i class="fas fa-folder-open"></i> Trámites</button>
+                <button class="p-nav-link" data-nav="multas"><i class="fas fa-triangle-exclamation"></i> Multas</button>
+                <button class="p-nav-link" data-nav="institucion"><i class="fas fa-landmark"></i> Institución</button>
+            </div>
+        </nav>
     </header>
 
     <!-- MESA DE TRABAJO -->
@@ -184,8 +202,10 @@
                     </div>
 
                     <div class="p-hero-art" aria-hidden="true">
-                        <div class="p-orbit orbit-a"></div>
-                        <div class="p-orbit orbit-b"></div>
+                        <div class="p-arch">
+                            <img src="{{ url_for('static', filename='img/portada-sacaba.webp') }}" alt="">
+                        </div>
+                        <span class="p-arch-swoosh"></span>
                         <div class="p-hero-card card-a"><i class="fas fa-file-signature"></i><span>20 fichas</span><strong>detalladas</strong></div>
                         <div class="p-hero-card card-b"><i class="fas fa-qrcode"></i><span>Pago</span><strong>con QR</strong></div>
                         <div class="p-hero-card card-c"><i class="fas fa-clock"></i><span>Atención</span><strong>24/7</strong></div>
@@ -194,12 +214,13 @@
                         </div>
                     </div>
                 </div>
+                <svg class="p-leaf p-leaf-hero" aria-hidden="true"><use href="#sacaba-rama"></use></svg>
 
                 <div class="p-stats" role="list">
-                    <div class="p-stat" role="listitem"><strong>20</strong><span>trámites explicados</span></div>
-                    <div class="p-stat" role="listitem"><strong>2</strong><span>idiomas: ES / QU</span></div>
-                    <div class="p-stat" role="listitem"><strong>24/7</strong><span>asistencia en línea</span></div>
-                    <div class="p-stat" role="listitem"><strong>4</strong><span>canales de pago</span></div>
+                    <div class="p-stat" role="listitem"><i class="fas fa-list-check"></i><div><strong>20</strong><span>trámites explicados</span></div></div>
+                    <div class="p-stat" role="listitem"><i class="fas fa-comments"></i><div><strong>2</strong><span>idiomas: ES / QU</span></div></div>
+                    <div class="p-stat" role="listitem"><i class="fas fa-headset"></i><div><strong>24/7</strong><span>asistencia en línea</span></div></div>
+                    <div class="p-stat" role="listitem"><i class="fas fa-credit-card"></i><div><strong>4</strong><span>canales de pago</span></div></div>
                 </div>
 
                 <section class="p-section" id="seccionTramites">
@@ -274,6 +295,15 @@
         </main>
     </div>
 
+    <div class="p-wave" aria-hidden="true">
+        <svg viewBox="0 0 1440 130" preserveAspectRatio="none">
+            <path fill="var(--ribbon)" opacity=".8" d="M0,70 C240,20 420,110 720,70 C1020,30 1200,110 1440,60 L1440,130 L0,130 Z"/>
+            <path fill="var(--olive)" d="M0,92 C260,44 460,124 760,88 C1040,55 1240,120 1440,78 L1440,130 L0,130 Z"/>
+            <path fill="var(--forest)" d="M0,112 C300,84 520,128 820,110 C1080,95 1270,126 1440,104 L1440,130 L0,130 Z"/>
+        </svg>
+        <svg class="p-leaf"><use href="#sacaba-rama"></use></svg>
+    </div>
+
     <footer class="p-footer">
         <div class="p-footer-inner">
             <div class="p-footer-brand">
@@ -326,8 +356,8 @@
         window.SACABA_TRAMITES = {{ tramites|tojson }};
         window.SACABA_CATS = {{ categorias|tojson }};
     </script>
-    <script src="{{ url_for('static', filename='js/main.js') }}?v=20261111a"></script>
-    <script src="{{ url_for('static', filename='chatbot/chatbot-widget.js') }}?v=20261111a"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}?v=20261111b"></script>
+    <script src="{{ url_for('static', filename='chatbot/chatbot-widget.js') }}?v=20261111b"></script>
     <script>initChatbotWidget({ defaultLanguage: 'es', embedded: true });</script>
 </body>
 </html>
